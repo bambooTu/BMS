@@ -31,6 +31,7 @@
 #include "dtc.h"
 #include "fault.h"
 #include "indicator.h"
+#include "hv_setup.h"
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

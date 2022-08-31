@@ -61,6 +61,7 @@
 
 
 void TIMER_4_InterruptHandler( void );
+void CAN1_InterruptHandler( void );
 void CAN4_InterruptHandler( void );
 
 
@@ -69,6 +70,11 @@ void CAN4_InterruptHandler( void );
 void __ISR(_TIMER_4_VECTOR, ipl1SRS) TIMER_4_Handler (void)
 {
     TIMER_4_InterruptHandler();
+}
+
+void __ISR(_CAN1_VECTOR, ipl1SRS) CAN1_Handler (void)
+{
+    CAN1_InterruptHandler();
 }
 
 void __ISR(_CAN4_VECTOR, ipl1SRS) CAN4_Handler (void)

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "hv_setup.h": "c",
+        "sys_parameter.h": "c"
+    }
+}

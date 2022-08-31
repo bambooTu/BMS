@@ -185,6 +185,8 @@ void SYS_Initialize ( void* data )
 
     CAN4_Initialize();
 
+    CAN1_Initialize();
+
     EEPROM_Initialize();
 
 	UART5_Initialize();
