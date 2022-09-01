@@ -7,6 +7,7 @@
 // *****************************************************************************
 // *****************************************************************************
 #include "definitions.h"  // SYS function prototypes
+#include "dtc.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 

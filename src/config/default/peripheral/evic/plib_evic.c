@@ -57,6 +57,8 @@ void EVIC_Initialize( void )
     /* Set up priority and subpriority of enabled interrupts */
     IPC4SET = 0x4000000 | 0x0;  /* TIMER_4:  Priority 1 / Subpriority 0 */
     IPC41SET = 0x4000000 | 0x0;  /* CAN1:  Priority 1 / Subpriority 0 */
+    IPC42SET = 0x4 | 0x0;  /* CAN2:  Priority 1 / Subpriority 0 */
+    IPC46SET = 0x4000000 | 0x0;  /* CAN3:  Priority 1 / Subpriority 0 */
     IPC47SET = 0x4 | 0x0;  /* CAN4:  Priority 1 / Subpriority 0 */
 
 

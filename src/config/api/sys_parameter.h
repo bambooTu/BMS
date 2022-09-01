@@ -24,40 +24,40 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
+#include "bms_ctrl.h"
 #include "commonly_used.h"
 #include "current_gauge.h"
 #include "current_sensor.h"
 #include "debounce.h"
 #include "dtc.h"
 #include "fault.h"
-#include "indicator.h"
 #include "hv_setup.h"
-
+#include "indicator.h"
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    //#define NVM_MODE
+//#define NVM_MODE
 
 #define APP_FLASH_ADDRESS 0
 #define EEPROM_START_ADDR APP_FLASH_ADDRESS
 
-    /****** EERPOM Address 0x040 ~ 0x7FF Storage BMS Parameter ******/
-    /* section 1 */
+/****** EERPOM Address 0x040 ~ 0x7FF Storage BMS Parameter ******/
+/* section 1 */
 #define EEPROM_BMS_START_ADDR (EEPROM_START_ADDR + 0x000)
 #define EEPROM_BMS_END_ADDR   (EEPROM_START_ADDR + 0x7FF)
 
-    /****** EEPROM Address 0x800 ~ 0x8FF Storage Emergency Parameter ******/
-    /* section 2 */
+/****** EEPROM Address 0x800 ~ 0x8FF Storage Emergency Parameter ******/
+/* section 2 */
 #define EEPROM_EMG_START_ADDR (EEPROM_START_ADDR + 0x800)
 #define EEPROM_EMG_END_ADDR   (EEPROM_START_ADDR + 0x8FF)
-    /****** EEPROM Address 0x900 ~ 0xFFF Storage Special Parameter ******/
-    /* section 3 */
+/****** EEPROM Address 0x900 ~ 0xFFF Storage Special Parameter ******/
+/* section 3 */
 #define EEPROM_SPE_START_ADDR (EEPROM_START_ADDR + 0x900)
 #define EEPROM_SPE_END        (EEPROM_START_ADDR + 0xFFF)
 
-    /*** EEPROM Initial Parameter ***/
+/*** EEPROM Initial Parameter ***/
 #define EEP_KEY_ID       0x55 /* BMS:0x55, BMU:0x65 */
 #define SVN_NUMBER       202
 #define BMS_COMM_ADDR    0x00 /* Communication Address */
@@ -78,195 +78,180 @@ extern "C" {
 #define CELL_DESIGN_CAP      78 /*unit:Ah*/
 #define CELL_DESIGN_MAX_VOLT 3485
 
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Data Types
-    // *****************************************************************************
-    // *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
 
-    typedef enum {
-        SYS_INIT = 0,
-        SYS_TURN_OFF, /*Relay Open*/
-        SYS_TURN_ON, /*Relay Close @ 0 Ampere*/
-        SYS_CHARGING,
-        SYS_DISCHARGING,
-        SYS_FAULT, /*System Fault?Waiting For Reset*/
-        SYS_GOTO_RESET, /*Reset Mode*/
-        SYS_EMERGENCY, /*Emergency Relay Off*/
-        SYS_PRE_ON, /*PreChg Relay Close*/
-        SYS_BMS_MAX
-    } BMS_STATUS_e; /*BMS Status*/
+typedef enum {
+    SYS_INIT = 0,
+    SYS_TURN_OFF, /*Relay Open*/
+    SYS_TURN_ON,  /*Relay Close @ 0 Ampere*/
+    SYS_CHARGING,
+    SYS_DISCHARGING,
+    SYS_FAULT,      /*System Fault?Waiting For Reset*/
+    SYS_GOTO_RESET, /*Reset Mode*/
+    SYS_EMERGENCY,  /*Emergency Relay Off*/
+    SYS_PRE_ON,     /*PreChg Relay Close*/
+    SYS_BMS_MAX
+} BMS_STATUS_e; /*BMS Status*/
 
-    typedef enum { /*Remote Control*/
-        BMS_OFF = 0, /**Power Off*/
-        BMS_CHG_ON, /**Remote Control?Power On @ Charge Mode*/
-        BMS_DISCHG_ON, /**Remote Control?Power On @ Discharge Mode*/
-        BMS_CHG_PRE_ON, /**Remote Control?Pre-Power On @ Charge Mode @ Branch Parrellel*/
-        BMS_DISCHG_PRE_ON, /**Remote Control?Pre-Power On @ Discharge Mode @ Branch Parrellel*/
-        /*Internal Control*/
-        BMS_HAND_ON, /**Manual Control*/
-        BMS_RESET,
-        BMS_OCCUR_FAULT,
-        BMS_OCCUR_EMRG,
-        BMS_CONTROL_MAX
-    } BMS_WORK_MODE_e;
+typedef enum {
+    RLY_OFF = 0, /**Relay Open*/
+    RLY_PRE_ON,  /**Relay Pre-Close*/
+    RLY_ON,      /**Relay Close*/
+    RLY_FAULT,
+} RELAY_STATUS_e;
 
-    typedef enum {
-        RLY_OFF = 0, /**Relay Open*/
-        RLY_PRE_ON, /**Relay Pre-Close*/
-        RLY_ON, /**Relay Close*/
-        RLY_FAULT,
-    } RELAY_STATUS_e;
+typedef enum {
+    BAL_OFF = 0,      /* Balance Off */
+    BAL_CHG,          /* Balance @ Charging */
+    BAL_DISCHG,       /* Balance @ Dischging */
+    BAL_CHG_N_DISCHG, /* Balance @ Discharging & Charging */
+    BAL_FORCE,        /* ForceBalance*/
+    BAL_MAX
+} BALANCE_MODE_e;
 
-    typedef enum {
-        BAL_OFF = 0, /* Balance Off */
-        BAL_CHG, /* Balance @ Charging */
-        BAL_DISCHG, /* Balance @ Dischging */
-        BAL_CHG_N_DISCHG, /* Balance @ Discharging & Charging */
-        BAL_FORCE, /* ForceBalance*/
-        BAL_MAX
-    } BALANCE_MODE_e;
+typedef struct {
+    BALANCE_MODE_e Mode;     /* Balance Mode */
+    unsigned short Volt;     /* unit:m,Balance Target Voltage */
+    unsigned char  VoltDiff; /* unit:mV,Voltage Different */
+} BALANCE_PARA_t;
 
-    typedef struct {
-        BALANCE_MODE_e Mode; /* Balance Mode*/
-        unsigned short Volt; /* unit:m,Balance Target Voltage */
-        unsigned char VoltDiff; /* unit:mV,Voltage Different */
-    } BALANCE_PARA_t;
+typedef struct {
+    unsigned char  EepromKey; /* Eeprom Identifier */
+    unsigned short EepromSVN; /* Eeprom Sub Version */
 
-    typedef struct {
-        unsigned char EepromKey; /* Eeprom Identifier */
-        unsigned short EepromSVN; /* Eeprom Sub Version */
+    /***BMS Parameter Setting***/
+    /**Over/Under Temperature**/
+    FAULT_PARA_t OTP;  /* Over Temperature Protection */
+    FAULT_PARA_t OTW;  /* Over Temperature Warning */
+    FAULT_PARA_t UTP;  /* Under Temperature Protection */
+    FAULT_PARA_t UTW;  /* Under Temperature Warning */
+    FAULT_PARA_t UBTW; /* Unbalance Temperature Warning */
 
-        /***BMS Parameter Setting***/
-        /**Over Temperature**/
-        FAULT_PARA_t OTP; /* Over Temperature Protection */
-        FAULT_PARA_t OTW; /* Over Temperature Warning */
-        FAULT_PARA_t UTP; /* Under Temperature Protection */
-        FAULT_PARA_t UTW; /* Under Temperature Warning */
-        FAULT_PARA_t UBTW; /* Unbalance Temperature Warning */
+    /**Over/Under Voltage**/
+    FAULT_PARA_t BusOVP;  /* Bus OverVoltage Protection */
+    FAULT_PARA_t BusOVW;  /* Bus OverVoltage Warning */
+    FAULT_PARA_t BusUVP;  /* Bus UnderVoltage Protection */
+    FAULT_PARA_t BusUVW;  /* Bus UnderVoltage Warning */
+    FAULT_PARA_t CellUBP; /* Cell Unbalance VoltageWarning */
+    FAULT_PARA_t CellUBW; /* Cell Unbalance VoltageWarning */
+    FAULT_PARA_t CellOVP; /* Cell OverVoltage Warning */
+    FAULT_PARA_t CellUVP; /* Cell OverVoltage Warning */
 
-        /**Over Voltage**/
-        FAULT_PARA_t BusOVP; /* Bus OverVoltage Protection */
-        FAULT_PARA_t BusOVW; /* Bus OverVoltage Warning */
-        FAULT_PARA_t BusUVP; /* Bus UnderVoltage Protection */
-        FAULT_PARA_t BusUVW; /* Bus UnderVoltage Warning */
-        FAULT_PARA_t CellUBP; /* Cell Unbalance VoltageWarning */
-        FAULT_PARA_t CellUBW; /* Cell Unbalance VoltageWarning */
-        FAULT_PARA_t CellOVP; /* Cell OverVoltage Warning */
-        FAULT_PARA_t CellUVP; /* Cell OverVoltage Warning */
+    /**OverCurrent**/
+    FAULT_PARA_t ODCP; /*Over Discharge Current Protection*/
+    FAULT_PARA_t ODCW; /*Over Discharge Current Warning*/
+    FAULT_PARA_t OCCP; /*Over Charge Current Protection*/
+    FAULT_PARA_t OCCW; /*Over Charge Current Warning*/
 
-        /**OverCurrent**/
-        FAULT_PARA_t ODCP; /*Over Discharge Current Protection*/
-        FAULT_PARA_t ODCW; /*Over Discharge Current Warning*/
-        FAULT_PARA_t OCCP; /*Over Charge Current Protection*/
-        FAULT_PARA_t OCCW; /*Over Charge Current Warning*/
+    unsigned short LockTimeOCP; /*unit:100mS*/
 
-        unsigned short LockTimeOCP; /*unit:100mS*/
+    /*SOH Decay Coefficient*/
+    float          FullCap; /* unit: Ah */
+    unsigned short DecayCoefficient;
 
-        /*SOH Decay Coefficient*/
-        float FullCap; /* unit: Ah */
-        unsigned short DecayCoefficient;
+    /***BMSFactoryDate***/
+    unsigned char  FactoryDay;
+    unsigned char  FactoryMonth;
+    unsigned short FactoryYear;
+    unsigned char  SerialNum[13 + 1];
 
-        /***BMSFactoryDate***/
-        unsigned char FactoryDay;
-        unsigned char FactoryMonth;
-        unsigned short FactoryYear;
-        unsigned char SerialNum[13 + 1];
+    /***Balance***/
+    BALANCE_PARA_t BalanceDef;
 
-        /***Balance***/
-        BALANCE_PARA_t BalanceDef;
+    /***Dummy***/
+    unsigned char Dummy1;
+    unsigned char Dummy2;
+    unsigned char Dummy3;
 
-        /***Dummy***/
-        unsigned char Dummy1;
-        unsigned char Dummy2;
-        unsigned char Dummy3;
+    unsigned char CheckSum;
+} EEPROM_BMS_t;
 
-        unsigned char CheckSum;
-    } EEPROM_BMS_t;
+typedef struct {
+    float          ChgCap;                    /* unit:Ah  Fixed Eeprom Locations */
+    float          DisChgCap;                 /* unit:Ah Fixed Eeprom Locations */
+    unsigned short CycleLife;                 /* Fixed Eeprom Locations */
+    unsigned short ErrorCode[DTC_LOG_LENGTH]; /* Diagnostic Trouble Code */
+} EEPROM_EMERGENCY_t;
 
-    typedef struct {
-        float ChgCap; /* unit:Ah  Fixed Eeprom Locations */
-        float DisChgCap; /* unit:Ah Fixed Eeprom Locations */
-        unsigned short CycleLife; /* Fixed Eeprom Locations */
-        unsigned short ErrorCode[DTC_LOG_LENGTH]; /* Diagnostic Trouble Code */
-    } EEPROM_EMERGENCY_t;
+typedef struct {
+    unsigned char Addr; /* BMS Module Address Fixed Eeprom Locations */
+    /* MCP3421 */
+    unsigned short AdcZeroOffset;
+    unsigned short AdcGainOffset;
+    unsigned short Dummy;
+} EEPROM_SPECIAL_t;
 
-    typedef struct {
-        unsigned char Addr; /* BMS Module Address Fixed Eeprom Locations */
-        /* MCP3421 */
-        unsigned short AdcZeroOffset;
-        unsigned short AdcGainOffset;
-        unsigned short Dummy;
-    } EEPROM_SPECIAL_t;
+typedef struct {
+    BMS_WORK_MODE_e WorkModeCmd; /* BMS Receive Command */
+    BMS_STATUS_e    Status;      /* BMS Status */
 
-    typedef struct {
-        BMS_WORK_MODE_e WorkModeCmd; /* BMS Receive Command */
-        BMS_STATUS_e Status; /* BMS Status */
+    RELAY_STATUS_e PosRlyStatus; /* Positive Relay Status */
+    RELAY_STATUS_e NegRlyStatus; /* BMS_Slave response Negative Relay Status */
+    BALANCE_PARA_t Balance;      /* BMU Balance Parameter */
 
-        RELAY_STATUS_e PosRlyStatus; /* Positive Relay Status */
-        RELAY_STATUS_e NegRlyCMD; /* Negative Relay Command to BMS Slave */
-        RELAY_STATUS_e NegRlyStatus; /* BMS_Slave response Negative Relay Status */
-        BALANCE_PARA_t Balance; /* BMU Balance Parameter */
+    int           BusCurrent;    /* unit:mA RawData */
+    int           BusVolt_mV;    /* unit:mV */
+    int           BusVolt;       /* unit:V */
+    int           MinVcell;      /* Unit:mV */
+    int           MaxVcell;      /* Unit:mV */
+    int           DeltaVolt;     /* Unit:mV */
+    int           MinTcell;      /* unit:0.1 degC */
+    int           MaxTcell;      /* unit:0.1 degC */
+    int           DeltaTemp;     /* unit:0.1 degC */
+    unsigned char MinVoltBmuID;  /* BMU ID For Min. Volt */
+    unsigned char MaxVoltBmuID;  /* BMU ID For Max. Volt */
+    unsigned char BmuMinVcellID; /* Min.Volt Cell ID In BMU */
+    unsigned char BmuMaxVcellID; /* Max.Volt Cell ID In BMU */
+    unsigned char MinTempBmuID;  /* BMU ID for Min.Temp Cell */
+    unsigned char MaxTempBmuID;  /* BMU ID for Max.Temp Cell */
+    unsigned char BmuMinTcellID; /* Min.Temp Cell ID In BMU */
+    unsigned char BmuMaxTcellID; /* Max.Temp Cell ID In BMU */
 
-        int BusCurrent; /* unit:mA RawData */
-        int BusVolt_mV; /* unit:mV */
-        int BusVolt; /* unit:V */
-        int MinVcell; /* Unit:mV */
-        int MaxVcell; /* Unit:mV */
-        int DeltaVolt; /* Unit:mV */
-        int MinTcell; /* unit:0.1 degC */
-        int MaxTcell; /* unit:0.1 degC */
-        int DeltaTemp; /* unit:0.1 degC */
-        unsigned char MinVoltBmuID; /* BMU ID For Min. Volt */
-        unsigned char MaxVoltBmuID; /* BMU ID For Max. Volt */
-        unsigned char BmuMinVcellID; /* Min.Volt Cell ID In BMU */
-        unsigned char BmuMaxVcellID; /* Max.Volt Cell ID In BMU */
-        unsigned char MinTempBmuID; /* BMU ID for Min.Temp Cell */
-        unsigned char MaxTempBmuID; /* BMU ID for Max.Temp Cell */
-        unsigned char BmuMinTcellID; /* Min.Temp Cell ID In BMU */
-        unsigned char BmuMaxTcellID; /* Max.Temp Cell ID In BMU */
+    unsigned char  SOC;       /* unit:% */
+    unsigned char  SOH;       /* unit:%,According to the Cycle Life Calculation */
+    float          RemCap;    /* unit: Ah */
+    float          ChgCap;    /* unit: Ah */
+    float          DischgCap; /* unit: Ah */
+    float          FullCap;   /* unit: Ah */
+    unsigned int   DesingCap; /* unit: AH */
+    unsigned short CycleLife; /* Fixed Eeprom Locations */
+    unsigned short DecayCoefficient;
+    /* Protection Flag */
+    unsigned char FaultBitArray[(DTC_EVENT_MAX_NUM / 8) + 1];
+    unsigned char FaultBitArrayHold[(DTC_EVENT_MAX_NUM / 8) + 1];
+} BMS_DATA_t;
 
-        unsigned char SOC; /* unit:% */
-        unsigned char SOH; /* unit:%,According to the Cycle Life Calculation */
-        float RemCap; /* unit: Ah */
-        float ChgCap; /* unit: Ah */
-        float DischgCap; /* unit: Ah */
-        float FullCap; /* unit: Ah */
-        unsigned int DesingCap; /* unit: AH */
-        unsigned short CycleLife; /* Fixed Eeprom Locations */
-        unsigned short DecayCoefficient;
-        /* Protection Flag */
-        unsigned char FaultBitArray[(DTC_EVENT_MAX_NUM / 8) + 1];
-        unsigned char FaultBitArrayHold[(DTC_EVENT_MAX_NUM / 8) + 1];
-    } BMS_DATA_t;
+typedef enum {
+    EEPROM_READY = 0,
+    EEPROM_READING,
+    EEPROM_WRITING,
+    EEPROM_MAX
+} EEPROM_OPERATION_STATUS_e; /*Operation Status*/
 
-    typedef enum {
-        EEPROM_READY = 0,
-        EEPROM_READING,
-        EEPROM_WRITING,
-        EEPROM_MAX
-    } EEPROM_OPERATION_STATUS_e; /*Operation Status*/
+extern volatile const EEPROM_BMS_t        eepBmsDef; /* EEPROM default data */
+extern BMS_DATA_t                         bmsData;
+extern EEPROM_BMS_t                       eepBms;
+extern EEPROM_EMERGENCY_t                 eepEmg;
+extern EEPROM_SPECIAL_t                   eepSpe;
+extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
 
-    extern volatile const EEPROM_BMS_t eepBmsDef;
-    extern BMS_DATA_t bmsData;
-    extern EEPROM_BMS_t eepBms;
-    extern EEPROM_EMERGENCY_t eepEmg;
-    extern EEPROM_SPECIAL_t eepSpe;
-    extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
+// *****************************************************************************
+// *****************************************************************************
+// Section: Interface Functions
+// *****************************************************************************
+// *****************************************************************************
 
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Interface Functions
-    // *****************************************************************************
-    // *****************************************************************************
+unsigned char APP_EepromInitialize(void);
+void          APP_EepromBmsWrite(void);
+void          APP_EepromEmergencyWrite(void);
+void          APP_EepromSpecialWrite(void);
+void          APP_EepromTask(void);
 
-    unsigned char APP_EepromInitialize(void);
-    void          APP_EepromBmsWrite(void);
-    void          APP_EepromEmergencyWrite(void);
-    void          APP_EepromSpecialWrite(void);
-    void          APP_EepromTask(void);
-
-    /* Provide C++ Compatibility */
+/* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif

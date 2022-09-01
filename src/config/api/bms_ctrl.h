@@ -12,7 +12,7 @@ extern "C" {
 /* USER CODE END GD */
 
 /* Includes ------------------------------------------------------------------*/
-#include "sys_parameter.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -20,7 +20,20 @@ extern "C" {
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum {
+    /* Remote Control */
+    BMS_OFF = 0,       /* Power Off */
+    BMS_CHG_ON,        /* Remote Control Power On @ Charge Mode */
+    BMS_DISCHG_ON,     /* Remote Control Power On @ Discharge Mode */
+    BMS_CHG_PRE_ON,    /* Remote Control Pre-Power On @ Charge Mode @ Branch Parrellel */
+    BMS_DISCHG_PRE_ON, /* Remote Control Pre-Power On @ Discharge Mode @ Branch Parrellel */
+    /* Internal Control */
+    BMS_HAND_ON,     /* Manual Control */
+    BMS_RESET,       /* BMS software reset */
+    BMS_OCCUR_FAULT, /* BMS occur fault  */
+    BMS_OCCUR_EMRG,  /* EMS is pressed occur */
+    BMS_CONTROL_MAX
+} BMS_WORK_MODE_e;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/

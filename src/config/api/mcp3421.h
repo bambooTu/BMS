@@ -1,72 +1,27 @@
-/* ************************************************************************** */
-/** Descriptive File Name
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
- */
-/* ************************************************************************** */
-
-#ifndef _MCP3421_H /* Guard against multiple inclusion */
-#define _MCP3421_H
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
 extern "C" {
+
 #endif
+// DOM-IGNORE-END
 
-#include "../config/default/library/i2cbb/i2c_bb_local.h"
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Constants                                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-/** Descriptive Constant Name
-
-  @Summary
-    Brief one-line summary of the constant.
-
-  @Description
-    Full description, explaining the purpose and usage of the constant.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-  @Remarks
-    Any additional remarks
- */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 #define MCP3421_DEVICE_CDOE 0xD
 #define I2C_TX_BUFFER_SIZE  8
 #define I2C_RX_BUFFER_SIZE  8
+/* USER CODE END GD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* Includes ------------------------------------------------------------------*/
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "../config/default/library/i2cbb/i2c_bb_local.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 typedef union {
     struct {
         unsigned r_w         : 1;
@@ -137,25 +92,44 @@ typedef struct {
     unsigned char errorCount;
     unsigned char timeoutCount;
 } APP_I2C_DATA_t;
+/* USER CODE END PTD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
 void  MCP3421_Initialize(void);
 short MCP3421_AdcValueGet(void);
 void  MCP3421_InterruptTasks(void);
 void  MCP3421_ReadAdc(unsigned char addr);
 void  MCP3421_WriteConfig(unsigned char addr, unsigned char config);
+/* USER CODE END FP */
 
-/* Provide C++ Compatibility */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _MCP3421_H  */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+/*******************************************************************************
  End of File
  */

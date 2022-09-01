@@ -58,7 +58,7 @@
 // *****************************************************************************
 // *****************************************************************************
 /* CAN4 Message memory size */
-#define CANFD_MESSAGE_RAM_CONFIG_SIZE 224
+#define CANFD_MESSAGE_RAM_CONFIG_SIZE 144
 /* Number of configured FIFO */
 #define CANFD_NUM_OF_FIFO             2
 /* Maximum number of CAN Message buffers in each FIFO */
@@ -137,15 +137,9 @@ void CAN4_Initialize(void)
     /* Set Message memory base address for all FIFOs/Queue */
     CFD4FIFOBA = (uint32_t)KVA_TO_PA(can_message_buffer);
 
-    /* Tx Event FIFO Configuration */
-    CFD4TEFCON = (((1 - 1) << _CFD4TEFCON_FSIZE_POSITION) & _CFD4TEFCON_FSIZE_MASK);
-    CFD4CON |= _CFD4CON_STEF_MASK;
+    CFD4CON &= ~_CFD4CON_STEF_MASK;
 
-    /* Tx Queue Configuration */
-    CFD4TXQCON = (((1 - 1) << _CFD4TXQCON_FSIZE_POSITION) & _CFD4TXQCON_FSIZE_MASK)
-               | ((0x7 << _CFD4TXQCON_PLSIZE_POSITION) & _CFD4TXQCON_PLSIZE_MASK)
-               | ((0x0 << _CFD4TXQCON_TXPRI_POSITION) & _CFD4TXQCON_TXPRI_MASK);
-    CFD4CON |= _CFD4CON_TXQEN_MASK;
+    CFD4CON &= ~_CFD4CON_TXQEN_MASK;
 
 
     /* Configure CAN FIFOs */
@@ -196,17 +190,11 @@ void CAN4_Initialize(void)
 bool CAN4_MessageTransmit(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoQueueNum, CANFD_MODE mode, CANFD_MSG_TX_ATTRIBUTE msgAttr)
 {
     CANFD_TX_MSG_OBJECT *txMessage = NULL;
-    static uint32_t sequence = 0;
     uint8_t count = 0;
     bool status = false;
 
     if (fifoQueueNum == 0)
     {
-        if ((CFD4TXQSTA & _CFD4TXQSTA_TXQNIF_MASK) == _CFD4TXQSTA_TXQNIF_MASK)
-        {
-            txMessage = (CANFD_TX_MSG_OBJECT *)PA_TO_KVA1(CFD4TXQUA);
-            status = true;
-        }
     }
     else if (fifoQueueNum <= CANFD_NUM_OF_FIFO)
     {
@@ -247,15 +235,8 @@ bool CAN4_MessageTransmit(uint32_t id, uint8_t length, uint8_t* data, uint8_t fi
             }
         }
 
-        txMessage->t1 |= ((++sequence << 9) & CANFD_MSG_SEQ_MASK);
-
         if (fifoQueueNum == 0)
         {
-            CFD4TXQCON |= _CFD4TXQCON_TXQEIE_MASK;
-
-            /* Request the transmit */
-            CFD4TXQCON |= _CFD4TXQCON_UINC_MASK;
-            CFD4TXQCON |= _CFD4TXQCON_TXREQ_MASK;
         }
         else
         {
@@ -350,7 +331,6 @@ void CAN4_MessageAbort(uint8_t fifoQueueNum)
 {
     if (fifoQueueNum == 0)
     {
-        CFD4TXQCON &= ~_CFD4TXQCON_TXREQ_MASK;
     }
     else if (fifoQueueNum <= CANFD_NUM_OF_FIFO)
     {
@@ -505,61 +485,6 @@ uint32_t CAN4_MessageAcceptanceFilterMaskGet(uint8_t acceptanceFilterMaskNum)
     return id;
 }
 
-// *****************************************************************************
-/* Function:
-    bool CAN4_TransmitEventFIFOElementGet(uint32_t *id, uint32_t *sequence, uint32_t *timestamp)
-
-   Summary:
-    Get the Transmit Event FIFO Element for the transmitted message.
-
-   Precondition:
-    CAN4_Initialize must have been called for the associated CAN instance.
-
-   Parameters:
-    id          - Pointer to 11-bit / 29-bit identifier (ID) to be received.
-    sequence    - Pointer to Tx message sequence number to be received
-    timestamp   - Pointer to Tx message timestamp to be received, timestamp value is 0 if Timestamp is disabled in CFD4TSCON
-
-   Returns:
-    Request status.
-    true  - Request was successful.
-    false - Request has failed.
-*/
-bool CAN4_TransmitEventFIFOElementGet(uint32_t *id, uint32_t *sequence, uint32_t *timestamp)
-{
-    CANFD_TX_EVENT_FIFO_ELEMENT *txEventFIFOElement = NULL;
-    bool status = false;
-
-    /* Check if there is a message available in Tx Event FIFO */
-    if ((CFD4TEFSTA & _CFD4TEFSTA_TEFNEIF_MASK) == _CFD4TEFSTA_TEFNEIF_MASK)
-    {
-        /* Get a pointer to Tx Event FIFO Element */
-        txEventFIFOElement = (CANFD_TX_EVENT_FIFO_ELEMENT *)PA_TO_KVA1(CFD4TEFUA);
-
-        /* Check if it's a extended message type */
-        if (txEventFIFOElement->te1 & CANFD_MSG_IDE_MASK)
-        {
-            *id = txEventFIFOElement->te0 & CANFD_MSG_EID_MASK;
-        }
-        else
-        {
-            *id = txEventFIFOElement->te0 & CANFD_MSG_SID_MASK;
-        }
-
-        *sequence = ((txEventFIFOElement->te1 & CANFD_MSG_SEQ_MASK) >> 9);
-
-        if (timestamp != NULL)
-        {
-        }
-
-        /* Tx Event FIFO Element read done, update the Tx Event FIFO tail */
-        CFD4TEFCON |= _CFD4TEFCON_UINC_MASK;
-
-        /* Tx Event FIFO Element read successfully, so return true */
-        status = true;
-    }
-    return status;
-}
 
 // *****************************************************************************
 /* Function:
@@ -627,7 +552,7 @@ bool CAN4_InterruptGet(uint8_t fifoQueueNum, CANFD_FIFO_INTERRUPT_FLAG_MASK fifo
 {
     if (fifoQueueNum == 0)
     {
-        return ((CFD4TXQSTA & fifoInterruptFlagMask) != 0x0);
+        return false;
     }
     else
     {
@@ -881,7 +806,6 @@ static void CAN4_TX_InterruptHandler(void)
     {
         if (fifoNum == 0)
         {
-            CFD4TXQCON &= ~_CFD4TXQCON_TXQEIE_MASK;
         }
         else
         {

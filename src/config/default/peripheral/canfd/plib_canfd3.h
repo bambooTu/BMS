@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    plib_canfd4.h
+    plib_canfd3.h
 
   Summary:
     CANFD PLIB interface declarations.
@@ -44,8 +44,8 @@
 *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef PLIB_CANFD4_H
-#define PLIB_CANFD4_H
+#ifndef PLIB_CANFD3_H
+#define PLIB_CANFD3_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -72,25 +72,25 @@
 // Section: Interface Routines
 // *****************************************************************************
 // *****************************************************************************
-void CAN4_Initialize(void);
-bool CAN4_MessageTransmit(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoQueueNum, CANFD_MODE mode, CANFD_MSG_TX_ATTRIBUTE msgAttr);
-bool CAN4_MessageReceive(uint32_t *id, uint8_t *length, uint8_t *data, uint32_t *timestamp, uint8_t fifoNum, CANFD_MSG_RX_ATTRIBUTE *msgAttr);
-void CAN4_MessageAbort(uint8_t fifoQueueNum);
-void CAN4_MessageAcceptanceFilterSet(uint8_t filterNum, uint32_t id);
-uint32_t CAN4_MessageAcceptanceFilterGet(uint8_t filterNum);
-void CAN4_MessageAcceptanceFilterMaskSet(uint8_t acceptanceFilterMaskNum, uint32_t id);
-uint32_t CAN4_MessageAcceptanceFilterMaskGet(uint8_t acceptanceFilterMaskNum);
-CANFD_ERROR CAN4_ErrorGet(void);
-void CAN4_ErrorCountGet(uint8_t *txErrorCount, uint8_t *rxErrorCount);
-bool CAN4_InterruptGet(uint8_t fifoQueueNum, CANFD_FIFO_INTERRUPT_FLAG_MASK fifoInterruptFlagMask);
-bool CAN4_TxFIFOQueueIsFull(uint8_t fifoQueueNum);
-bool CAN4_AutoRTRResponseSet(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoNum);
-void CAN4_CallbackRegister(CANFD_CALLBACK callback, uintptr_t contextHandle, uint8_t fifoQueueNum);
-void CAN4_ErrorCallbackRegister(CANFD_CALLBACK callback, uintptr_t contextHandle);
+void CAN3_Initialize(void);
+bool CAN3_MessageTransmit(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoQueueNum, CANFD_MODE mode, CANFD_MSG_TX_ATTRIBUTE msgAttr);
+bool CAN3_MessageReceive(uint32_t *id, uint8_t *length, uint8_t *data, uint32_t *timestamp, uint8_t fifoNum, CANFD_MSG_RX_ATTRIBUTE *msgAttr);
+void CAN3_MessageAbort(uint8_t fifoQueueNum);
+void CAN3_MessageAcceptanceFilterSet(uint8_t filterNum, uint32_t id);
+uint32_t CAN3_MessageAcceptanceFilterGet(uint8_t filterNum);
+void CAN3_MessageAcceptanceFilterMaskSet(uint8_t acceptanceFilterMaskNum, uint32_t id);
+uint32_t CAN3_MessageAcceptanceFilterMaskGet(uint8_t acceptanceFilterMaskNum);
+CANFD_ERROR CAN3_ErrorGet(void);
+void CAN3_ErrorCountGet(uint8_t *txErrorCount, uint8_t *rxErrorCount);
+bool CAN3_InterruptGet(uint8_t fifoQueueNum, CANFD_FIFO_INTERRUPT_FLAG_MASK fifoInterruptFlagMask);
+bool CAN3_TxFIFOQueueIsFull(uint8_t fifoQueueNum);
+bool CAN3_AutoRTRResponseSet(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoNum);
+void CAN3_CallbackRegister(CANFD_CALLBACK callback, uintptr_t contextHandle, uint8_t fifoQueueNum);
+void CAN3_ErrorCallbackRegister(CANFD_CALLBACK callback, uintptr_t contextHandle);
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
     }
 #endif
 // DOM-IGNORE-END
 
-#endif // PLIB_CANFD4_H
+#endif // PLIB_CANFD3_H

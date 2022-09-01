@@ -1,45 +1,66 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       mcp3421.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-09-01
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * I2C Inter-Integrated Circuit
  */
-/* ************************************************************************** */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 
-#include 
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "sys_parameter.h"
+/* USER CODE END Includes */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+#define MCP3421_DEVICE_CDOE 0xD
+#define I2C_TX_BUFFER_SIZE  8
+#define I2C_RX_BUFFER_SIZE  8
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
 APP_I2C_DATA_t   I2C0_data      = {0};
 MCP3421_ADDR_t   mcp3421_addr   = {0};
 MCP3421_CONFIG_t mcp3421_config = {0};
 bool             b_adc_complete = 0;
 unsigned char    I2C_TxBuffer[I2C_TX_BUFFER_SIZE];
 unsigned char    I2C_RxBuffer[I2C_RX_BUFFER_SIZE];
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 void MCP3421_WriteConfig(unsigned char addr, unsigned char config) {
     I2C0_data.txBuffer[0] = config;
     I2C_BB_Write(addr, I2C0_data.txBuffer, 1);
@@ -63,7 +84,7 @@ void MCP3421_Initialize(void) {
     MCP3421_WriteConfig(mcp3421_addr.byte >> 1, mcp3421_config.byte);
 }
 
-short MCP3421_AdcValueGet(void) {
+short MCP3421_AdcValueGet(void) {//20ms
     short adc_value = 0;
     if (I2C0_data.timeoutCount++ > 50) {
         I2C0_data.errorCount = SATURATION(I2C0_data.timeoutCount, 50, 0);
@@ -118,3 +139,8 @@ void MCP3421_InterruptTasks(void) {
             break;
     }
 }
+/* USER CODE END 0 */
+
+/*******************************************************************************
+ End of File
+ */

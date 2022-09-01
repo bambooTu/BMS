@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "hv_setup.h": "c",
-        "sys_parameter.h": "c"
+        "sys_parameter.h": "c",
+        "bms_ctrl.h": "c",
+        "can.h": "c",
+        "definitions.h": "c",
+        "plib_canfd4.h": "c",
+        "plib_tmr4.h": "c",
+        "plib_canfd1.h": "c",
+        "plib_eeprom.h": "c"
     }
 }

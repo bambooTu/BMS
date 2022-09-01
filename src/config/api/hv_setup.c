@@ -1,3 +1,17 @@
+/**
+ * @file       hv_setup.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief
+ * @version    0.1
+ * @date       2022-09-01
+ *
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ *
+ * Abbreviation:
+ * HV  High-voltage
+ * PDU power distribution unit
+ *
+ */
 
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
@@ -25,6 +39,7 @@
 #define TURN_ON_POS_DELAY_MS      (500)
 #define TURN_OFF_POS_DELAY_MS     (500)
 #define TURN_OFF_NEG_DELAY_MS     (500)
+/*TODO:*/
 #define BACK_END_VOLT             (100)
 #define PRECHG_PERCENTAGE_SETTING (90)
 #define RELAY_NEG_OPEN            RELAY_NEG_Clear();
@@ -35,6 +50,7 @@
 #define RELAY_PRECHG_CLOSE        RELAY_PRECHG_Set();
 #define CURRENT                   25
 #define PRECHG_CURRENT_OFFSET     20
+/*TODO:*/
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,8 +78,8 @@ HV_DATA_t HV = {
 /* USER CODE BEGIN 0 */
 
 /**
- * @brief      High voltage relay trun on sequence
- * 
+ * @brief      High-voltage PDU trun on sequence
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -132,7 +148,7 @@ static void HV_SeqTurnOn(void) {
                     HV.opMode         = HV_PRECHG_START;
                 }
             }
-            GLED_Set();
+            GLED_Set();//TODO:Delete
             break;
         case HV_SETUP_FAULT:
             HV.delayTimeCount = 0;
@@ -142,8 +158,8 @@ static void HV_SeqTurnOn(void) {
 }
 
 /**
- * @brief      High voltage relay turn off sequence
- * 
+ * @brief      High voltage PDU turn off sequence
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -205,9 +221,9 @@ static void HV_SeqTurnOff(void) {
 }
 
 /**
- * @brief      
- * 
- * @return     HV_SETUP_STATUS_e 
+ * @brief      Get high-voltage PDU setup status
+ *
+ * @return     HV_SETUP_STATUS_e
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -218,9 +234,9 @@ HV_SETUP_STATUS_e HV_SetupStatusGet(void) {
 }
 
 /**
- * @brief      
- * 
- * @return     HV_OFF_STATUS_e 
+ * @brief      Get high-voltage PDU off status
+ *
+ * @return     HV_OFF_STATUS_e
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -231,9 +247,9 @@ HV_OFF_STATUS_e HV_OffStatusGet(void) {
 }
 
 /**
- * @brief      
- * 
- * @param      opMode 
+ * @brief      High-voltage PDU operation command
+ *
+ * @param      opMode
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -244,8 +260,8 @@ void HV_ModeCommand(HV_OPERATION_MODE_e opMode) {
 }
 
 /**
- * @brief      
- * 
+ * @brief      High-voltage PDU initialization
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31
@@ -258,8 +274,8 @@ void HV_Initialize(void) {
 }
 
 /**
- * @brief      
- * 
+ * @brief      High-voltage PDU polling tasks
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-08-31

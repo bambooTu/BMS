@@ -1,18 +1,18 @@
-/************************************************************
-**  Copyright (C) 2010-2011, XXX Co. Ltd.
-**  All rights reserved.
-**
-**  FileName: 		  sys_parameter.h
-**  Description:      系統參數
-**  Author:		      TU
-**  Date:   		  2022/8/17
-**  Others:
-***********************************************************/
-
-/************************************************************
-** Abbreviation:
-** OTP:
-***********************************************************/
+/**
+ * @file       sys_parameter.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-09-01
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * BMS  Battery management system
+ * EMG  Emergency
+ * SPE  Special
+ * EEP  EEPROM
+ */
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -37,7 +37,7 @@ struct {
     unsigned Emg     : 1;
     unsigned Spe     : 1;
     unsigned Reserve : 5;
-} eepWriteFlag;
+} eepWriteCmd;
 
 volatile const EEPROM_BMS_t eepBmsDef = {
     EEP_KEY_ID,
@@ -104,7 +104,6 @@ BMS_DATA_t         bmsData = {};
 
 EEPROM_OPERATION_STATUS_e eepOpStatus = 0;
 
-
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -112,8 +111,8 @@ EEPROM_OPERATION_STATUS_e eepOpStatus = 0;
 /* ************************************************************************** */
 
 /**
- * @brief
- * Data written into EEPROM
+ * @brief      Data written into EEPROM
+ *
  * @param      ptrData  The starting address of the data
  * @param      dataSize  Data size
  * @param      startAddr The starting address of the EEPROM
@@ -132,7 +131,7 @@ static void APP_EepromWordWrite(unsigned int* ptrData, unsigned int dataSize, un
 }
 
 /**
- * @brief    Read data from EEPROM and Storage into the buffer
+ * @brief      Read data from EEPROM and Storage into the buffer
  *
  * @param      ptrData The starting address of the data
  * @param      dataSize Data size
@@ -152,7 +151,7 @@ static void APP_EepromWordRead(unsigned int* ptrData, unsigned int dataSize, uns
 }
 
 /**
- * @brief     Calculate the checksum
+ * @brief      Calculate the checksum
  *
  * @param      ptrData The starting address of the calculated data
  * @param      dataSize
@@ -197,7 +196,7 @@ void APP_EepromPageErase(unsigned int startAddr, unsigned int dataSize) {
 /* ************************************************************************** */
 
 /**
- * @brief
+ * @brief      Read data from EEPROM when APP start
  *
  * @return     unsigned char
  * @version    0.1
@@ -249,37 +248,67 @@ unsigned char APP_EepromInitialize(void) {
     return ret;
 }
 
+/**
+ * @brief      Write bms data to EEPROM
+ *
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void APP_EepromBmsWrite(void) {
+    eepWriteCmd.Emg = true;
+}
+/**
+ * @brief      Write emergency data to EEPROM
+ *
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+void APP_EepromEmergencyWrite(void) {
     eepEmg.ChgCap    = bmsData.ChgCap;
     eepEmg.CycleLife = bmsData.CycleLife;
     eepEmg.DisChgCap = bmsData.DischgCap;
 
-    eepWriteFlag.Emg = true;
+    eepWriteCmd.Bms = true;
 }
-
-void APP_EepromEmergencyWrite(void) {
-    eepWriteFlag.Bms = true;
-}
-
+/**
+ * @brief      Write special data to EEPROM
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void APP_EepromSpecialWrite(void) {
-    eepWriteFlag.Spe = true;
+    eepWriteCmd.Spe = true;
 }
 
+/**
+ * @brief      EEPROM polling tasks
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void APP_EepromTask(void) {
-    if (eepWriteFlag.Emg == true) {
-        eepOpStatus      = EEPROM_WRITING;
-        eepWriteFlag.Emg = false;
+    if (eepWriteCmd.Emg == true) {
+        eepOpStatus     = EEPROM_WRITING;
+        eepWriteCmd.Emg = false;
         APP_EepromWordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to Word
                             EEPROM_EMG_START_ADDR);
-    } else if (eepWriteFlag.Spe == true) {
-        eepOpStatus      = EEPROM_WRITING;
-        eepWriteFlag.Spe = false;
+    } else if (eepWriteCmd.Spe == true) {
+        eepOpStatus     = EEPROM_WRITING;
+        eepWriteCmd.Spe = false;
         APP_EepromWordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to Word
                             EEPROM_SPE_START_ADDR);
-    } else if (eepWriteFlag.Bms == true) {
+    } else if (eepWriteCmd.Bms == true) {
         unsigned char checkSum = 0;
         eepOpStatus            = EEPROM_WRITING;
-        eepWriteFlag.Bms       = false;
+        eepWriteCmd.Bms        = false;
         checkSum               = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum        = checkSum;
         APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word

@@ -1,3 +1,15 @@
+/**
+ * @file       bms_ctrl.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-09-01
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * BMS Battery Management System
+ */
 
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
@@ -9,7 +21,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sys_parameter.h"
-#include "bms_ctrl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -19,8 +30,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FAULT_INDICATOR_ON
-#define FAULT_INDICATOR_OFF
+#define FAULT_INDICATOR_ON  //TODO: PDU外殼指示燈開啟
+#define FAULT_INDICATOR_OFF //TODO: PDU外殼指示燈關閉
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,6 +59,15 @@ unsigned char gEmergencyState    = 0;
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/**
+ * @brief      BMS software reset handler
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void BMS_SoftWareReset(void) {
     HV_ModeCommand(MODE_OFF);
     if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
@@ -69,6 +89,14 @@ static void BMS_SoftWareReset(void) {
     }
 }
 
+/**
+ * @brief      BMS protection handler
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void BMS_Protection(void) {
     switch (protectionState) {
         case 0:
@@ -92,7 +120,14 @@ static void BMS_Protection(void) {
             break;
     }
 }
-
+/**
+ * @brief      BMS emergency handler
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void BMS_Emergency(void) {
     switch (gEmergencyState) {
         case 0:
@@ -123,7 +158,14 @@ static void BMS_Emergency(void) {
             break;
     }
 }
-
+/**
+ * @brief      BMS operation command detection
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void BMS_CommandDetect(void) {
     /*TODO: Engineer mode*/
     /*
@@ -168,11 +210,26 @@ static void BMS_CommandDetect(void) {
         gEmergencyState = 0;
     }
 }
-
+/**
+ * @brief      BMS operation mode command
+ * 
+ * @param      opMode 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
     bmsData.WorkModeCmd = opMode;
 }
-
+/**
+ * @brief     BMS control task flow
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-01
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void BMS_1ms_Tasks(void) {
     BMS_CommandDetect();
     switch (bmsData.WorkModeCmd) {

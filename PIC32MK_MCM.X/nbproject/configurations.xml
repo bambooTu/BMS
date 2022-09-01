@@ -17,12 +17,15 @@
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/debounce.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/bms_ctrl.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/hv_setup.h</itemPath>
+            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.h</itemPath>
           </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="canfd" displayName="canfd" projectFiles="true">
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd_common.h</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.h</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd1.h</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd2.h</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd3.h</itemPath>
             </logicalFolder>
             <logicalFolder name="clk" displayName="clk" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clk/plib_clk.h</itemPath>
@@ -82,12 +85,15 @@
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/debounce.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/bms_ctrl.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/hv_setup.c</itemPath>
+          <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.c</itemPath>
         </logicalFolder>
         <logicalFolder name="default" displayName="default" projectFiles="true">
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="canfd" displayName="canfd" projectFiles="true">
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.c</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd1.c</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd2.c</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd3.c</itemPath>
             </logicalFolder>
             <logicalFolder name="clk" displayName="clk" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clk/plib_clk.c</itemPath>
@@ -192,7 +198,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
-        <property key="make-warnings-into-errors" value="true"/>
+        <property key="make-warnings-into-errors" value="false"/>
         <property key="optimization-level" value="-O1"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
@@ -561,6 +567,8 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d07ffff"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/PIC32MK_MCM.X/debug/default/PIC32MK_MCM_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>
