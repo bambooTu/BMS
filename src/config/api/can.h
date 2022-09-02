@@ -155,8 +155,8 @@ typedef struct {
 #define CAN_NUMBER_OF_MODULE 4
 #define CAN_QUEUE_SIZE       8
 
-#define CAN_FIFONUM_TX0 0
-#define CAN_FIFONUM_RX0 1
+#define CAN_FIFONUM_TX0 1
+#define CAN_FIFONUM_RX0 2
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -173,17 +173,15 @@ typedef struct {
 /* USER CODE BEGIN PFP */
 void CAN_Initialize(void);
 
-uint8_t CAN_PushTxQueue(CAN_MODULE INSTANCE, can_msg_t* pMessage);
-uint8_t CAN_PushRxQueue(CAN_MODULE INSTANCE, can_msg_t* pMessage);
-uint8_t CAN_PullTxQueue(CAN_MODULE INSTANCE, can_msg_t* pMessage);
-uint8_t CAN_PullRxQueue(CAN_MODULE INSTANCE, can_msg_t* pMessage);
+uint8_t CAN_PushTxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
+uint8_t CAN_PushRxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
+uint8_t CAN_PullTxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
+uint8_t CAN_PullRxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
 
-uint32_t CAN_GetTxQueueCount(CAN_MODULE INSTANCE);
-uint32_t CAN_GetRxQueueCount(CAN_MODULE INSTANCE);
+uint32_t CAN_GetTxQueueCount(CAN_MODULE Instance);
+uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance);
 
-void CAN_InitializeMessage(can_msg_t* pMessage);
-bool CAN_ReceiveBMSMessage(can_msg_t* pRxMessage);
-void CAN_TimeoutCountdown(void);
+bool CAN_QueueDataXfer(CAN_MODULE Instance);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/

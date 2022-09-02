@@ -1,13 +1,13 @@
 /**
  * @file       bms_ctrl.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-09-01
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * BMS Battery Management System
  */
 
@@ -30,8 +30,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FAULT_INDICATOR_ON  //TODO: PDU外殼指示燈開啟
-#define FAULT_INDICATOR_OFF //TODO: PDU外殼指示燈關閉
+#define FAULT_INDICATOR_ON   // TODO: PDU外殼指示燈開啟
+#define FAULT_INDICATOR_OFF  // TODO: PDU外殼指示燈關閉
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,7 +62,7 @@ unsigned char gEmergencyState    = 0;
 
 /**
  * @brief      BMS software reset handler
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -91,7 +91,7 @@ static void BMS_SoftWareReset(void) {
 
 /**
  * @brief      BMS protection handler
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -122,7 +122,7 @@ static void BMS_Protection(void) {
 }
 /**
  * @brief      BMS emergency handler
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -160,7 +160,7 @@ static void BMS_Emergency(void) {
 }
 /**
  * @brief      BMS operation command detection
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -212,8 +212,8 @@ static void BMS_CommandDetect(void) {
 }
 /**
  * @brief      BMS operation mode command
- * 
- * @param      opMode 
+ *
+ * @param      opMode
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -224,7 +224,7 @@ void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
 }
 /**
  * @brief     BMS control task flow
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01

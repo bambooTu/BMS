@@ -48,7 +48,7 @@
 #define RELAY_POS_CLOSE           RELAY_POS_Set();
 #define RELAY_PRECHG_OPEN         RELAY_PRECHG_Clear();
 #define RELAY_PRECHG_CLOSE        RELAY_PRECHG_Set();
-#define CURRENT                   25
+#define CURRENT                   19
 #define PRECHG_CURRENT_OFFSET     20
 /*TODO:*/
 /* USER CODE END PD */
@@ -94,12 +94,10 @@ static void HV_SeqTurnOn(void) {
             RELAY_NEG_CLOSE;
             RELAY_POS_OPEN;
             RELAY_PRECHG_OPEN;
-
             if (HV.delayTimeCount++ >= TURN_ON_PRECHG_DELAY_MS) {
                 HV.delayTimeCount = 0;
                 HV.setupStatus    = HV_PRECHG_START;
             }
-
             break;
         case HV_PRECHG_START:
             RELAY_PRECHG_CLOSE;
@@ -131,7 +129,6 @@ static void HV_SeqTurnOn(void) {
                     HV.delayTimeCount = 0;
                     HV.setupStatus    = HV_SETUP_FAULT;
                 } else {
-                    HV.errorCount     = 0;
                     HV.delayTimeCount = 0;
                     HV.setupStatus    = HV_PRECHG_START;
                 }
@@ -148,7 +145,7 @@ static void HV_SeqTurnOn(void) {
                     HV.opMode         = HV_PRECHG_START;
                 }
             }
-            GLED_Set();//TODO:Delete
+            YLED_Set();  // TODO:Delete
             break;
         case HV_SETUP_FAULT:
             HV.delayTimeCount = 0;
@@ -197,25 +194,21 @@ static void HV_SeqTurnOff(void) {
                     HV.delayTimeCount = 0;
                     HV.offStatus      = HV_OFF_FORCE;
                 } else {
-                    HV.errorCount     = 0;
                     HV.delayTimeCount = 0;
                     HV.offStatus      = HV_OFF_PREWORK;
                 }
             }
             break;
         case HV_OFF_FINISH:
-            if (HV.delayTimeCount++ >= TURN_OFF_NEG_DELAY_MS) {
-                HV.delayTimeCount = 0;
-                RELAY_NEG_OPEN;
-            }
-            GLED_Clear();
+            RELAY_NEG_OPEN;
+            YLED_Clear();
             break;
         case HV_OFF_FORCE:
             HV.delayTimeCount = 0;
             RELAY_POS_OPEN;
             RELAY_NEG_OPEN;
             Fault_EventSet(DTC_BMS_RELAY);
-            GLED_Clear();
+            YLED_Clear();
             break;
     }
 }

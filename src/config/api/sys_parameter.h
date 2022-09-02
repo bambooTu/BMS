@@ -25,6 +25,8 @@
 /* ************************************************************************** */
 
 #include "bms_ctrl.h"
+#include "can.h"
+#include "can_bms_vs_bmu.h"
 #include "commonly_used.h"
 #include "current_gauge.h"
 #include "current_sensor.h"
@@ -178,7 +180,7 @@ typedef struct {
 } EEPROM_EMERGENCY_t;
 
 typedef struct {
-    unsigned char Addr; /* BMS Module Address Fixed Eeprom Locations */
+    unsigned char BmsAddr; /* BMS Module Address Fixed Eeprom Locations */
     /* MCP3421 */
     unsigned short AdcZeroOffset;
     unsigned short AdcGainOffset;
@@ -233,6 +235,7 @@ typedef enum {
 } EEPROM_OPERATION_STATUS_e; /*Operation Status*/
 
 extern volatile const EEPROM_BMS_t        eepBmsDef; /* EEPROM default data */
+extern volatile const EEPROM_SPECIAL_t    eepSpeDef; /* EEPROM default data */
 extern BMS_DATA_t                         bmsData;
 extern EEPROM_BMS_t                       eepBms;
 extern EEPROM_EMERGENCY_t                 eepEmg;

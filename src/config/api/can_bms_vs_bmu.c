@@ -1,0 +1,547 @@
+/**
+ * @file       can_bms2bmu.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief
+ * @version    0.1
+ * @date       2022-08-29
+ *
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ *
+ * Abbreviation:
+ * BMS    Battery Manager Systeum
+ *
+ * BR     Branch                      _____________________[Branch]_______________________
+ *                                   |                                                    |
+ * BMU    Battery Monitor Unit       ----[BMU]----[BMU]----[BMU]----[BMU]----[BMU]-- * N --
+ *                                         |        |        |        |        |
+ * Vcell  Cell Voltage                  [Cell*N] [Cell*N] [Cell*N] [Cell*N] [Cell*N]
+ * Tcell  Cell Temperature
+ */
+
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
+#define BMU_MAX_NUM               32U      /* The number of bmu */
+#define BMU_VCELL_MAX_NUM         7U       /* The number of Vcell in the BMU */
+#define BMU_TCELL_MAX_NUM         2U       /* The number of Tcell in the BMU */
+#define BMU_ID_OFFSET             1U       /* BMU start ID */
+#define GUI_ID_OFFSET             1U       /* PC GUI軟體，從1開始編號 */
+#define BMU_RESPONSE_TIMEOUT_TIME 10       /* unit:ms */
+#define BMU_TASK_CYCLE_TIME       1000     /* Unit:ms */
+#define BMU_RECV_MSG_FLAG         0x07     /* BMU recieve all packet */
+#define BMU_NTC_OPEN              (-1000L) /* NTC Open Value  -100.0 Deg. C */
+#define BMU_NTC_SHOTR             5000L    /* NTC Short Value  500.0 Deg. C */
+#define BMU_AFE_COMM_ERR          9999L    /* AFE I2C communication fault value */
+#define BMU_CAN_COMM_ERR          0xFFFF   /* BMU communication fault value */
+#define BMU_FAULT_LED_DELAY       2000     /* Unit:ms */
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "sys_parameter.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+
+/* USER CODE BEGIN PTD */
+
+typedef struct {
+    /*BMU*/
+    unsigned char  BmuConnected[(BMU_MAX_NUM >> 3) + 1];     /* BMU comm status 1: Connected 0: Disconnected*/
+    unsigned char  BmuTimeout[(BMU_MAX_NUM >> 3) + 1];       /* BMU comm status，1: Timeout 0: Normal */
+    unsigned short BmuVcell[BMU_MAX_NUM][BMU_VCELL_MAX_NUM]; /* Unit:mV,Volt. of all cell in the BMU */
+    unsigned short BmuVoltage[BMU_MAX_NUM];                  /* Unit:mV,Sum of Vcell voltage */
+    unsigned short BmuMaxVcell[BMU_MAX_NUM];                 /* Max. Volt. in the BMU */
+    unsigned short BmuMinVcell[BMU_MAX_NUM];                 /* Max. Volt. in the BMU */
+    unsigned char  BmuMaxVcellID[BMU_MAX_NUM];               /* ID of the Max. Vcell in the BMU */
+    unsigned char  BmuMinVcellID[BMU_MAX_NUM];               /* ID of the Min. Vcell in the BMU */
+    short          BmuTcell[BMU_MAX_NUM][BMU_TCELL_MAX_NUM]; /* Unit:0.1 Deg. C,Temp. of all cell in the BMU */
+    short          BmuMaxTcell[BMU_MAX_NUM];                 /* Max. Temp. in the BMU */
+    short          BmuMinTcell[BMU_MAX_NUM];                 /* Max. Temp. in the BMU */
+    unsigned char  BmuMaxTcellID[BMU_MAX_NUM];               /* ID of the Max. Tcell in the BMU */
+    unsigned char  BmuMinTcellID[BMU_MAX_NUM];               /* ID of the Min. Tcell in the BMU */
+    unsigned char  BmuMsgFlag[BMU_MAX_NUM];                  /* unit: bitmap,The number of packets is recieved  */
+    unsigned char  BmuFaultLed[BMU_MAX_NUM];                 /* Fault indicator number of the BMU */
+
+    /*Branch*/
+    unsigned int Voltage; /* Unit:mV, Branch Voltage = Sum of Bmu Voltage */
+
+    unsigned short MaxVcell;      /* Max. Volt. in the branch */
+    unsigned char  MaxVcellBmuID; /* BMU ID of the Max. Vcell in the branch */
+    unsigned char  MaxVcellID;    /* ID of the Max. Vcell in the branch */
+
+    unsigned short MinVcell;      /* Min. Volt. in the branch */
+    unsigned char  MinVcellBmuID; /* BMU ID of the Min. Vcell in the branch */
+    unsigned char  MinVcellID;    /* ID of the Min. Vcell in the branch   */
+
+    short         MaxTcell;      /* Max. Temp. in the branch  */
+    unsigned char MaxTcellBmuID; /* BMU ID of the Max. Tcell in the branch */
+    unsigned char MaxTcellID;    /* ID of the Max. Tcell in the branch   */
+
+    short         MinTcell;      /* Min. Temp. in the branch */
+    unsigned char MinTcellBmuID; /* BMU ID of the Min. Tcell in the branch */
+    unsigned char MinTcellID;    /* ID of the Min. Tcell in the branch */
+
+} BRANCH_INFO_t;
+
+typedef enum {
+    BMS_BMU_REQ_CMD,
+    BMS_BMU_CHK_RSP,
+    BMS_BMU_SRCH_DATA,
+    BMS_BMU_STAT_MAX
+} BMS_BMU_TASK_STATE_e;
+
+typedef enum {
+    PNG_TEMP_GET_G1 = 0xB9,
+    PNG_VOLT_GET_G1 = 0xBB,
+    PNG_VOLT_GET_G2 = 0xBA,
+} AFE_PNG_e;
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Globalvariables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+BMS_BMU_TASK_STATE_e BMU_taskState            = BMS_BMU_REQ_CMD;
+unsigned int         BMU_ID                   = 0;
+unsigned int         BMU_retryCount           = 0;
+unsigned int         BMU_tasksTimeCount       = 0;
+unsigned int         gBmuFaultLed1msDEC       = 0;
+unsigned int         BMU_responseTimeoutCount = 0;
+unsigned char        BMU_rxMessageFlag        = 0;
+unsigned char        BMS_SourceAddrBackup     = 0;
+can_msg_t            canRxMsg;
+can_msg_t            canTxMsg;
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+BRANCH_INFO_t BR = {0};
+
+static void BMU_ResponseCheck(unsigned int BMU_ID) {
+    if (CAN_GetRxQueueCount(CAN_1)) {
+        CAN_PullRxQueue(CAN_1, &canRxMsg);
+        if ((BMU_ID + 1) == canRxMsg.J1939.sourceAddress) {
+            switch (canRxMsg.J1939.pduFormat) {
+                case PNG_TEMP_GET_G1:
+                    BMU_responseTimeoutCount = (BMU_RESPONSE_TIMEOUT_TIME / 2);
+                    BMU_rxMessageFlag |= (1 << 0);
+                    for (unsigned char i = 0; i < BMU_TCELL_MAX_NUM; i++) {
+                        BR.BmuTcell[BMU_ID][i] = (canRxMsg.data[(i * 2 + 1)] << 8) + (canRxMsg.data[i]);
+                    }
+                    break;
+                case PNG_VOLT_GET_G1:
+                    BMU_responseTimeoutCount = (BMU_RESPONSE_TIMEOUT_TIME / 2);
+                    BMU_rxMessageFlag |= (1 << 1);
+                    for (unsigned char i = 0; i < 4; i++) {
+                        BR.BmuVcell[BMU_ID][i] = (canRxMsg.data[(i * 2 + 1)] << 8) + (canRxMsg.data[i]);
+                    }
+                    break;
+                case PNG_VOLT_GET_G2:
+                    BMU_responseTimeoutCount = (BMU_RESPONSE_TIMEOUT_TIME / 2);
+                    BMU_rxMessageFlag |= (1 << 2);
+                    for (unsigned char i = 0; i < (BMU_TCELL_MAX_NUM - 4); i++) {
+                        BR.BmuVcell[BMU_ID][i + 4] = (canRxMsg.data[(i * 2 + 1)] << 8) + (canRxMsg.data[i]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+static unsigned char BMU_XtrmVcellSearch(unsigned int BMU_ID) { /*TODO: Change the type to boolean*/
+    /* Search BMU Max. Min. Voltage Value */
+    unsigned char ret             = 0;
+    unsigned char fCommOkAFE      = 0;
+    BR.BmuMaxVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
+    BR.BmuMinVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
+    unsigned short pastBmuVoltage = BR.BmuVoltage[BMU_ID];
+    BR.BmuVoltage[BMU_ID]         = 0;
+
+    for (unsigned char i = 0; i < BMU_VCELL_MAX_NUM; i++) {
+        if (BR.BmuVcell[BMU_ID][i] == BMU_AFE_COMM_ERR) {
+            BR.BmuVoltage[BMU_ID] = pastBmuVoltage;
+            break;
+        } else if (BR.BmuVcell[BMU_ID][i] > BR.BmuMaxVcell[BMU_ID]) {
+            BR.BmuMaxVcell[BMU_ID]   = BR.BmuVcell[BMU_ID][i];
+            BR.BmuMaxVcellID[BMU_ID] = i;
+        } else if (BR.BmuVcell[BMU_ID][i] < BR.BmuMinVcell[BMU_ID]) {
+            BR.BmuMinVcell[BMU_ID]   = BR.BmuVcell[BMU_ID][i];
+            BR.BmuMinVcellID[BMU_ID] = i;
+        }
+        BR.BmuVoltage[BMU_ID] += BR.BmuVcell[BMU_ID][i];
+        fCommOkAFE = i;
+    }
+
+    if (fCommOkAFE == BMU_VCELL_MAX_NUM) {
+        ret = 1;
+    }
+    return ret;
+}
+
+static void BMU_XtrmTcellSearch(unsigned int BMU_ID) {
+    /* Search BMU Max. Min. Temperature Value */
+    BR.BmuMaxTcell[BMU_ID] = BR.BmuTcell[BMU_ID][0];
+    BR.BmuMinTcell[BMU_ID] = BR.BmuTcell[BMU_ID][0];
+    for (unsigned char i = 0; i < BMU_TCELL_MAX_NUM; i++) {
+        if (BR.BmuTcell[BMU_ID][i] > BR.BmuMaxTcell[BMU_ID]) {
+            BR.BmuMaxTcell[BMU_ID]   = BR.BmuTcell[BMU_ID][i];
+            BR.BmuMaxTcellID[BMU_ID] = i;
+        } else if (BR.BmuTcell[BMU_ID][i] < BR.BmuMinTcell[BMU_ID]) {
+            BR.BmuMinTcell[BMU_ID]   = BR.BmuTcell[BMU_ID][i];
+            BR.BmuMinTcellID[BMU_ID] = i;
+        }
+    }
+}
+
+static void BMU_XferMsgInit(can_msg_t *canTxMsg) {
+    canTxMsg->J1939.priority      = 6; /* 0~7(3bits), 6:0x18, 7:0x1C */
+    canTxMsg->J1939.reserved      = 1; /* EDP?X?ibit */
+    canTxMsg->J1939.dataPage      = 0;
+    canTxMsg->J1939.pduFormat     = 0x00;
+    canTxMsg->J1939.pduSpecific   = 0x00; /* DestinationAddress */
+    canTxMsg->J1939.sourceAddress = BMS_SourceAddrBackup;
+    canTxMsg->dlc                 = 8;
+
+    for (unsigned i = 0; i < 8; i++) {
+        *(canTxMsg->data + i) = 0xAA;
+    }
+}
+
+static void BMU_RequestDataMsg(unsigned int BMU_ID) {
+    can_msg_t canTxMsg;
+    BMU_XferMsgInit(&canTxMsg);
+    canTxMsg.J1939.pduFormat   = 0xEA;
+    canTxMsg.J1939.pduSpecific = BMU_ID;
+
+    canTxMsg.data[0] = 0x00;
+    canTxMsg.data[1] = 0xBB;
+    canTxMsg.data[2] = 0x00;
+    CAN_PushTxQueue(CAN_1, &canTxMsg);
+}
+
+static void BMU_BalanceParamMsg(unsigned int BMU_ID) {
+    can_msg_t canTxMsg;
+    BMU_XferMsgInit(&canTxMsg);
+    canTxMsg.J1939.pduFormat   = 0xBC;
+    canTxMsg.J1939.pduSpecific = BMU_ID;
+
+    canTxMsg.data[0] = (unsigned char)(eepBms.BalanceDef.Mode);
+    canTxMsg.data[1] = (unsigned char)(eepBms.BalanceDef.VoltDiff);
+    canTxMsg.data[2] = (unsigned char)(eepBms.BalanceDef.Volt & 0xFF);
+    canTxMsg.data[3] = (unsigned char)((eepBms.BalanceDef.Volt & 0xFF00) >> 8);
+    canTxMsg.data[4] = (unsigned char)(bmsData.MinVcell & 0xFF);
+    canTxMsg.data[5] = (unsigned char)((bmsData.MinVcell & 0xFF00) >> 8);
+    canTxMsg.data[6] = (unsigned char)(bmsData.Status);
+    canTxMsg.data[7] = BR.BmuFaultLed[(BMU_ID)];
+    CAN_PushTxQueue(CAN_1, &canTxMsg);
+}
+
+static void BMU_ResponseTimeout(unsigned char BMU_ID) {
+    BR.BmuTimeout[(BMU_ID >> 3)] |= (1 << (BMU_ID & 0x07));
+    BR.BmuMsgFlag[BMU_ID] = BMU_rxMessageFlag;
+
+    for (unsigned char i = 0; i < BMU_VCELL_MAX_NUM; i++) {
+        BR.BmuVcell[BMU_ID][i] = BMU_CAN_COMM_ERR;
+    }
+    BR.BmuVcell[BMU_ID][(BMU_VCELL_MAX_NUM - 1)] = BMU_rxMessageFlag;
+}
+
+static void BMU_ResponseComplete(unsigned char BMU_ID) {
+    BR.BmuConnected[(BMU_ID >> 3)] |= (1 << (BMU_ID & 0x07));
+    BR.BmuTimeout[(BMU_ID >> 3)] &= ~(1 << (BMU_ID & 0x07));
+
+    BR.BmuMsgFlag[BMU_ID] = BMU_rxMessageFlag;
+}
+
+static inline void BRANCH_XtrmVoltSearch(void) {
+    unsigned char Bit;
+    unsigned int  BmuVoltSum = 0;
+
+    /* Search  Max. Min. voltage value in Branch*/
+
+    BR.MaxVcell      = BR.BmuMaxVcell[0];
+    BR.MaxVcellBmuID = 0;
+
+    BR.MinVcell      = BR.BmuMinVcell[0];
+    BR.MinVcellBmuID = 0;
+
+    for (unsigned char i = 0; i < BMU_MAX_NUM; i++) {
+        Bit = 1 << (i & 0x07);
+        if ((BR.BmuTimeout[(i >> 3)] & Bit) == 0) {
+            if (BR.BmuMaxVcell[i] > BR.MaxVcell) {
+                BR.MaxVcell      = BR.BmuMaxVcell[i];
+                BR.MaxVcellBmuID = i;
+            }
+            if (BR.BmuMinVcell[i] < BR.MinVcell) {
+                BR.MinVcell      = BR.BmuMinVcell[i];
+                BR.MinVcellBmuID = i;
+            }
+            /* BMU fault LED indicator */
+            // if (is_fault_event(DTC_CELL_OVP) == true) {
+            //     if (BR.BmuMaxVcell[i] > eepBMS.CellOVP.Limit) {
+            //         BR.BmuFaultLed[i] = 1; /* LED???G?A?q?T??? */
+            //         gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
+            //     }
+            // }
+            // if (is_fault_event(DTC_CELL_UVP) == true) {
+            //     if (BR.BmuMinVcell[i] < eepBMS.CellUVP.Limit) {
+            //         BR.BmuFaultLed[i] = 1;
+            //         gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
+            //     }
+            // }
+
+            /*** Calculate Total Voltage ***/
+            BmuVoltSum += BR.BmuVoltage[i];
+        }
+        BR.Voltage = BmuVoltSum;
+    }
+}
+
+static inline void BRANCH_XtrmTempSearch(void) {
+    unsigned char Bit;
+    unsigned char fErrNTC = 0;
+    /* Search  Max. Min. voltage value in Branch*/
+    BR.MaxTcell      = BR.BmuMaxTcell[0];
+    BR.MaxTcellBmuID = 0;
+
+    BR.MinTcell      = BR.BmuMinTcell[0];
+    BR.MinTcellBmuID = 0;
+
+    for (unsigned char i = 0; i < BMU_MAX_NUM; i++) {
+        Bit = 1 << (i & 0x07);
+        if ((BR.BmuTimeout[(i >> 3)] & Bit) == 0) {
+            if (BR.BmuMaxTcell[i] == BMU_NTC_SHOTR) {
+                // TODO:  set_fault_occur(DTC_NTC_SHORT);
+                fErrNTC++;
+            } else {
+                if (BR.BmuMaxTcell[i] > BR.MaxTcell) {
+                    BR.MaxTcell      = BR.BmuMaxTcell[i];
+                    BR.MaxTcellBmuID = i;
+                }
+            }
+
+            if (BR.BmuMinTcell[i] == BMU_NTC_OPEN) {
+                // TODO:  set_fault_occur(DTC_NTC_OPEN);
+                fErrNTC++;
+            } else {
+                if (BR.BmuMinTcell[i] < BR.MinTcell) {
+                    BR.MinTcell      = BR.BmuMinTcell[i];
+                    BR.MinTcellBmuID = i;
+                }
+            }
+
+            /* BMU fault LED indicator */
+            if (Fault_EventGet(DTC_OTP) == true) {
+                if (BR.BmuMaxTcell[i] > eepBms.OTP.Limit) {
+                        BR.BmuFaultLed[i] = 1;
+                        gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
+                    }
+            }
+            if (Fault_EventGet(DTC_UTP) == true) {
+                if (BR.BmuMinTcell[i] < eepBms.UTP.Limit) {
+                    BR.BmuFaultLed[i] = 1;
+                    gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
+                }
+            }
+        }
+    }
+    if (fErrNTC == 0) {
+        // TODO: clr_fault_occur(DTC_NTC_OPEN);
+        // TODO: clr_fault_occur(DTC_NTC_OPEN);
+    }
+}
+
+static void BRANCH_XtrmTcellIDSearch(void) {
+    BR.MinTcellID = BR.BmuMinTcellID[BR.MinTcellBmuID];
+    BR.MaxTcellID = BR.BmuMaxTcellID[BR.MaxTcellBmuID];
+}
+
+static void BRANCH_XtrmVcellIDSearch(void) {
+    BR.MinVcellID = BR.BmuMinVcellID[BR.MinVcellBmuID];
+    BR.MaxVcellID = BR.BmuMaxVcellID[BR.MaxVcellBmuID];
+}
+
+static void BMU_CommStatusCheck(void) {
+    static unsigned char ErrCnt = 0;
+    unsigned char        Err    = 0;
+
+    for (unsigned i = 0; i < BMU_MAX_NUM; i++) {
+        if (BR.BmuMsgFlag[i] != BMU_RECV_MSG_FLAG) {
+            Err++;
+        }
+        BR.BmuMsgFlag[i] = 0;
+    }
+    if (0 == Err) {
+        ErrCnt = 0;
+        // TODO:clr_fault_event(DTC_BMU_COMM);
+    } else {
+        if (ErrCnt++ > 2) {
+            // TODO: set_fault_occur(DTC_BMU_COMM);
+        }
+    }
+}
+
+/**
+ * @brief      Get the cell temperature value at the specified ID
+ *
+ * @param      BMU_ID Start ID is 1 , End ID is BMU_MAX_NUM
+ * @param      Cell_ID Start ID is 0 , End ID is BMU_TCELL_MAX_NUM
+ * @return     unsigned short
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-08-29
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+unsigned short BMU_CellTempGet(unsigned char BMU_ID, unsigned char Cell_ID) {
+    unsigned short ret;
+    if ((BMU_ID < (BMU_MAX_NUM + BMU_ID_OFFSET)) && (BMU_ID >= BMU_ID_OFFSET) && (BMU_ID < BMU_TCELL_MAX_NUM)) {
+        BMU_ID -= BMU_ID_OFFSET;
+        ret = BR.BmuVcell[BMU_ID][Cell_ID];
+    } else {
+        ret = 0xFF;
+    }
+    return ret;
+}
+
+/**
+ * @brief      Get the cell Voltage value at the specified ID
+ *
+ * @param      BMU_ID Start ID is 1 , End ID is BMU_MAX_NUM
+ * @param      Cell_ID Start ID is 0 , End ID is BMU_VCELL_MAX_NUM
+ * @return     unsigned short
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-08-29
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+unsigned short BMU_CellVoltGet(unsigned char BMU_ID, unsigned char Cell_ID) {
+    unsigned short ret;
+    if ((BMU_ID < (BMU_MAX_NUM + BMU_ID_OFFSET)) && (BMU_ID >= BMU_ID_OFFSET) && (BMU_ID < BMU_VCELL_MAX_NUM)) {
+        BMU_ID -= BMU_ID_OFFSET;
+        ret = BR.BmuVcell[BMU_ID][Cell_ID];
+    } else {
+        ret = 0xFF;
+    }
+    return ret;
+}
+
+static void BMU_Ctrl_Tasks(void) {
+    if (BMU_tasksTimeCount == 0) {
+        BMU_taskState      = BMS_BMU_SRCH_DATA;
+        BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
+    }
+    switch (BMU_taskState) {
+        case BMS_BMU_REQ_CMD:
+            BMU_rxMessageFlag        = 0;
+            BMU_responseTimeoutCount = BMU_RESPONSE_TIMEOUT_TIME;
+            BMU_BalanceParamMsg(BMU_ID);
+            BMU_RequestDataMsg(BMU_ID);
+            BMU_taskState = BMS_BMU_CHK_RSP;
+            break;
+        case BMS_BMU_CHK_RSP:
+            if (BMU_ID < BMU_MAX_NUM) {
+                BMU_ResponseCheck(BMU_ID);
+                BMU_rxMessageFlag = 0x07;  // TODO: Delete
+                if (BMU_rxMessageFlag == BMU_RECV_MSG_FLAG) {
+                    BMU_ResponseComplete(BMU_ID);
+                    if (BMU_XtrmVcellSearch(BMU_ID)) {
+                        /*TODO:clear_fault_occur(DTC_AFE_COMM);*/
+                    } else {
+                        /*TODO:set_fault_occur(DTC_AFE_COMM);*/
+                    }
+                    BMU_XtrmTcellSearch(BMU_ID);
+                    BMU_ID++;
+                    BMU_taskState = BMS_BMU_REQ_CMD;
+                } else if (BMU_responseTimeoutCount == 0) {
+                    BMU_ResponseTimeout(BMU_ID);
+                    if (++BMU_retryCount > 2) {
+                        BMU_retryCount = 0;
+                        BMU_ID++;
+                    }
+                    BMU_taskState = BMS_BMU_REQ_CMD;
+                }
+            }
+            break;
+        case BMS_BMU_SRCH_DATA:
+            BMU_ID        = 0;
+            BMU_taskState = BMS_BMU_REQ_CMD;
+
+            BMU_CommStatusCheck();
+            BRANCH_XtrmVoltSearch();
+            BRANCH_XtrmTempSearch();
+            BRANCH_XtrmVcellIDSearch();
+            BRANCH_XtrmTcellIDSearch();
+
+            break;
+        default:
+            break;
+    }
+}
+
+void BMU_Initialize(void) {
+    BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
+    BMU_taskState      = BMS_BMU_REQ_CMD;
+
+    if (0x00 == eepSpe.BmsAddr) {  // TODO:
+        /* 測試時如果沒有變更位址，各BMU回覆0xC0(BCU)的位址，
+            避免造成Slave BCU的負擔，Slave BCU預設位址0xC0 */
+        BMS_SourceAddrBackup = 0xD0;
+    } else {
+        /* 避免中途變更BSM_Address的問題 */
+        BMS_SourceAddrBackup = (eepSpe.BmsAddr | 0xC0); /* 內網通訊位址 */
+    }
+
+    /*TODO: Clr Queue*/
+    while (CAN_GetRxQueueCount(CAN_1) != 0) {
+        CAN_PullRxQueue(CAN_1, &canRxMsg);
+    }
+}
+
+/*TODO: 1ms TimeCount Handle*/
+void BMU_1ms_Tasks(void) {
+    BMU_Ctrl_Tasks();
+
+    if (BMU_responseTimeoutCount) {
+        BMU_responseTimeoutCount--;
+    }
+
+    if (BMU_tasksTimeCount) {
+        BMU_tasksTimeCount--;
+    }
+
+    if (gBmuFaultLed1msDEC) {
+        gBmuFaultLed1msDEC--;
+    } else {
+        for (unsigned i = 0; i < BMU_MAX_NUM; i++) {
+            BR.BmuFaultLed[i] = 0;
+        }
+    }
+}
+
+/* USER CODE END 0 */
+/*******************************************************************************
+ End of File
+ */

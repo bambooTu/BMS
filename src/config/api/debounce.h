@@ -15,9 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _DIGITAL_INPUT_H    /* Guard against multiple inclusion */
+#ifndef _DIGITAL_INPUT_H /* Guard against multiple inclusion */
 #define _DIGITAL_INPUT_H
-
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -36,77 +35,72 @@
 extern "C" {
 #endif
 
+/* ************************************************************************** */
+/* ************************************************************************** */
+/* Section: Constants                                                         */
+/* ************************************************************************** */
+/* ************************************************************************** */
 
-    /* ************************************************************************** */
-    /* ************************************************************************** */
-    /* Section: Constants                                                         */
-    /* ************************************************************************** */
-    /* ************************************************************************** */
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
 
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
+/* ************************************************************************** */
+/** Descriptive Constant Name
 
+  @Summary
+    Brief one-line summary of the constant.
 
-    /* ************************************************************************** */
-    /** Descriptive Constant Name
+  @Description
+    Full description, explaining the purpose and usage of the constant.
+    <p>
+    Additional description in consecutive paragraphs separated by HTML
+    paragraph breaks, as necessary.
+    <p>
+    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
 
-      @Summary
-        Brief one-line summary of the constant.
-    
-      @Description
-        Full description, explaining the purpose and usage of the constant.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-      @Remarks
-        Any additional remarks
-     */
+  @Remarks
+    Any additional remarks
+ */
 #define EXAMPLE_CONSTANT 0
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
 
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Data Types
-    // *****************************************************************************
-    // *****************************************************************************
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
+typedef enum {
+    DIN_1,            // Button release
+    DIN_2,            // Button turn on
+    DIN_3,            // Button turn off
+    DIN_4,            // EMS cutoff
+    DIN_MAPPING_MAX,  // max
+} DIN_MAPPING_e;
 
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
-    typedef enum {
-        DIN_1, // Button release
-        DIN_2, // Button turn on 
-        DIN_3, // Button turn off
-        DIN_4, // EMS cutoff
-        DIN_MAPPING_MAX, //max
-    } DIN_MAPPING_e;
+typedef struct {
+    bool         status;
+    unsigned int debounceTime;
+} DIN_PARAM_t;
 
-    typedef struct {
-        bool status;
-        unsigned int debounceTime;
-    } DIN_PARAM_t;
+typedef struct {
+    DIN_MAPPING_e dinNum;
+    DIN_PARAM_t*  dinParam;
+} DIN_TASK_TABLE_t;
 
-    typedef struct {
-        DIN_MAPPING_e dinNum;
-        DIN_PARAM_t* dinParam;
-    } DIN_TASK_TABLE_t;
+// *****************************************************************************
+// *****************************************************************************
+// Section: Interface Functions
+// *****************************************************************************
+// *****************************************************************************
+void DIN_ParameterInitialize(void);
+void DIN_5ms_Tasks(void);
+bool DIN_StateGet(DIN_MAPPING_e dinNum);
 
-
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Interface Functions
-    // *****************************************************************************
-    // *****************************************************************************
-    void DIN_ParameterInitialize(void);
-    void DIN_5ms_Tasks(void);
-    bool DIN_StateGet(DIN_MAPPING_e dinNum);
-
-
-    /* Provide C++ Compatibility */
+/* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif

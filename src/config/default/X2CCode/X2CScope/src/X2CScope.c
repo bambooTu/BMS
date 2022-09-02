@@ -4,7 +4,7 @@
  */
 /*
  * This file is licensed according to the BSD 3-clause license as follows:
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
  *     * Neither the name of the "Linz Center of Mechatronics GmbH" and "LCM" nor
  *       the names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -30,12 +30,10 @@
 /*
  * This file is part of X2C. http://www.mechatronic-simulation.org/
  */
-#include "definitions.h"
 #include "../inc/X2CScopeCommunication.h"
+#include "definitions.h"
 
-
-void X2CScope_Init(void)
-{
+void X2CScope_Init(void) {
     X2CScope_HookUARTFunctions(sendSerial, receiveSerial, isReceiveDataAvailable, isSendReady);
     X2CScope_Initialise();
 }

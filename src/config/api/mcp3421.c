@@ -1,13 +1,13 @@
 /**
  * @file       mcp3421.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-09-01
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * I2C Inter-Integrated Circuit
  */
 
@@ -84,7 +84,7 @@ void MCP3421_Initialize(void) {
     MCP3421_WriteConfig(mcp3421_addr.byte >> 1, mcp3421_config.byte);
 }
 
-short MCP3421_AdcValueGet(void) {//20ms
+short MCP3421_AdcValueGet(void) {  // 20ms
     short adc_value = 0;
     if (I2C0_data.timeoutCount++ > 50) {
         I2C0_data.errorCount = SATURATION(I2C0_data.timeoutCount, 50, 0);

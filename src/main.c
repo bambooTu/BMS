@@ -36,6 +36,7 @@
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
+
 struct {
     unsigned _1ms   : 1;
     unsigned _5ms   : 1;
@@ -68,6 +69,7 @@ unsigned char step  = 0;
 // Section: Interrupt Handler
 // *****************************************************************************
 // *****************************************************************************
+
 void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
     if (cnt_1ms++ >= CALCULTAE_TIME_MS(1)) {
         cnt_1ms      = 0;
@@ -93,7 +95,7 @@ int main(void) {
     /* Initialize all modules */
     SYS_Initialize(NULL);
     eepBms = eepBmsDef;
-
+    eepSpe = eepSpeDef;
     while (true) {
         /* Maintain state machines of all polled MPLAB Harmony modules. */
         SYS_Tasks();
@@ -108,15 +110,17 @@ int main(void) {
                 TMR4_Start();
                 DIN_ParameterInitialize();
                 HV_Initialize();
+                BMU_Initialize();
+                CAN_Initialize();
                 appData.state = APP_STATE_SERVICE_TASKS;
                 break;
             case APP_STATE_SERVICE_TASKS:
                 if (tmrData._1ms) {
                     tmrData._1ms = false;
                     HV_1ms_Tasks();
-                    DTC_1ms_Tasks();
+                    //DTC_1ms_Tasks();
+                    BMU_1ms_Tasks();
                     BMS_1ms_Tasks();
-
                     switch (step) {
                         case 0:
                             if (DIN_StateGet(DIN_2) == true) {
@@ -145,15 +149,10 @@ int main(void) {
                 if (tmrData._5ms) {
                     tmrData._5ms = false;
                     DIN_5ms_Tasks();
+                    CAN_QueueDataXfer(CAN_1);
                 }
                 if (tmrData._500ms) {
                     tmrData._500ms = false;
-                    /*TODO: Delete Test Function*/
-                    static unsigned char testi = 0;
-                    if (testi++ > 20) {
-                        // DTC_FaultOccurSet(DTC_BMU_COMM);
-                    }
-                    /*TODO: Delete Test Function*/
                     RLED_Toggle();
                 }
                 break;

@@ -1,9 +1,9 @@
 #include "sys_parameter.h"
 
-#define debugLED_On           
-#define debugLED_Off          
-#define debugLED_Get          false
-#define debugLED_Toggle       
+#define debugLED_On
+#define debugLED_Off
+#define debugLED_Get false
+#define debugLED_Toggle
 #define NoFaultInterval_mS    100
 #define LongInterval_mS       600
 #define LongDelayInterval_mS  2500

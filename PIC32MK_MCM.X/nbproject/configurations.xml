@@ -18,14 +18,15 @@
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/bms_ctrl.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/hv_setup.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.h</itemPath>
+            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_bmu.h</itemPath>
           </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="canfd" displayName="canfd" projectFiles="true">
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd_common.h</itemPath>
-              <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.h</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd1.h</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd2.h</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd3.h</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.h</itemPath>
             </logicalFolder>
             <logicalFolder name="clk" displayName="clk" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clk/plib_clk.h</itemPath>
@@ -86,13 +87,14 @@
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/bms_ctrl.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/hv_setup.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.c</itemPath>
+          <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_bmu.c</itemPath>
         </logicalFolder>
         <logicalFolder name="default" displayName="default" projectFiles="true">
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="canfd" displayName="canfd" projectFiles="true">
-              <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.c</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd1.c</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd2.c</itemPath>
+              <itemPath>../src/config/default/peripheral/canfd/plib_canfd4.c</itemPath>
               <itemPath>../src/config/default/peripheral/canfd/plib_canfd3.c</itemPath>
             </logicalFolder>
             <logicalFolder name="clk" displayName="clk" projectFiles="true">

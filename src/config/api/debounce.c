@@ -23,25 +23,23 @@
 
 #include "sys_parameter.h"
 
-
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-#define RISING 0
+#define RISING  0
 #define FALLING 1
-unsigned int g_DebounceTimeCount[2][DIN_MAPPING_MAX];
-DIN_PARAM_t g_DinParamTable[DIN_MAPPING_MAX];
+unsigned int     g_DebounceTimeCount[2][DIN_MAPPING_MAX];
+DIN_PARAM_t      g_DinParamTable[DIN_MAPPING_MAX];
 DIN_TASK_TABLE_t g_DinTaskTable[] = {
-    {DIN_1, &g_DinParamTable[DIN_1]},
-    {DIN_2, &g_DinParamTable[DIN_2]},
-    {DIN_3, &g_DinParamTable[DIN_3]},
-    {DIN_4, &g_DinParamTable[DIN_4]},
+    {          DIN_1,           &g_DinParamTable[DIN_1]},
+    {          DIN_2,           &g_DinParamTable[DIN_2]},
+    {          DIN_3,           &g_DinParamTable[DIN_3]},
+    {          DIN_4,           &g_DinParamTable[DIN_4]},
     {DIN_MAPPING_MAX, &g_DinParamTable[DIN_MAPPING_MAX]},
 };
-
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -97,7 +95,6 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
         g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime;
     }
 }
-
 
 /* ************************************************************************** */
 /* ************************************************************************** */

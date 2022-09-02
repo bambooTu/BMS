@@ -21,27 +21,27 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
-*
-* Subject to your compliance with these terms, you may use Microchip software
-* and any derivatives exclusively with Microchip products. It is your
-* responsibility to comply with third party license terms applicable to your
-* use of third party software (including open source software) that may
-* accompany Microchip software.
-*
-* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-* PARTICULAR PURPOSE.
-*
-* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-*******************************************************************************/
+ * Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
+ *
+ * Subject to your compliance with these terms, you may use Microchip software
+ * and any derivatives exclusively with Microchip products. It is your
+ * responsibility to comply with third party license terms applicable to your
+ * use of third party software (including open source software) that may
+ * accompany Microchip software.
+ *
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+ * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *******************************************************************************/
 // DOM-IGNORE-END
 
 #ifndef PLIB_CANFD_COMMON_H
@@ -50,7 +50,7 @@
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -74,8 +74,7 @@
    Remarks:
     None.
 */
-typedef enum
-{
+typedef enum {
     CANFD_MODE_NORMAL = 0,
     CANFD_MODE_FD_WITHOUT_BRS,
     CANFD_MODE_FD_WITH_BRS
@@ -95,8 +94,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum
-{
+typedef enum {
     CANFD_MSG_TX_DATA_FRAME = 0,
     CANFD_MSG_TX_REMOTE_FRAME
 } CANFD_MSG_TX_ATTRIBUTE;
@@ -113,8 +111,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum
-{
+typedef enum {
     CANFD_MSG_RX_DATA_FRAME = 0,
     CANFD_MSG_RX_REMOTE_FRAME
 } CANFD_MSG_RX_ATTRIBUTE;
@@ -131,8 +128,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum
-{
+typedef enum {
     /* Receive FIFO Not Empty / Transmit FIFO Not Full Interrupt Mask */
     CANFD_FIFO_INTERRUPT_TFNRFNIF_MASK = 0x1,
 
@@ -161,15 +157,14 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum
-{
-    CANFD_ERROR_NONE = 0x0,
-    CANFD_ERROR_TX_RX_WARNING_STATE = 0x10000,
-    CANFD_ERROR_RX_WARNING_STATE = 0x20000,
-    CANFD_ERROR_TX_WARNING_STATE = 0x40000,
+typedef enum {
+    CANFD_ERROR_NONE                 = 0x0,
+    CANFD_ERROR_TX_RX_WARNING_STATE  = 0x10000,
+    CANFD_ERROR_RX_WARNING_STATE     = 0x20000,
+    CANFD_ERROR_TX_WARNING_STATE     = 0x40000,
     CANFD_ERROR_RX_BUS_PASSIVE_STATE = 0x80000,
     CANFD_ERROR_TX_BUS_PASSIVE_STATE = 0x100000,
-    CANFD_ERROR_TX_BUS_OFF_STATE = 0x200000
+    CANFD_ERROR_TX_BUS_OFF_STATE     = 0x200000
 } CANFD_ERROR;
 
 // *****************************************************************************
@@ -184,7 +179,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef void (*CANFD_CALLBACK) (uintptr_t contextHandle);
+typedef void (*CANFD_CALLBACK)(uintptr_t contextHandle);
 
 // *****************************************************************************
 /* CANFD RX Message
@@ -198,14 +193,13 @@ typedef void (*CANFD_CALLBACK) (uintptr_t contextHandle);
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* Rx Message ID */
     uint32_t *id;
     /* Rx Message buffer */
-    uint8_t  *buffer;
+    uint8_t *buffer;
     /* Rx Message size */
-    uint8_t  *size;
+    uint8_t *size;
     /* Rx Message timestamp */
     uint32_t *timestamp;
     /* Rx Message attribute */
@@ -224,8 +218,7 @@ typedef struct
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* CANFD Rx message - SID[10:0] and EID[28:11]  */
     uint32_t r0;
 
@@ -249,8 +242,7 @@ typedef struct
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* CANFD Tx message - SID[10:0] and EID[28:11] */
     uint32_t t0;
 
@@ -274,8 +266,7 @@ typedef struct
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* CANFD Tx Event FIFO - SID[10:0] and EID[28:11] */
     uint32_t te0;
 
@@ -299,8 +290,7 @@ typedef struct
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* Transfer Event Callback */
     CANFD_CALLBACK callback;
 
@@ -320,8 +310,7 @@ typedef struct
    Remarks:
     None.
 */
-typedef struct
-{
+typedef struct {
     /* CANFD Error Status */
     uint32_t errorStatus;
 } CANFD_OBJ;
@@ -332,4 +321,4 @@ typedef struct
 #endif
 // DOM-IGNORE-END
 
-#endif //PLIB_CANFD_COMMON_H
+#endif  // PLIB_CANFD_COMMON_H

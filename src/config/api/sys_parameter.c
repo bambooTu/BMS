@@ -1,13 +1,13 @@
 /**
  * @file       sys_parameter.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-09-01
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * BMS  Battery management system
  * EMG  Emergency
  * SPE  Special
@@ -43,36 +43,33 @@ volatile const EEPROM_BMS_t eepBmsDef = {
     EEP_KEY_ID,
     SVN_NUMBER,
  /***BMSParameterSetting***/
-  //clang-format off
-
   /**Over Temperature**/
   /*Limit,Release,Limit Time,Release Time*/
-    {450,     430,      1000,             3000}, /*OTP*/
-    {400,       380,             1000,                    3000}, /*OTW*/
-    {100,   120,           1000,      3000}, /*UTP*/
-    {150,   170,1000,        3000}, /*UTW*/
-    {100,  50,          5000,               3000}, /*UBTW*/
+    {    450,    430, 1000, 3000}, /*OTP*/
+    {    400,    380, 1000, 3000}, /*OTW*/
+    {    100,    120, 1000, 3000}, /*UTP*/
+    {    150,    170, 1000, 3000}, /*UTW*/
+    {    100,     50, 5000, 3000}, /*UBTW*/
 
   /**OverVoltage**/
   /*Limit,Release,LimitTime,ReleaseTime*/
-    {806000,     800000,          3000,             3000}, /*OVP*/
-    {795000,       790000,          3000,                3000}, /*OVW*/
-    {560000,   575000,           3000,          3000}, /*UVP*/
-    {570000,   590000,3000,3000}, /*UVW*/
-    {500,200,2000,5000}, /*CellUBP*/
-    {350,  300,  2000,                 5000}, /*CellUBW*/
-    {3650,       3600,             2000,                            5000}, /*CellOVP*/
-    {2500,   2600,           2000,                              5000}, /*CellUVP*/
+    { 806000, 800000, 3000, 3000}, /*OVP*/
+    { 795000, 790000, 3000, 3000}, /*OVW*/
+    { 560000, 575000, 3000, 3000}, /*UVP*/
+    { 570000, 590000, 3000, 3000}, /*UVW*/
+    {    500,    200, 2000, 5000}, /*CellUBP*/
+    {    350,    300, 2000, 5000}, /*CellUBW*/
+    {   3650,   3600, 2000, 5000}, /*CellOVP*/
+    {   2500,   2600, 2000, 5000}, /*CellUVP*/
 
   /**OverCurrent**/
   /*Limit,Release,LimitTime,ReleaseTime*/
-    {-120000,   -1000,      1000,      1000}, /*ODCP*/
-    {-80000,-1000,1000,1000}, /*ODCW*/
-    {80000,    1000,      1000,        1000}, /*OCCP*/
-    {75000,       1000,         1000,                  1000},
+    {-120000,  -1000, 1000, 1000}, /*ODCP*/
+    { -80000,  -1000, 1000, 1000}, /*ODCW*/
+    {  80000,   1000, 1000, 1000}, /*OCCP*/
+    {  75000,   1000, 1000, 1000},
 
- //clang-format on
-  /*OCCW*/
+ /*OCCW*/
   /*OCPLockTime*/
     (60000 / 100),
 
@@ -83,9 +80,11 @@ volatile const EEPROM_BMS_t eepBmsDef = {
     26U, /*FactoryDay*/
     10U, /*FactoryMonth*/
     2021UL, /*FactoryYear*/
-    "0000000000000", /*SerialNum[13+1]*/
-  /***Balance***/ {BAL_OFF,   CELL_DESIGN_MAX_VOLT,           10                },
- /***Dummy***/
+    "0000000000000",
+ // clang-format off
+    {BAL_OFF, CELL_DESIGN_MAX_VOLT,   10     },
+  // clang-format on
+  /***Dummy***/
     0,
     0,
     0,
@@ -95,7 +94,7 @@ volatile const EEPROM_BMS_t eepBmsDef = {
 
 volatile const EEPROM_EMERGENCY_t eepEmgDef = {
     .ChgCap = CELL_DESIGN_CAP, .CycleLife = 0, .DisChgCap = 0, .ErrorCode = {0}};
-volatile const EEPROM_SPECIAL_t eepSpeDef = {.Addr = BMS_COMM_ADDR, .AdcGainOffset = 0, .AdcZeroOffset = 0};
+volatile const EEPROM_SPECIAL_t eepSpeDef = {.BmsAddr = BMS_COMM_ADDR, .AdcGainOffset = 0, .AdcZeroOffset = 0};
 
 EEPROM_BMS_t       eepBms  = {};
 EEPROM_EMERGENCY_t eepEmg  = {};
@@ -216,7 +215,7 @@ unsigned char APP_EepromInitialize(void) {
                        EEPROM_BMS_START_ADDR);
 
     /*If Chip Is New, Write Default Data Into EEPROM*/
-    if (0xFF == eepSpe.Addr) {
+    if (0xFF == eepSpe.BmsAddr) {
         eepEmg          = eepEmgDef;
         eepSpe          = eepSpeDef;
         eepBms          = eepBmsDef;
@@ -276,7 +275,7 @@ void APP_EepromEmergencyWrite(void) {
 }
 /**
  * @brief      Write special data to EEPROM
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01
@@ -288,7 +287,7 @@ void APP_EepromSpecialWrite(void) {
 
 /**
  * @brief      EEPROM polling tasks
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-01

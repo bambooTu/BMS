@@ -18,27 +18,27 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
-*
-* Subject to your compliance with these terms, you may use Microchip software
-* and any derivatives exclusively with Microchip products. It is your
-* responsibility to comply with third party license terms applicable to your
-* use of third party software (including open source software) that may
-* accompany Microchip software.
-*
-* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-* PARTICULAR PURPOSE.
-*
-* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-*******************************************************************************/
+ * Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
+ *
+ * Subject to your compliance with these terms, you may use Microchip software
+ * and any derivatives exclusively with Microchip products. It is your
+ * responsibility to comply with third party license terms applicable to your
+ * use of third party software (including open source software) that may
+ * accompany Microchip software.
+ *
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+ * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *******************************************************************************/
 // DOM-IGNORE-END
 
 // *****************************************************************************
@@ -46,10 +46,10 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "device.h"
-#include "definitions.h"
 #include <stdio.h>
 
+#include "definitions.h"
+#include "device.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -73,20 +73,20 @@ static unsigned int _excep_addr;
 
 /* Enum identifying the cause */
 typedef enum {
-    EXCEP_IRQ      =  0, // interrupt
-    EXCEP_AdEL     =  4, // address error exception (load or ifetch)
-    EXCEP_AdES     =  5, // address error exception (store)
-    EXCEP_IBE      =  6, // bus error (ifetch)
-    EXCEP_DBE      =  7, // bus error (load/store)
-    EXCEP_Sys      =  8, // syscall
-    EXCEP_Bp       =  9, // breakpoint
-    EXCEP_RI       = 10, // reserved instruction
-    EXCEP_CpU      = 11, // coprocessor unusable
-    EXCEP_Overflow = 12, // arithmetic overflow
-    EXCEP_Trap     = 13, // trap (possible divide by zero)
-    EXCEP_IS1      = 16, // implementation specfic 1
-    EXCEP_CEU      = 17, // CorExtend Unuseable
-    EXCEP_C2E      = 18, // coprocessor 2
+    EXCEP_IRQ      = 0,   // interrupt
+    EXCEP_AdEL     = 4,   // address error exception (load or ifetch)
+    EXCEP_AdES     = 5,   // address error exception (store)
+    EXCEP_IBE      = 6,   // bus error (ifetch)
+    EXCEP_DBE      = 7,   // bus error (load/store)
+    EXCEP_Sys      = 8,   // syscall
+    EXCEP_Bp       = 9,   // breakpoint
+    EXCEP_RI       = 10,  // reserved instruction
+    EXCEP_CpU      = 11,  // coprocessor unusable
+    EXCEP_Overflow = 12,  // arithmetic overflow
+    EXCEP_Trap     = 13,  // trap (possible divide by zero)
+    EXCEP_IS1      = 16,  // implementation specfic 1
+    EXCEP_CEU      = 17,  // CorExtend Unuseable
+    EXCEP_C2E      = 18,  // coprocessor 2
 } excep_code;
 
 /* Code identifying the cause of the exception (CP0 Cause register). */
@@ -106,18 +106,16 @@ static excep_code _excep_code;
     Refer to the XC32 User's Guide for additional information.
  */
 
-void __attribute__((noreturn)) _general_exception_handler ( void )
-{
+void __attribute__((noreturn)) _general_exception_handler(void) {
     /* Mask off the ExcCode Field from the Cause Register
     Refer to the MIPs Software User's manual */
     _excep_code = (_CP0_GET_CAUSE() & 0x0000007C) >> 2;
     _excep_addr = _CP0_GET_EPC();
 
-    while (1)
-    {
-        #if defined(__DEBUG) || defined(__DEBUG_D) && defined(__XC32)
-            __builtin_software_breakpoint();
-        #endif
+    while (1) {
+#if defined(__DEBUG) || defined(__DEBUG_D) && defined(__XC32)
+        __builtin_software_breakpoint();
+#endif
     }
 }
 
@@ -133,18 +131,16 @@ void __attribute__((noreturn)) _general_exception_handler ( void )
     Refer to the XC32 User's Guide for additional information.
  */
 
-void __attribute__((noreturn)) _bootstrap_exception_handler(void)
-{
+void __attribute__((noreturn)) _bootstrap_exception_handler(void) {
     /* Mask off the ExcCode Field from the Cause Register
     Refer to the MIPs Software User's manual */
     _excep_code = (_CP0_GET_CAUSE() & 0x0000007C) >> 2;
     _excep_addr = _CP0_GET_EPC();
 
-    while (1)
-    {
-        #if defined(__DEBUG) || defined(__DEBUG_D) && defined(__XC32)
-            __builtin_software_breakpoint();
-        #endif
+    while (1) {
+#if defined(__DEBUG) || defined(__DEBUG_D) && defined(__XC32)
+        __builtin_software_breakpoint();
+#endif
     }
 }
 /*******************************************************************************

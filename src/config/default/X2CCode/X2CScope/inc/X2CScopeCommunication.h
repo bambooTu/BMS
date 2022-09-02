@@ -4,7 +4,7 @@
  */
 /*
  * This file is licensed according to the BSD 3-clause license as follows:
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
  *     * Neither the name of the "Linz Center of Mechatronics GmbH" and "LCM" nor
  *       the names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -31,19 +31,19 @@
  * This file is part of X2C. http://www.mechatronic-simulation.org/
  */
 #ifndef X2CSCOPECOMMUNICATION_H
-#define	X2CSCOPECOMMUNICATION_H
+#define X2CSCOPECOMMUNICATION_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include <stdint.h>
 
 void X2CScope_Initialise(void);
-void X2CScope_HookUARTFunctions(void (*sendSerialFcnPntr)(uint8_t), uint8_t (*receiveSerialFcnPntr)(void), \
-        uint8_t (*isReceiveDataAvailableFcnPntr)(void), uint8_t (*isSendReadyFcnPntr)(void));
+void X2CScope_HookUARTFunctions(void (*sendSerialFcnPntr)(uint8_t), uint8_t (*receiveSerialFcnPntr)(void),
+                                uint8_t (*isReceiveDataAvailableFcnPntr)(void), uint8_t (*isSendReadyFcnPntr)(void));
 
-void sendSerial(uint8_t data);
+void    sendSerial(uint8_t data);
 uint8_t receiveSerial(void);
 uint8_t isReceiveDataAvailable(void);
 uint8_t isSendReady(void);
@@ -52,4 +52,4 @@ uint8_t isSendReady(void);
 }
 #endif
 
-#endif	/* X2CSCOPECOMMUNICATION_H */
+#endif /* X2CSCOPECOMMUNICATION_H */

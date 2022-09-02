@@ -15,67 +15,29 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "can.h"
+#include "sys_parameter.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum {
-    GRP_PARAM_CURR,
-    GRP_PARAM_VOLT,
-    GRP_PARAM_TEMP,
-    GRP_PARAM_OTHERS,
-} GROUP_PARAM;
-
-typedef enum {
-    SN1,
-    SN2,
-} SECT_SN;
-
 typedef bool (*CAN_MESSAGERECEIVE)(uint32_t* id, uint8_t* length, uint8_t* data, uint32_t* timestamp, uint8_t fifoNum,
                                    CANFD_MSG_RX_ATTRIBUTE* msgAttr);
-
 
 typedef CANFD_ERROR (*CAN_ERRORGET)(void);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define _1000MS                   (1000)
-#define TIMEOUT_MBMS_COMMS_SEC(x) (x * _1000MS)
-#define TIMEOUT_ENG_MODE_SEC(x)   (x * _1000MS)
-#define TIMED_OUT                 (0)
-
-#define COMMS_MAJOR_VER_0 'D'
-#define COMMS_MAJOR_VER_1 'I'
-#define COMMS_MINOR_VER_0 'C'
-#define COMMS_MINOR_VER_1 'K'
-#define COMMS_MINOR_VER_2 '!'
-
-#define HW_VER_0 'd'
-#define HW_VER_1 'i'
-#define HW_VER_2 'c'
-#define SW_VER_0 'k'
-#define SW_VER_1 '?'
-#define SW_VER_2 '!'
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define FUNC_GET_KEY(x)   (x * 1)
-#define MACRO_LOWBYTE(x)  *(uint8_t*)(&x)
-#define MACRO_HIGHBYTE(x) *((uint8_t*)(&x) + 1)
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
 
-extern uint16_t CurrentParamGroupSize;
-extern uint16_t VoltageParamGroupSize;
-extern uint16_t TemperatureParamGroupSize;
-extern uint16_t OtherParamGroupSize;
+/* USER CODE BEGIN PV */
 
 union {
     struct {
@@ -91,15 +53,6 @@ union {
     uint64_t u64;
 } Data;
 
-enum {
-    RESPOND_ACK,
-    RESPOND_NACK,
-};
-
-enum {
-    CMD_RESPOND = 0xE8,
-};
-
 const CAN_MESSAGERECEIVE CANx_MessageReceive[CAN_NUMBER_OF_MODULE] = {
     CAN1_MessageReceive,
     CAN2_MessageReceive,
@@ -113,8 +66,6 @@ const CAN_ERRORGET CANx_ErrorGet[CAN_NUMBER_OF_MODULE] = {
     CAN3_ErrorGet,
     CAN4_ErrorGet,
 };
-
-
 
 // CAN Variable
 static can_msg_t    txQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE], rxQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE];
@@ -147,6 +98,7 @@ static void CAN1_Callback(uintptr_t contextHandle) {
                                           recvMessage[Instance].data, &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
                                           &recvMessage[Instance].msgAttr);
             CAN_PushRxQueue(Instance, &recvMessage[Instance]);
+            GLED_Toggle();
             Nop();
             break;
         case CAN_EVENT_ERR:
@@ -375,27 +327,27 @@ static void initializeQueue(CAN_MODULE Instance) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void CAN_Initialize(void) {
-    can_msg_t settingMessage = {};
+    // can_msg_t settingMessage = {};
+
+    CAN1_CallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
+    CAN1_ErrorCallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_ERR);
+    CAN2_CallbackRegister(CAN2_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
+    CAN2_ErrorCallbackRegister(CAN2_Callback, (uintptr_t)CAN_EVENT_ERR);
+    CAN3_CallbackRegister(CAN3_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
+    CAN3_ErrorCallbackRegister(CAN3_Callback, (uintptr_t)CAN_EVENT_ERR);
+    CAN4_CallbackRegister(CAN4_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
+    CAN4_ErrorCallbackRegister(CAN4_Callback, (uintptr_t)CAN_EVENT_ERR);
+    // TODO(Chiou): Only filter for BMS communication protocol address, can be removed if you want accept all messages
+
     for (CAN_MODULE Instance = CAN_1; Instance < CAN_NUMBER_OF_MODULE; Instance++) {
         CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc, recvMessage[Instance].data,
                                       &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
                                       &recvMessage[Instance].msgAttr);
         initializeQueue(Instance);
     }
-    CAN1_CallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
-    CAN1_ErrorCallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_ERR);
-     CAN2_CallbackRegister(CAN2_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
-     CAN2_ErrorCallbackRegister(CAN2_Callback, (uintptr_t)CAN_EVENT_ERR);
-     CAN3_CallbackRegister(CAN3_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
-     CAN3_ErrorCallbackRegister(CAN3_Callback, (uintptr_t)CAN_EVENT_ERR);
-    CAN4_CallbackRegister(CAN4_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
-    CAN4_ErrorCallbackRegister(CAN4_Callback, (uintptr_t)CAN_EVENT_ERR);
-    // TODO(Chiou): Only filter for BMS communication protocol address, can be removed if you want accept all messages
     /* Code begin */
-  
-    CAN1_MessageAcceptanceFilterSet(CAN_FIFONUM_RX0, settingMessage.id);
+    // CAN1_MessageAcceptanceFilterSet(CAN_FIFONUM_RX0, settingMessage.id);
     /* Code end */
-
 }
 
 /**
@@ -544,7 +496,7 @@ uint8_t CAN_PullRxQueue(CAN_MODULE Instance, can_msg_t* rxMessage) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint32_t CAN_getTxQueueCount(CAN_MODULE Instance) {
+uint32_t CAN_GetTxQueueCount(CAN_MODULE Instance) {
     return (Object[Instance].txQueue.Count);
 }
 
@@ -560,6 +512,35 @@ uint32_t CAN_getTxQueueCount(CAN_MODULE Instance) {
  */
 uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance) {
     return (Object[Instance].rxQueue.Count);
+}
+
+bool CAN_QueueDataXfer(CAN_MODULE Instance) {
+    bool      ret = false;
+    can_msg_t canTxMsg;
+    if (CAN_GetTxQueueCount(Instance)) {
+        CAN_PullTxQueue(Instance, &canTxMsg);
+        switch (Instance) {
+            case CAN_1:
+                ret = CAN1_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
+                                           CANFD_MSG_TX_DATA_FRAME);
+                break;
+            case CAN_2:
+                ret = CAN2_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
+                                           CANFD_MSG_TX_DATA_FRAME);
+                break;
+            case CAN_3:
+                ret = CAN3_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
+                                           CANFD_MSG_TX_DATA_FRAME);
+                break;
+            case CAN_4:
+                ret = CAN4_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
+                                           CANFD_MSG_TX_DATA_FRAME);
+                break;
+            default:
+                break;
+        }
+    }
+    return ret;
 }
 
 /* USER CODE END 0 */

@@ -5,10 +5,10 @@ frameworkPath: C:\Users\a01347\Harmony3
 processor: PIC32MK0512MCM100
 projectName: PIC32MK_MCM
 settings:
-  PackageFilter: ''
-  FORCE_OPTIMIZATION: 'false'
-  GENERATE_BACKUP: 'true'
-  TRUSTZONE: 'false'
+  PackageFilter: ""
+  FORCE_OPTIMIZATION: "false"
+  GENERATE_BACKUP: "true"
+  TRUSTZONE: "false"
   CMSISPath: dev_packs\arm\CMSIS\5.8.0
   MERGE_STRATEGY: USER_ALL
   DFPPath: dev_packs\Microchip\PIC32MK-MC_DFP\1.10.146\atdf\PIC32MK0512MCM100.atdf

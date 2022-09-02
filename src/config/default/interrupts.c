@@ -20,26 +20,26 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
-*
-* Subject to your compliance with these terms, you may use Microchip software
-* and any derivatives exclusively with Microchip products. It is your
-* responsibility to comply with third party license terms applicable to your
-* use of third party software (including open source software) that may
-* accompany Microchip software.
-*
-* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-* PARTICULAR PURPOSE.
-*
-* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ * Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
+ *
+ * Subject to your compliance with these terms, you may use Microchip software
+ * and any derivatives exclusively with Microchip products. It is your
+ * responsibility to comply with third party license terms applicable to your
+ * use of third party software (including open source software) that may
+ * accompany Microchip software.
+ *
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+ * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *******************************************************************************/
 // DOM-IGNORE-END
 
@@ -50,8 +50,8 @@
 // *****************************************************************************
 
 #include "interrupts.h"
-#include "definitions.h"
 
+#include "definitions.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -59,43 +59,32 @@
 // *****************************************************************************
 // *****************************************************************************
 
-
-void TIMER_4_InterruptHandler( void );
-void CAN1_InterruptHandler( void );
-void CAN2_InterruptHandler( void );
-void CAN3_InterruptHandler( void );
-void CAN4_InterruptHandler( void );
-
-
+void TIMER_4_InterruptHandler(void);
+void CAN1_InterruptHandler(void);
+void CAN2_InterruptHandler(void);
+void CAN3_InterruptHandler(void);
+void CAN4_InterruptHandler(void);
 
 /* All the handlers are defined here.  Each will call its PLIB-specific function. */
-void __ISR(_TIMER_4_VECTOR, ipl1SRS) TIMER_4_Handler (void)
-{
+void __ISR(_TIMER_4_VECTOR, ipl1SRS) TIMER_4_Handler(void) {
     TIMER_4_InterruptHandler();
 }
 
-void __ISR(_CAN1_VECTOR, ipl1SRS) CAN1_Handler (void)
-{
+void __ISR(_CAN1_VECTOR, ipl1SRS) CAN1_Handler(void) {
     CAN1_InterruptHandler();
 }
 
-void __ISR(_CAN2_VECTOR, ipl1SRS) CAN2_Handler (void)
-{
+void __ISR(_CAN2_VECTOR, ipl1SRS) CAN2_Handler(void) {
     CAN2_InterruptHandler();
 }
 
-void __ISR(_CAN3_VECTOR, ipl1SRS) CAN3_Handler (void)
-{
+void __ISR(_CAN3_VECTOR, ipl1SRS) CAN3_Handler(void) {
     CAN3_InterruptHandler();
 }
 
-void __ISR(_CAN4_VECTOR, ipl1SRS) CAN4_Handler (void)
-{
+void __ISR(_CAN4_VECTOR, ipl1SRS) CAN4_Handler(void) {
     CAN4_InterruptHandler();
 }
-
-
-
 
 /*******************************************************************************
  End of File
