@@ -166,7 +166,7 @@ void SYS_Initialize(void* data) {
     GPIO_Initialize();
 
     TMR4_Initialize();
-
+    I2C1_Initialize();
     //    CAN3_Initialize();
     //
     //    CAN4_Initialize();

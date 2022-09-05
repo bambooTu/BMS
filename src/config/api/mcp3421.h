@@ -1,3 +1,5 @@
+#ifndef _MCP3421_H
+#define _MCP3421_H
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -17,7 +19,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "../config/default/library/i2cbb/i2c_bb_local.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,25 +69,26 @@ typedef enum {
 } MCP3421_MODE_e;
 
 typedef enum {
-    I2C_TRANSFER_STATUS_IN_PROGRESS,
-    I2C_TRANSFER_STATUS_SUCCESS,
-    I2C_TRANSFER_STATUS_ERROR,
-    I2C_TRANSFER_STATUS_IDLE,
-} I2C_TRANSFER_STATUS_e;
+    APP_STATE_SENSOR_STATUS_VERIFY,
+    APP_STATE_CHECK_SENSOR_READY,
+    APP_STATE_READ_ADC_VALUE,
+    APP_STATE_WAIT_READ_COMPLETE,
+    APP_STATE_XFER_ERROR,
+    APP_STATE_IDLE
+} APP_STATES_e;
 
 typedef enum {
-    /* Application's state machine's initial state. */
-    I2C_STATE_INIT = 0,
-    I2C_STATE_READ_ADC,
-    I2C_STATE_READ_ADC_FINISH,
-    I2C_STATE_XFER_ERROR,
-    I2C_STATE_COMM_ERROR
-} APP_I2C_STATES_e;
+    APP_TRANSFER_STATUS_IN_PROGRESS,
+    APP_TRANSFER_STATUS_SUCCESS,
+    APP_TRANSFER_STATUS_ERROR,
+    APP_TRANSFER_STATUS_IDLE,
+} APP_TRANSFER_STATUS_e;
 
 typedef struct {
     /* The application's current state */
-    APP_I2C_STATES_e taskState;
-    I2CBB_ERROR      errorState;
+    APP_STATES_e taskState;
+    APP_STATES_e pastState;
+    I2C_ERROR    errorState;
     /* TODO: Define any additional data used by the application. */
     unsigned char txBuffer[I2C_TX_BUFFER_SIZE];
     unsigned char rxBuffer[I2C_RX_BUFFER_SIZE];
@@ -106,30 +109,29 @@ typedef struct {
 
 /* Global variables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
+
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void  MCP3421_Initialize(void);
-short MCP3421_AdcValueGet(void);
-void  MCP3421_InterruptTasks(void);
-void  MCP3421_ReadAdc(unsigned char addr);
-void  MCP3421_WriteConfig(unsigned char addr, unsigned char config);
+void MCP3421_Initialize(void);
+unsigned short MCP3421_AdcValueGet(void);
 /* USER CODE END FP */
-
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
 // DOM-IGNORE-END
+
+#endif /* _MCP3421_H */
 /*******************************************************************************
  End of File
  */

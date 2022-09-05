@@ -195,7 +195,7 @@ bool CAN_QueueDataXfer(CAN_MODULE Instance);
 #endif
 // DOM-IGNORE-END
 
-#endif /* _APP_H */
+#endif /* _CAN_H */
 
 /*******************************************************************************
  End of File

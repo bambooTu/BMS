@@ -35,6 +35,7 @@
 #include "fault.h"
 #include "hv_setup.h"
 #include "indicator.h"
+#include "mcp3421.h"
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
@@ -127,27 +128,27 @@ typedef struct {
 
     /***BMS Parameter Setting***/
     /**Over/Under Temperature**/
-    FAULT_PARA_t OTP;  /* Over Temperature Protection */
-    FAULT_PARA_t OTW;  /* Over Temperature Warning */
-    FAULT_PARA_t UTP;  /* Under Temperature Protection */
-    FAULT_PARA_t UTW;  /* Under Temperature Warning */
-    FAULT_PARA_t UBTW; /* Unbalance Temperature Warning */
+    FAULT_PARAM_t OTP;  /* Over Temperature Protection */
+    FAULT_PARAM_t OTW;  /* Over Temperature Warning */
+    FAULT_PARAM_t UTP;  /* Under Temperature Protection */
+    FAULT_PARAM_t UTW;  /* Under Temperature Warning */
+    FAULT_PARAM_t UBTW; /* Unbalance Temperature Warning */
 
     /**Over/Under Voltage**/
-    FAULT_PARA_t BusOVP;  /* Bus OverVoltage Protection */
-    FAULT_PARA_t BusOVW;  /* Bus OverVoltage Warning */
-    FAULT_PARA_t BusUVP;  /* Bus UnderVoltage Protection */
-    FAULT_PARA_t BusUVW;  /* Bus UnderVoltage Warning */
-    FAULT_PARA_t CellUBP; /* Cell Unbalance VoltageWarning */
-    FAULT_PARA_t CellUBW; /* Cell Unbalance VoltageWarning */
-    FAULT_PARA_t CellOVP; /* Cell OverVoltage Warning */
-    FAULT_PARA_t CellUVP; /* Cell OverVoltage Warning */
+    FAULT_PARAM_t BusOVP;  /* Bus OverVoltage Protection */
+    FAULT_PARAM_t BusOVW;  /* Bus OverVoltage Warning */
+    FAULT_PARAM_t BusUVP;  /* Bus UnderVoltage Protection */
+    FAULT_PARAM_t BusUVW;  /* Bus UnderVoltage Warning */
+    FAULT_PARAM_t CellUBP; /* Cell Unbalance VoltageWarning */
+    FAULT_PARAM_t CellUBW; /* Cell Unbalance VoltageWarning */
+    FAULT_PARAM_t CellOVP; /* Cell OverVoltage Warning */
+    FAULT_PARAM_t CellUVP; /* Cell OverVoltage Warning */
 
     /**OverCurrent**/
-    FAULT_PARA_t ODCP; /*Over Discharge Current Protection*/
-    FAULT_PARA_t ODCW; /*Over Discharge Current Warning*/
-    FAULT_PARA_t OCCP; /*Over Charge Current Protection*/
-    FAULT_PARA_t OCCW; /*Over Charge Current Warning*/
+    FAULT_PARAM_t ODCP; /*Over Discharge Current Protection*/
+    FAULT_PARAM_t ODCW; /*Over Discharge Current Warning*/
+    FAULT_PARAM_t OCCP; /*Over Charge Current Protection*/
+    FAULT_PARAM_t OCCW; /*Over Charge Current Warning*/
 
     unsigned short LockTimeOCP; /*unit:100mS*/
 

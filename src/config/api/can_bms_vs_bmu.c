@@ -171,9 +171,9 @@ static void BMU_ResponseCheck(unsigned int BMU_ID) {
     }
 }
 
-static unsigned char BMU_XtrmVcellSearch(unsigned int BMU_ID) { /*TODO: Change the type to boolean*/
+bool BMU_XtrmVcellSearch(unsigned int BMU_ID) {
     /* Search BMU Max. Min. Voltage Value */
-    unsigned char ret             = 0;
+    bool ret             = false;
     unsigned char fCommOkAFE      = 0;
     BR.BmuMaxVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
     BR.BmuMinVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
@@ -196,7 +196,7 @@ static unsigned char BMU_XtrmVcellSearch(unsigned int BMU_ID) { /*TODO: Change t
     }
 
     if (fCommOkAFE == BMU_VCELL_MAX_NUM) {
-        ret = 1;
+        ret = true;
     }
     return ret;
 }

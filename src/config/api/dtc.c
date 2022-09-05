@@ -151,7 +151,7 @@ static unsigned char DTC_FaultEventGet(DTC_EVENT_e event) {
     return ret;
 }
 
-static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARA_t* ptrObj) {
+static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source < ptrObj->Limit) {
             if (g_DtcTimeCount[event]-- == 0) {
@@ -173,7 +173,7 @@ static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARA_t* ptr
     }
 }
 
-static void DTC_HigherLimitCheck(DTC_EVENT_e event, int source, FAULT_PARA_t* ptrObj) {
+static void DTC_HigherLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source > ptrObj->Limit) {
             if (g_DtcTimeCount[event]-- == 0) {

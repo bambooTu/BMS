@@ -83,7 +83,7 @@ typedef struct {
     int            Release;     /*Protection Release Conditions*/
     unsigned short LimitTime;   /*Protection Timing,mSec*/
     unsigned short ReleaseTime; /*Release Timing,mSec*/
-} FAULT_PARA_t;                 /*Protection/Warning Parameter*/
+} FAULT_PARAM_t;                 /*Protection/Warning Parameter*/
 
 typedef enum {
     ERR_LEVEL_NONE,
@@ -103,7 +103,7 @@ typedef struct {
 typedef struct {
     DTC_EVENT_e   event;
     int*          source;
-    FAULT_PARA_t* ptrObject;
+    FAULT_PARAM_t* ptrObject;
 } DTC_FAULT_CHECK_TABLE_t;
 
 // *****************************************************************************
@@ -124,7 +124,7 @@ ERROR_LEVEL_e  DTC_WorstLevelGet(void);
 }
 #endif
 
-#endif /* _MCP3421_H  */
+#endif /* _DTC_H  */
 
 /* *****************************************************************************
  End of File

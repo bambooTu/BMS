@@ -45,20 +45,22 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
-
+#include <stddef.h>
+#include <stdbool.h>
 #include "X2CCode/X2CScope/inc/X2CScope.h"
+#include "peripheral/i2c/master/plib_i2c1_master.h"
+#include "peripheral/canfd/plib_canfd3.h"
+#include "peripheral/tmr/plib_tmr4.h"
+#include "peripheral/canfd/plib_canfd4.h"
+#include "peripheral/eeprom/plib_eeprom.h"
 #include "peripheral/canfd/plib_canfd1.h"
 #include "peripheral/canfd/plib_canfd2.h"
 #include "peripheral/canfd/plib_canfd3.h"
 #include "peripheral/canfd/plib_canfd4.h"
 #include "peripheral/clk/plib_clk.h"
-#include "peripheral/eeprom/plib_eeprom.h"
-#include "peripheral/evic/plib_evic.h"
 #include "peripheral/gpio/plib_gpio.h"
-#include "peripheral/tmr/plib_tmr4.h"
+#include "peripheral/evic/plib_evic.h"
 #include "peripheral/uart/plib_uart5.h"
 
 // DOM-IGNORE-BEGIN
