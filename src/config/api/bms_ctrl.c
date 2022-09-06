@@ -49,7 +49,10 @@ unsigned char gEmergencyState    = 0;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+// TODO :DELETE
+static bool          polar = false;
+static unsigned char step  = 0;
+// TODO :DELETE
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -134,22 +137,18 @@ static void BMS_Emergency(void) {
             HV_ModeCommand(MODE_OFF);
             if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
                 gEmergencyState++;
-                Nop();
             }
             break;
         case 1:
             if (DIN_StateGet(DIN_4) == false) {
                 gEmergencyState++;
-                Nop();
             }
             break;
         case 2:
             /*TODO: set_emergency_2_eeprom();*/
-            Nop();
             gEmergencyState++;
             break;
         case 3:
-            Nop();
             fEmrgProcess = false;
             break;
         default:
@@ -202,6 +201,32 @@ static void BMS_CommandDetect(void) {
     else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {
         BMS_ModeCommand(BMS_OFF);
     }
+    // TODO :DELETE  Test Function
+
+    switch (step) {
+        case 0:
+            if (DIN_StateGet(DIN_2) == true) {
+                step++;
+            }
+            break;
+        case 1:
+            if (DIN_StateGet(DIN_2) == false) {
+                step++;
+            }
+            break;
+        case 2:
+            polar = !polar;
+            if (polar) {
+                BMS_ModeCommand(BMS_DISCHG_ON);
+            } else {
+                BMS_ModeCommand(BMS_OFF);
+            }
+            step = 0;
+        default:
+            step = 0;
+            break;
+    }
+    // TODO : DELETE
 
     /*Clear the error code and reset BMS_Emergency() task state
      when the BMS_Emergency() has been executed */

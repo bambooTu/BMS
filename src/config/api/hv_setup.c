@@ -42,14 +42,13 @@
 /*TODO:*/
 #define BACK_END_VOLT             (100)
 #define PRECHG_PERCENTAGE_SETTING (90)
-#define RELAY_NEG_OPEN            RELAY_NEG_Clear();
-#define RELAY_NEG_CLOSE           RELAY_NEG_Set();
-#define RELAY_POS_OPEN            RELAY_POS_Clear();
-#define RELAY_POS_CLOSE           RELAY_POS_Set();
-#define RELAY_PRECHG_OPEN         RELAY_PRECHG_Clear();
-#define RELAY_PRECHG_CLOSE        RELAY_PRECHG_Set();
-#define CURRENT                   19
-#define PRECHG_CURRENT_OFFSET     20
+#define RELAY_NEG_OPEN            RELAY_NEG_Clear();     // TODO : Setting GPIO
+#define RELAY_NEG_CLOSE           RELAY_NEG_Set();       // TODO : Setting GPIO
+#define RELAY_POS_OPEN            RELAY_POS_Clear();     // TODO : Setting GPIO
+#define RELAY_POS_CLOSE           RELAY_POS_Set();       // TODO : Setting GPIO
+#define RELAY_PRECHG_OPEN         RELAY_PRECHG_Clear();  // TODO : Setting GPIO
+#define RELAY_PRECHG_CLOSE        RELAY_PRECHG_Set();    // TODO : Setting GPIO
+#define PRECHG_CURRENT_OFFSET     200000                 // unit mA
 /*TODO:*/
 /* USER CODE END PD */
 
@@ -103,7 +102,7 @@ static void HV_SeqTurnOn(void) {
             RELAY_PRECHG_CLOSE;
             RELAY_POS_OPEN;
             if (HV.opMode == MODE_ON) {
-                if (CURRENT < PRECHG_CURRENT_OFFSET) {
+                if (ABS(bmsData.BusCurrent) < PRECHG_CURRENT_OFFSET) {
                     if (HV.delayTimeCount++ >= TURN_ON_POS_DELAY_MS) {
                         HV.delayTimeCount = 0;
                         HV.setupStatus    = HV_PRECHG_FINISH;
@@ -176,7 +175,7 @@ static void HV_SeqTurnOff(void) {
             }
             break;
         case HV_OFF_PREWORK:
-            if (CURRENT < PRECHG_CURRENT_OFFSET) { /*TODO: change  CURRENT to the Real var  */
+            if (ABS(bmsData.BusCurrent) < PRECHG_CURRENT_OFFSET) { 
                 if (HV.delayTimeCount++ >= TURN_OFF_POS_DELAY_MS) {
                     HV.delayTimeCount = 0;
                     RELAY_POS_OPEN;

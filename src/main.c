@@ -38,9 +38,9 @@
 // *****************************************************************************
 
 struct {
-    unsigned _1ms : 1;
-    unsigned _5ms : 1;
-    unsigned _10ms : 1;
+    unsigned _1ms   : 1;
+    unsigned _5ms   : 1;
+    unsigned _10ms  : 1;
     unsigned _500ms : 1;
 } tmrData;
 
@@ -54,19 +54,15 @@ typedef enum {
 
 struct {
     APP_STATUS_e state;
-    unsigned mainPWR : 1;
+    unsigned     mainPWR : 1;
 } appData;
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
 /* ************************************************************************** */
-unsigned int cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
-bool polar = false;
-unsigned char step = 0;
-short ADC_value[10];
-unsigned char index = 0;
-float curr = 0;
+unsigned int  cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Interrupt Handler
@@ -75,19 +71,19 @@ float curr = 0;
 
 void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
     if (cnt_1ms++ >= CALCULTAE_TIME_MS(1)) {
-        cnt_1ms = 0;
+        cnt_1ms      = 0;
         tmrData._1ms = true;
     }
     if (cnt_5ms++ >= CALCULTAE_TIME_MS(5)) {
-        cnt_5ms = 0;
+        cnt_5ms      = 0;
         tmrData._5ms = true;
     }
     if (cnt_10ms++ >= CALCULTAE_TIME_MS(10)) {
-        cnt_10ms = 0;
+        cnt_10ms      = 0;
         tmrData._10ms = true;
     }
     if (cnt_500ms++ >= CALCULTAE_TIME_MS(500)) {
-        cnt_500ms = 0;
+        cnt_500ms      = 0;
         tmrData._500ms = true;
     }
     X2CScope_Update();
@@ -101,25 +97,28 @@ void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
 int main(void) {
     /* Initialize all modules */
     SYS_Initialize(NULL);
-    eepBms = eepBmsDef;
-    eepSpe = eepSpeDef;
     while (true) {
-        /* Maintain state machines of all polled MPLAB Harmony modules. */
         SYS_Tasks();
         X2CScope_Communicate();
 
-        switch ((APP_STATUS_e) appData.state) {
+        switch ((APP_STATUS_e)appData.state) { 
             case APP_EEPROM_READ:
+                eepBms        = eepBmsDef;
+                eepSpe        = eepSpeDef;
                 appData.state = APP_STATE_INIT;
                 break;
             case APP_STATE_INIT:
-                TMR4_CallbackRegister(TMR4_EvnetHandler, (uintptr_t) NULL);
+                /* APP Timer Start */
+                TMR4_CallbackRegister(TMR4_EvnetHandler, (uintptr_t)NULL);
                 TMR4_Start();
-                DIN_ParameterInitialize();
+                /* APP Initialize */
                 HV_Initialize();
                 BMU_Initialize();
                 CAN_Initialize();
                 MCP3421_Initialize();
+                CurrentSensor_Intialize();
+                DIN_ParameterInitialize();
+
                 appData.state = APP_STATE_SERVICE_TASKS;
                 break;
             case APP_STATE_SERVICE_TASKS:
@@ -129,31 +128,7 @@ int main(void) {
                     // DTC_1ms_Tasks();
                     BMU_1ms_Tasks();
                     BMS_1ms_Tasks();
-                    switch (step) {
-                        case 0:
-                            if (DIN_StateGet(DIN_2) == true) {
-                                step++;
-                            }
-                            break;
-                        case 1:
-                            if (DIN_StateGet(DIN_2) == false) {
-                                step++;
-                            }
-                            break;
-                        case 2:
-                            polar = !polar;
-                            if (polar) {
-                                BMS_ModeCommand(BMS_DISCHG_ON);
-                            } else {
-                                BMS_ModeCommand(BMS_OFF);
-                            }
-                            step = 0;
-                        default:
-                            step = 0;
-                            break;
-                    }
                 }
-
                 if (tmrData._5ms) {
                     tmrData._5ms = false;
                     DIN_5ms_Tasks();
@@ -161,12 +136,7 @@ int main(void) {
                 }
                 if (tmrData._10ms) {
                     tmrData._10ms = false;
-                    ADC_value[index] = MCP3421_AdcValueGet();
-                    if (++index > 9) {
-                        index = 0;
-                    }
-                    curr = CurrentSensor_AmpereGet(ADC_value, 10);
-
+                    CurrentSensor_10ms_Tasks();
                 }
                 if (tmrData._500ms) {
                     tmrData._500ms = false;
@@ -188,7 +158,6 @@ int main(void) {
 
     return (EXIT_FAILURE);
 }
-
 /*******************************************************************************
  End of File
  */

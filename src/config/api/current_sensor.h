@@ -52,7 +52,9 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 
-float CurrentSensor_AmpereGet(short *arr, unsigned int arrSize);
+void CurrentSensor_ParamSet(short gainOffset, short zeroOffset);
+void CurrentSensor_Intialize(void);
+void CurrentSensor_10ms_Tasks(void);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

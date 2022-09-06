@@ -35,7 +35,7 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-static unsigned short   g_DtcTimeCount[(DTC_TCELL_UNBALANCE_W + 1)];
+static unsigned short   gDtcTimeCount[(DTC_TCELL_UNBALANCE_W + 1)];
 DTC_FAULT_CHECK_TABLE_t FaultCheckTaskTable[] = {
     {        DTC_VCELL_OVP,   &bmsData.MaxVcell, &eepBms.CellOVP},
     {        DTC_VCELL_UVP,   &bmsData.MinVcell, &eepBms.CellUVP},
@@ -154,21 +154,21 @@ static unsigned char DTC_FaultEventGet(DTC_EVENT_e event) {
 static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source < ptrObj->Limit) {
-            if (g_DtcTimeCount[event]-- == 0) {
+            if (gDtcTimeCount[event]-- == 0) {
                 DTC_FaultOccurSet(event);
-                g_DtcTimeCount[event] = ptrObj->ReleaseTime;
+                gDtcTimeCount[event] = ptrObj->ReleaseTime;
             }
         } else {
-            g_DtcTimeCount[event] = ptrObj->LimitTime;
+            gDtcTimeCount[event] = ptrObj->LimitTime;
         }
     } else {
         if (source > ptrObj->Release) {
-            if (g_DtcTimeCount[event]-- == 0) {
+            if (gDtcTimeCount[event]-- == 0) {
                 DTC_FaultOccurClear(event);
-                g_DtcTimeCount[event] = ptrObj->LimitTime;
+                gDtcTimeCount[event] = ptrObj->LimitTime;
             }
         } else {
-            g_DtcTimeCount[event] = ptrObj->ReleaseTime;
+            gDtcTimeCount[event] = ptrObj->ReleaseTime;
         }
     }
 }
@@ -176,21 +176,21 @@ static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* pt
 static void DTC_HigherLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source > ptrObj->Limit) {
-            if (g_DtcTimeCount[event]-- == 0) {
+            if (gDtcTimeCount[event]-- == 0) {
                 DTC_FaultOccurSet(event);
-                g_DtcTimeCount[event] = ptrObj->ReleaseTime;
+                gDtcTimeCount[event] = ptrObj->ReleaseTime;
             }
         } else {
-            g_DtcTimeCount[event] = ptrObj->LimitTime;
+            gDtcTimeCount[event] = ptrObj->LimitTime;
         }
     } else {
         if (source < ptrObj->Release) {
-            if (g_DtcTimeCount[event]-- == 0) {
+            if (gDtcTimeCount[event]-- == 0) {
                 DTC_FaultOccurClear(event);
-                g_DtcTimeCount[event] = ptrObj->LimitTime;
+                gDtcTimeCount[event] = ptrObj->LimitTime;
             }
         } else {
-            g_DtcTimeCount[event] = ptrObj->ReleaseTime;
+            gDtcTimeCount[event] = ptrObj->ReleaseTime;
         }
     }
 }

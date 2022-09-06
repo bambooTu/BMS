@@ -9,7 +9,6 @@
           <logicalFolder name="api" displayName="api" projectFiles="true">
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/sys_parameter.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/commonly_used.h</itemPath>
-            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/current_gauge.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/current_sensor.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/dtc.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/fault.h</itemPath>
@@ -20,6 +19,7 @@
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_bmu.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/mcp3421.h</itemPath>
+            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/coulomb_gauge.h</itemPath>
           </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="canfd" displayName="canfd" projectFiles="true">

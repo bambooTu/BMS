@@ -28,7 +28,6 @@
 #include "can.h"
 #include "can_bms_vs_bmu.h"
 #include "commonly_used.h"
-#include "current_gauge.h"
 #include "current_sensor.h"
 #include "debounce.h"
 #include "dtc.h"
@@ -36,6 +35,7 @@
 #include "hv_setup.h"
 #include "indicator.h"
 #include "mcp3421.h"
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
@@ -79,7 +79,7 @@ extern "C" {
 #define DTC_LOG_LENGTH 4
 
 #define CELL_DESIGN_CAP      78 /*unit:Ah*/
-#define CELL_DESIGN_MAX_VOLT 3485
+#define CELL_DESIGN_MAX_VOLT 4100
 
 // *****************************************************************************
 // *****************************************************************************
@@ -205,22 +205,22 @@ typedef struct {
     int           MinTcell;      /* unit:0.1 degC */
     int           MaxTcell;      /* unit:0.1 degC */
     int           DeltaTemp;     /* unit:0.1 degC */
-    unsigned char MinVoltBmuID;  /* BMU ID For Min. Volt */
-    unsigned char MaxVoltBmuID;  /* BMU ID For Max. Volt */
+    unsigned char MinVcellBmuID;  /* BMU ID For Min. Volt */
+    unsigned char MaxVcellBmuID;  /* BMU ID For Max. Volt */
     unsigned char BmuMinVcellID; /* Min.Volt Cell ID In BMU */
     unsigned char BmuMaxVcellID; /* Max.Volt Cell ID In BMU */
-    unsigned char MinTempBmuID;  /* BMU ID for Min.Temp Cell */
-    unsigned char MaxTempBmuID;  /* BMU ID for Max.Temp Cell */
+    unsigned char MinTcellBmuID;  /* BMU ID for Min.Temp Cell */
+    unsigned char MaxTcellBmuID;  /* BMU ID for Max.Temp Cell */
     unsigned char BmuMinTcellID; /* Min.Temp Cell ID In BMU */
     unsigned char BmuMaxTcellID; /* Max.Temp Cell ID In BMU */
 
-    unsigned char  SOC;       /* unit:% */
-    unsigned char  SOH;       /* unit:%,According to the Cycle Life Calculation */
+    unsigned char  SOC;       /* unit: % */
+    unsigned char  SOH;       /* unit: %,According to the Cycle Life Calculation */
     float          RemCap;    /* unit: Ah */
     float          ChgCap;    /* unit: Ah */
     float          DischgCap; /* unit: Ah */
     float          FullCap;   /* unit: Ah */
-    unsigned int   DesingCap; /* unit: AH */
+    unsigned int   DesingCap; /* unit: Ah */
     unsigned short CycleLife; /* Fixed Eeprom Locations */
     unsigned short DecayCoefficient;
     /* Protection Flag */

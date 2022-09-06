@@ -1,13 +1,13 @@
 /**
  * @file       mcp3421.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-09-05
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 /* Global define -------------------------------------------------------------*/
@@ -25,7 +25,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /* USER CODE END PD */
-#define I2C_ERROR_TIMES   10
+#define I2C_ERROR_TIMES   100
 #define I2C_TIMEOUT_TIMES 100
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
@@ -44,9 +44,9 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 static volatile APP_TRANSFER_STATUS_e I2C1_XferStatus = APP_TRANSFER_STATUS_IN_PROGRESS;
-APP_I2C_DATA_t                        I2C1_data       = {0};  // TODO : Static
-static MCP3421_ADDR_t                 mcp3421_addr    = {0};
-static MCP3421_CONFIG_t               mcp3421_config  = {0};
+APP_I2C_DATA_t                        I2C1_data       = {};  // TODO : Static
+static MCP3421_ADDR_t                 mcp3421_addr    = {};
+static MCP3421_CONFIG_t               mcp3421_config  = {};
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -56,9 +56,9 @@ static MCP3421_CONFIG_t               mcp3421_config  = {0};
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/** 
+/**
  * @brief      I2C interrupt callback function
- * 
+ *
  * @param      context I2C transfer status
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -80,11 +80,11 @@ static void APP_I2CCallback(uintptr_t context) {
 }
 /**
  * @brief      Using I2C Command to set the MCP3421's configuration
- * 
+ *
  * @param      addr   MCP3421's address
  * @param      config MPC3421's configuration (ref. Datasheet)
- * @return     true 
- * @return     false 
+ * @return     true
+ * @return     false
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-05
@@ -97,11 +97,11 @@ static bool MCP3421_WriteConfigCmd(unsigned char addr, unsigned char config) {
     return ret;
 }
 /**
- * @brief      Using I2C Command to get the ADC value 
- * 
+ * @brief      Using I2C Command to get the ADC value
+ *
  * @param      addr MCP3421's address
- * @return     true 
- * @return     false 
+ * @return     true
+ * @return     false
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-05
@@ -114,7 +114,7 @@ static bool MCP3421_ReadAdcCmd(unsigned char addr) {
 }
 /**
  * @brief      MCP3421 parameter initialize
- * 
+ *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-05
@@ -135,8 +135,8 @@ void MCP3421_Initialize(void) {
 }
 /**
  * @brief      Use I2C get the ADC value from IC MCP3421 @ period 10ms
- * 
- * @return     unsigned short  
+ *
+ * @return     unsigned short
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-05
@@ -145,13 +145,14 @@ void MCP3421_Initialize(void) {
 unsigned short MCP3421_AdcValueGet(void) {
     unsigned short adc_value = 0;
     if (I2C1_data.timeoutCount++ >= I2C_TIMEOUT_TIMES) {
-        I2C1_data.timeoutCount = SATURATION(I2C1_data.timeoutCount, I2C_TIMEOUT_TIMES, 0); // Saturation the value
+        I2C1_data.timeoutCount = SATURATION(I2C1_data.timeoutCount, I2C_TIMEOUT_TIMES, 0);  // Saturation the value
         I2C1_data.taskState    = APP_STATE_IDLE;
     }
     switch (I2C1_data.taskState) {
         case APP_STATE_SENSOR_STATUS_VERIFY:
             I2C1_data.pastState = APP_STATE_SENSOR_STATUS_VERIFY;
             /* Verify if Sensor is ready */
+            I2C1_XferStatus = APP_TRANSFER_STATUS_IN_PROGRESS;
             if (MCP3421_WriteConfigCmd(mcp3421_addr.byte >> 1, mcp3421_config.byte) == false) {
                 I2C1_data.taskState = APP_STATE_XFER_ERROR;
             } else {
@@ -166,12 +167,8 @@ unsigned short MCP3421_AdcValueGet(void) {
                 I2C1_data.errorCount = 0;
                 I2C1_data.taskState  = APP_STATE_READ_ADC_VALUE;
             } else if (I2C1_XferStatus == APP_TRANSFER_STATUS_ERROR) {
-                /* Sensor is not ready.
-                 * Keep checking until it is ready. */
-                I2C1_XferStatus = APP_TRANSFER_STATUS_IN_PROGRESS;
-                if (MCP3421_ReadAdcCmd(mcp3421_addr.byte >> 1) == false) {
-                    I2C1_data.taskState = APP_STATE_XFER_ERROR;
-                }
+                /* Sensor is not ready. */
+                I2C1_data.taskState = APP_STATE_XFER_ERROR;
             }
             break;
 
@@ -191,7 +188,7 @@ unsigned short MCP3421_AdcValueGet(void) {
 
         case APP_STATE_XFER_ERROR:
             if (I2C1_data.errorCount++ >= I2C_ERROR_TIMES) {
-                I2C1_data.errorCount = SATURATION(I2C1_data.errorCount, I2C_ERROR_TIMES, 0); // Saturation the value
+                I2C1_data.errorCount = SATURATION(I2C1_data.errorCount, I2C_ERROR_TIMES, 0);  // Saturation the value
                 I2C1_data.taskState  = APP_STATE_IDLE;
             } else {
                 if (I2C1_data.pastState <= APP_STATE_CHECK_SENSOR_READY) {
@@ -204,7 +201,7 @@ unsigned short MCP3421_AdcValueGet(void) {
 
         case APP_STATE_IDLE:
             break;
-            //TODO:Current Sensor Timeout
+            // TODO:Current Sensor Timeout
         default:
             break;
     }

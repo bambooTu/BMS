@@ -465,7 +465,7 @@
         &lt;ElementPosition dnOrder=&quot;4&quot; id=&quot;can4&quot; x=&quot;490&quot; y=&quot;80&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;5&quot; id=&quot;core&quot; x=&quot;242&quot; y=&quot;22&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;6&quot; id=&quot;dfp&quot; x=&quot;20&quot; y=&quot;20&quot;/&gt;
-        &lt;ElementPosition dnOrder=&quot;7&quot; id=&quot;eeprom&quot; x=&quot;30&quot; y=&quot;60&quot;/&gt;
+        &lt;ElementPosition dnOrder=&quot;7&quot; id=&quot;eeprom&quot; x=&quot;31&quot; y=&quot;60&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;8&quot; id=&quot;i2c1&quot; x=&quot;30&quot; y=&quot;120&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;9&quot; id=&quot;tmr4&quot; x=&quot;340&quot; y=&quot;20&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;10&quot; id=&quot;uart5&quot; x=&quot;205&quot; y=&quot;175&quot;/&gt;

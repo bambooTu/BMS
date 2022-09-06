@@ -26,7 +26,7 @@
 
 /* This section lists the other files that are included in this file.
  */
-
+#include "sys_parameter.h"
 /* TODO:  Include other files here if needed. */
 
 /* Provide C++ Compatibility */
@@ -36,7 +36,7 @@ extern "C" {
 
 #define DECAY2SOH_TABLE_SIZE    9
 #define SOH2SFULLCAP_TABLE_SIZE 11
-
+#define OCV_TABLE_SIZE 11
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Constants                                                         */
@@ -55,8 +55,8 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 
-void CoulombGauge_Initialize(void);
-void CoulombGauge_Tasks(void);
+void CoulombGauge_Initialize(BMS_DATA_t *self);
+void CoulombGauge_Tasks(BMS_DATA_t *self);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

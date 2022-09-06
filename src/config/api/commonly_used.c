@@ -38,8 +38,8 @@
 /* ************************************************************************** */
 
 /**
- * @brief
- * Ascending power 1D Lookup Table
+ * @brief      Ascending power 1D Lookup Table
+ * 
  * @param      input Number of table dimensions
  * @param      bp0   1D-Table breakpoints
  * @param      table 1D-Table data
@@ -87,8 +87,8 @@ double Lookup_Table(double input, volatile const double *bp0, volatile const dou
 }
 
 /**
- * @brief
- * Average is the sum of array elements
+ * @brief      Average is the sum of array elements
+ * 
  * @param      arr Array input
  * @param      arrSize Array size
  * @return     float
@@ -98,18 +98,18 @@ double Lookup_Table(double input, volatile const double *bp0, volatile const dou
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 float Arr_Average(short *arr, unsigned int arrSize) {
-    double ret = 0;
+    float ret = 0;
 
     for (unsigned int index = 0; index < arrSize; index++) {
         ret += arr[index];
     }
     ret /= arrSize;
-    return ((float)ret);
+    return ret;
 }
 
 /**
- * @brief
- * The input data is in positive and negative range ,output is zero
+ * @brief      The input data is in positive and negative range ,output is zero
+ * 
  * @param      data Data Input
  * @param      threshold Threshold(Positive and negative range)
  * @return     float
