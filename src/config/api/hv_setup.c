@@ -260,6 +260,7 @@ void HV_ModeCommand(HV_OPERATION_MODE_e opMode) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void HV_Initialize(void) {
+    HV.opMode = MODE_OFF;
     RELAY_POS_OPEN;
     RELAY_NEG_OPEN;
     RELAY_PRECHG_OPEN;

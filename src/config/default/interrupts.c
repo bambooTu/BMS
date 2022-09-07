@@ -60,6 +60,7 @@
 // *****************************************************************************
 
 
+void EXTERNAL_2_InterruptHandler( void );
 void TIMER_4_InterruptHandler( void );
 void I2C1_BUS_InterruptHandler( void );
 void I2C1_MASTER_InterruptHandler( void );
@@ -71,6 +72,11 @@ void CAN4_InterruptHandler( void );
 
 
 /* All the handlers are defined here.  Each will call its PLIB-specific function. */
+void __ISR(_EXTERNAL_2_VECTOR, ipl1SRS) EXTERNAL_2_Handler (void)
+{
+    EXTERNAL_2_InterruptHandler();
+}
+
 void __ISR(_TIMER_4_VECTOR, ipl1SRS) TIMER_4_Handler (void)
 {
     TIMER_4_InterruptHandler();

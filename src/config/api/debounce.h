@@ -83,7 +83,7 @@ typedef enum {
 
 typedef struct {
     bool         status;
-    unsigned int debounceTime;
+    unsigned int debounceTime[2];
 } DIN_PARAM_t;
 
 typedef struct {

@@ -84,15 +84,15 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
     if (DIN_PinGet(ptrObj->dinNum) == true) {
         if (g_DebounceTimeCount[RISING][ptrObj->dinNum]-- == 0) {
             DIN_SetState(ptrObj->dinNum);
-            g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime;
+            g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
         }
-        g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime;
+        g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
     } else {
         if (g_DebounceTimeCount[FALLING][ptrObj->dinNum]-- == 0) {
             DIN_ClearState(ptrObj->dinNum);
-            g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime;
+            g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
         }
-        g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime;
+        g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
     }
 }
 
@@ -104,7 +104,8 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
 
 void DIN_ParameterInitialize(void) {
     for (DIN_MAPPING_e i = DIN_1; i < DIN_MAPPING_MAX; i++) {
-        g_DinParamTable[i].debounceTime = 4;
+        g_DinParamTable[i].debounceTime[RISING] = 4;
+        g_DinParamTable[i].debounceTime[FALLING] = 4;
     }
 }
 

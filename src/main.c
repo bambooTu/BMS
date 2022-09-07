@@ -61,7 +61,7 @@ struct {
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
 /* ************************************************************************** */
-unsigned int  cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
+unsigned int cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -88,6 +88,11 @@ void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
     }
     X2CScope_Update();
 }
+
+void LVD_EvnetHandler(EXTERNAL_INT_PIN pin, uintptr_t context) {
+    GLED_Toggle();
+    EVIC_ExternalInterruptDisable(EXTERNAL_INT_2);
+}
 // *****************************************************************************
 // *****************************************************************************
 // Section: Main Entry Point
@@ -101,13 +106,16 @@ int main(void) {
         SYS_Tasks();
         X2CScope_Communicate();
 
-        switch ((APP_STATUS_e)appData.state) { 
+        switch ((APP_STATUS_e)appData.state) {
             case APP_EEPROM_READ:
                 eepBms        = eepBmsDef;
                 eepSpe        = eepSpeDef;
                 appData.state = APP_STATE_INIT;
                 break;
             case APP_STATE_INIT:
+                /* APP low voltage detect start */
+                EVIC_ExternalInterruptCallbackRegister(EXTERNAL_INT_2, LVD_EvnetHandler, (uintptr_t)NULL);
+                EVIC_ExternalInterruptEnable(EXTERNAL_INT_2);
                 /* APP Timer Start */
                 TMR4_CallbackRegister(TMR4_EvnetHandler, (uintptr_t)NULL);
                 TMR4_Start();

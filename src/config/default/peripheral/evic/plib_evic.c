@@ -44,6 +44,7 @@
 #include "plib_evic.h"
 
 
+EXT_INT_PIN_CALLBACK_OBJ extInt2CbObj;
 // *****************************************************************************
 // *****************************************************************************
 // Section: IRQ Implementation
@@ -55,6 +56,7 @@ void EVIC_Initialize( void )
     INTCONSET = _INTCON_MVEC_MASK;
 
     /* Set up priority and subpriority of enabled interrupts */
+    IPC3SET = 0x400 | 0x0;  /* EXTERNAL_2:  Priority 1 / Subpriority 0 */
     IPC4SET = 0x4000000 | 0x0;  /* TIMER_4:  Priority 1 / Subpriority 0 */
     IPC10SET = 0x400 | 0x0;  /* I2C1_BUS:  Priority 1 / Subpriority 0 */
     IPC10SET = 0x4000000 | 0x0;  /* I2C1_MASTER:  Priority 1 / Subpriority 0 */
@@ -63,6 +65,8 @@ void EVIC_Initialize( void )
     IPC46SET = 0x4000000 | 0x0;  /* CAN3:  Priority 1 / Subpriority 0 */
     IPC47SET = 0x4 | 0x0;  /* CAN4:  Priority 1 / Subpriority 0 */
 
+    /* Initialize External interrupt 2 callback object */
+    extInt2CbObj.callback = NULL;
 
 
     /* Configure Shadow Register Set */
@@ -142,6 +146,58 @@ void EVIC_INT_Restore( bool state )
     {
         /* restore the state of CP0 Status register before the disable occurred */
         __builtin_enable_interrupts();
+    }
+}
+
+void EVIC_ExternalInterruptEnable( EXTERNAL_INT_PIN extIntPin )
+{
+    IEC0SET = extIntPin;
+}
+
+void EVIC_ExternalInterruptDisable( EXTERNAL_INT_PIN extIntPin )
+{
+    IEC0CLR = extIntPin;
+}
+
+bool EVIC_ExternalInterruptCallbackRegister(
+    EXTERNAL_INT_PIN extIntPin,
+    const EXTERNAL_INT_PIN_CALLBACK callback,
+    uintptr_t context
+)
+{
+    bool status = true;
+    switch  (extIntPin)
+        {
+        case EXTERNAL_INT_2:
+            extInt2CbObj.callback = callback;
+            extInt2CbObj.context  = context;
+            break;
+        default:
+            status = false;
+            break;
+        }
+
+    return status;
+}
+
+
+// *****************************************************************************
+/* Function:
+    void EXTERNAL_2_InterruptHandler(void)
+
+  Summary:
+    Interrupt Handler for External Interrupt pin 2.
+
+  Remarks:
+	It is an internal function called from ISR, user should not call it directly.
+*/
+void EXTERNAL_2_InterruptHandler(void)
+{
+    IFS0CLR = _IFS0_INT2IF_MASK;
+
+    if(extInt2CbObj.callback != NULL)
+    {
+        extInt2CbObj.callback (EXTERNAL_INT_2, extInt2CbObj.context);
     }
 }
 
