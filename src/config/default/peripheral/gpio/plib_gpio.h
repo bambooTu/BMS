@@ -62,6 +62,10 @@
 // *****************************************************************************
 
 
+/*** Macros for CAN3RX pin ***/
+#define CAN3RX_Get()               ((PORTG >> 6) & 0x1U)
+#define CAN3RX_PIN                  GPIO_PIN_RG6
+
 /*** Macros for SW1 pin ***/
 #define SW1_Set()               (LATGSET = (1U<<11))
 #define SW1_Clear()             (LATGCLR = (1U<<11))
@@ -96,6 +100,10 @@
 /*** Macros for CAN1TX pin ***/
 #define CAN1TX_Get()               ((PORTE >> 0) & 0x1U)
 #define CAN1TX_PIN                  GPIO_PIN_RE0
+
+/*** Macros for CAN3TX pin ***/
+#define CAN3TX_Get()               ((PORTC >> 15) & 0x1U)
+#define CAN3TX_PIN                  GPIO_PIN_RC15
 
 /*** Macros for RELAY_POS pin ***/
 #define RELAY_POS_Set()               (LATASET = (1U<<14))

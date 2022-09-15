@@ -31,14 +31,14 @@
 
 #define RISING  0
 #define FALLING 1
-unsigned int     g_DebounceTimeCount[2][DIN_MAPPING_MAX];
-DIN_PARAM_t      g_DinParamTable[DIN_MAPPING_MAX];
-DIN_TASK_TABLE_t g_DinTaskTable[] = {
-    {          DIN_1,           &g_DinParamTable[DIN_1]},
-    {          DIN_2,           &g_DinParamTable[DIN_2]},
-    {          DIN_3,           &g_DinParamTable[DIN_3]},
-    {          DIN_4,           &g_DinParamTable[DIN_4]},
-    {DIN_MAPPING_MAX, &g_DinParamTable[DIN_MAPPING_MAX]},
+unsigned int     gDebounceTimeCount[2][DIN_MAPPING_MAX];
+DIN_PARAM_t      gDinParamTable[DIN_MAPPING_MAX];
+DIN_TASK_TABLE_t gDinTaskTable[] = {
+    {          DIN_1,           &gDinParamTable[DIN_1]}, // Button release
+    {          DIN_2,           &gDinParamTable[DIN_2]}, // Button turn on
+    {          DIN_3,           &gDinParamTable[DIN_3]}, // Button turn off
+    {          DIN_4,           &gDinParamTable[DIN_4]}, // EMS cutoff
+    {DIN_MAPPING_MAX, &gDinParamTable[DIN_MAPPING_MAX]}, // max
 };
 
 /* ************************************************************************** */
@@ -48,13 +48,23 @@ DIN_TASK_TABLE_t g_DinTaskTable[] = {
 /* ************************************************************************** */
 
 static void DIN_SetState(DIN_MAPPING_e dinNum) {
-    g_DinParamTable[dinNum].status = true;
+    gDinParamTable[dinNum].status = true;
 }
 
 static void DIN_ClearState(DIN_MAPPING_e dinNum) {
-    g_DinParamTable[dinNum].status = false;
+    gDinParamTable[dinNum].status = false;
 }
-
+/**
+ * @brief      Get digital input status
+ *             (Reference DIN_MAPPING_e)
+ * @param      dinNum Digital input number
+ * @return     true
+ * @return     false
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static bool DIN_PinGet(DIN_MAPPING_e dinNum) {
     bool ret = false;
     switch (dinNum) {
@@ -79,20 +89,28 @@ static bool DIN_PinGet(DIN_MAPPING_e dinNum) {
     }
     return ret;
 }
-
+/**
+ * @brief      Digital input debounce
+ *
+ * @param      ptrObj Digital input task table (User establish Ref. gDinTaskTable[])
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
     if (DIN_PinGet(ptrObj->dinNum) == true) {
-        if (g_DebounceTimeCount[RISING][ptrObj->dinNum]-- == 0) {
+        if (gDebounceTimeCount[RISING][ptrObj->dinNum]-- == 0) {
             DIN_SetState(ptrObj->dinNum);
-            g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
+            gDebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
         }
-        g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
+        gDebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
     } else {
-        if (g_DebounceTimeCount[FALLING][ptrObj->dinNum]-- == 0) {
+        if (gDebounceTimeCount[FALLING][ptrObj->dinNum]-- == 0) {
             DIN_ClearState(ptrObj->dinNum);
-            g_DebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
+            gDebounceTimeCount[FALLING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[FALLING];
         }
-        g_DebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
+        gDebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
     }
 }
 
@@ -101,22 +119,46 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
 // Section: Interface Functions                                               */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
+/**
+ * @brief      Initialize digital input parameter
+ *
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void DIN_ParameterInitialize(void) {
     for (DIN_MAPPING_e i = DIN_1; i < DIN_MAPPING_MAX; i++) {
-        g_DinParamTable[i].debounceTime[RISING] = 4;
-        g_DinParamTable[i].debounceTime[FALLING] = 4;
+        gDinParamTable[i].debounceTime[RISING]  = 4;
+        gDinParamTable[i].debounceTime[FALLING] = 4;
     }
 }
-
+/**
+ * @brief      Digital input polling tasks
+ *
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void DIN_5ms_Tasks(void) {
     for (DIN_MAPPING_e i = DIN_1; i < DIN_MAPPING_MAX; i++) {
-        DIN_Debounce(&g_DinTaskTable[i]);
+        DIN_Debounce(&gDinTaskTable[i]);
     }
 }
-
+/**
+ * @brief      Get digital input to debounce result
+ *
+ * @param      dinNum Digital input number
+ * @return     true
+ * @return     false
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 bool DIN_StateGet(DIN_MAPPING_e dinNum) {
-    return g_DinParamTable[dinNum].status;
+    return gDinParamTable[dinNum].status;
 }
 /* *****************************************************************************
  End of File

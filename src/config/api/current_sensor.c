@@ -28,13 +28,14 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #define ADC_COEFFICIENT      19966L
-#define ADC_MOVING_AVG_TIMES 12
+#define ADC_MOVING_AVG_TIMES 12L
+#define ZERO_THRESHOLD       60L
 
 static short         adcBuffer[ADC_MOVING_AVG_TIMES];
 static unsigned char adcIndex      = 0;
 static short         adcZeroOffset = 0;  // convert error value
-static short         adcGainOffset = 0;  // caculate error value
-
+short                adcGainOffset = 0;  // caculate error value
+// TODO : static
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Interface Functions                                               */
@@ -42,9 +43,9 @@ static short         adcGainOffset = 0;  // caculate error value
 /* ************************************************************************** */
 /**
  * @brief      Transfer the ADC value to milli Ampere
- * 
- * @param      adcValue 
- * @return     int 
+ *
+ * @param      adcValue
+ * @return     int
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-06
@@ -63,16 +64,16 @@ static int CurrentSensor_AdcValue2mAmpere(int adcValue) {
 }
 /**
  * @brief      Get the moving average current value
- * 
- * @param      arr 
- * @param      arrSize 
- * @return     int 
+ *
+ * @param      arr
+ * @param      arrSize
+ * @return     int
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-06
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static int CurrentSensor_mAmpereGet(short *arr, unsigned int arrSize) {
+static inline int CurrentSensor_mAmpereGet(short *arr, unsigned int arrSize) {
     int ret = 0;
     ret     = (int)Arr_Average(arr, arrSize);
     ret     = CurrentSensor_AdcValue2mAmpere(ret);
@@ -80,10 +81,10 @@ static int CurrentSensor_mAmpereGet(short *arr, unsigned int arrSize) {
     return ret;
 }
 /**
- * @brief      Set the current sensor's parameter 
- * 
- * @param      gainOffset 
- * @param      zeroOffset 
+ * @brief      Set the current sensor's parameter
+ *
+ * @param      gainOffset
+ * @param      zeroOffset
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-06
@@ -117,5 +118,5 @@ void CurrentSensor_10ms_Tasks(void) {
     if (++adcIndex > ADC_MOVING_AVG_TIMES - 1) {
         adcIndex = 0;
     }
-    bmsData.BusCurrent = CurrentSensor_mAmpereGet(adcBuffer, ADC_MOVING_AVG_TIMES);
+    bmsData.BusCurrent = Deadzone_Filter(CurrentSensor_mAmpereGet(adcBuffer, ADC_MOVING_AVG_TIMES), ZERO_THRESHOLD);
 }

@@ -36,6 +36,7 @@
 #include "indicator.h"
 #include "mcp3421.h"
 
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
@@ -78,8 +79,8 @@ extern "C" {
 
 #define DTC_LOG_LENGTH 4
 
-#define CELL_DESIGN_CAP      78 /*unit:Ah*/
-#define CELL_DESIGN_MAX_VOLT 4100
+#define CELL_DESIGN_CAP      78000UL /*unit:Ah*/
+#define CELL_DESIGN_MAX_VOLT 4100UL
 
 // *****************************************************************************
 // *****************************************************************************
@@ -216,11 +217,11 @@ typedef struct {
 
     unsigned char  SOC;       /* unit: % */
     unsigned char  SOH;       /* unit: %,According to the Cycle Life Calculation */
-    float          RemCap;    /* unit: Ah */
-    float          ChgCap;    /* unit: Ah */
-    float          DischgCap; /* unit: Ah */
-    float          FullCap;   /* unit: Ah */
-    unsigned int   DesingCap; /* unit: Ah */
+    float          RemCap;    /* unit: mAh */
+    float          ChgCap;    /* unit: mAh */
+    float          DischgCap; /* unit: mAh */
+    float          FullCap;   /* unit: mAh */
+    unsigned int   DesingCap; /* unit: mAh */
     unsigned short CycleLife; /* Fixed Eeprom Locations */
     unsigned short DecayCoefficient;
     /* Protection Flag */
@@ -253,7 +254,7 @@ unsigned char APP_EepromInitialize(void);
 void          APP_EepromBmsWrite(void);
 void          APP_EepromEmergencyWrite(void);
 void          APP_EepromSpecialWrite(void);
-void          APP_EepromTask(void);
+void          APP_EepromTasks(void);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

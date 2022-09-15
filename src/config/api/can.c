@@ -99,7 +99,6 @@ static void CAN1_Callback(uintptr_t contextHandle) {
                                           &recvMessage[Instance].msgAttr);
             CAN_PushRxQueue(Instance, &recvMessage[Instance]);
             GLED_Toggle();
-            Nop();
             break;
         case CAN_EVENT_ERR:
             Object[Instance].errorCount++;
@@ -152,6 +151,7 @@ static void CAN2_Callback(uintptr_t contextHandle) {
                                           recvMessage[Instance].data, &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
                                           &recvMessage[Instance].msgAttr);
             CAN_PushRxQueue(Instance, &recvMessage[Instance]);
+            GLED_Toggle();
             Nop();
             break;
         case CAN_EVENT_ERR:
@@ -205,7 +205,7 @@ static void CAN3_Callback(uintptr_t contextHandle) {
                                           recvMessage[Instance].data, &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
                                           &recvMessage[Instance].msgAttr);
             CAN_PushRxQueue(Instance, &recvMessage[Instance]);
-            Nop();
+            GLED_Toggle();
             break;
         case CAN_EVENT_ERR:
             Object[Instance].errorCount++;
@@ -346,7 +346,8 @@ void CAN_Initialize(void) {
         initializeQueue(Instance);
     }
     /* Code begin */
-    // CAN1_MessageAcceptanceFilterSet(CAN_FIFONUM_RX0, settingMessage.id);
+    // CAN2_MessageAcceptanceFilterSet(1,0x18ff4520);
+    //  CAN2_MessageAcceptanceFilterMaskSet(1,0x7FFF0000);
     /* Code end */
 }
 
@@ -517,7 +518,7 @@ uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance) {
 bool CAN_QueueDataXfer(CAN_MODULE Instance) {
     bool      ret = false;
     can_msg_t canTxMsg;
-    if (CAN_GetTxQueueCount(Instance)) {
+    if (CAN_GetTxQueueCount(Instance) > 0) {
         CAN_PullTxQueue(Instance, &canTxMsg);
         switch (Instance) {
             case CAN_1:

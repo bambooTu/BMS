@@ -50,8 +50,8 @@
 #include <stdbool.h>
 #include "peripheral/i2c/master/plib_i2c1_master.h"
 #include "X2CCode/X2CScope/inc/X2CScope.h"
-#include "peripheral/tmr/plib_tmr4.h"
 #include "peripheral/canfd/plib_canfd3.h"
+#include "peripheral/tmr/plib_tmr4.h"
 #include "peripheral/canfd/plib_canfd4.h"
 #include "peripheral/canfd/plib_canfd1.h"
 #include "peripheral/eeprom/plib_eeprom.h"

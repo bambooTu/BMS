@@ -41,14 +41,15 @@
 
 /* Globalvariables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
-bool          fProtectionProcess = false;
-unsigned char protectionState    = 0;
-bool          fEmrgProcess       = false;
-unsigned char gEmergencyState    = 0;
+
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+static bool          fProtectionProcess = false;
+static unsigned char gProtectionState   = 0;
+static bool          fEmrgProcess       = false;
+static unsigned char gEmergencyState    = 0;
 // TODO :DELETE
 static bool          polar = false;
 static unsigned char step  = 0;
@@ -101,25 +102,25 @@ static void BMS_SoftWareReset(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void BMS_Protection(void) {
-    switch (protectionState) {
+    switch (gProtectionState) {
         case 0:
             HV_ModeCommand(MODE_OFF);
             if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
-                protectionState++;
+                gProtectionState++;
             }
             break;
         case 1:
             if (DIN_StateGet(DIN_4) == true) {
-                protectionState++;
+                gProtectionState++;
             } else {
                 FAULT_INDICATOR_ON; /*TODO: Set GPIO*/
             }
             break;
         case 2:
             BMS_SoftWareReset();
-            protectionState = 0;
+            gProtectionState = 0;
         default:
-            protectionState = 0;
+            gProtectionState = 0;
             break;
     }
 }
@@ -201,8 +202,8 @@ static void BMS_CommandDetect(void) {
     else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {
         BMS_ModeCommand(BMS_OFF);
     }
-    // TODO :DELETE  Test Function
 
+    // TODO :DELETE Test Function ↓
     switch (step) {
         case 0:
             if (DIN_StateGet(DIN_2) == true) {
@@ -226,7 +227,7 @@ static void BMS_CommandDetect(void) {
             step = 0;
             break;
     }
-    // TODO : DELETE
+    // TODO : DELETE ↑
 
     /*Clear the error code and reset BMS_Emergency() task state
      when the BMS_Emergency() has been executed */

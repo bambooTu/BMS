@@ -14,6 +14,7 @@
             <make-dep-projects/>
             <sourceRootList>
                 <sourceRootElem>C:\Users\a01347\HarmonyProjects\MyProject_4\firmware\src\config\api</sourceRootElem>
+                <sourceRootElem>C:\Users\a01347\HarmonyProjects\MyProject_4\firmware\src\config\default\classb</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

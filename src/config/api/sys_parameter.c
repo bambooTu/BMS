@@ -45,41 +45,41 @@ volatile const EEPROM_BMS_t eepBmsDef = {
  /***BMSParameterSetting***/
   /**Over Temperature**/
   /*Limit,Release,Limit Time,Release Time*/
-    {    450,    430, 1000, 3000}, /*OTP*/
-    {    400,    380, 1000, 3000}, /*OTW*/
-    {    100,    120, 1000, 3000}, /*UTP*/
-    {    150,    170, 1000, 3000}, /*UTW*/
-    {    100,     50, 5000, 3000}, /*UBTW*/
+    {    450,    430, 1000, 3000}, /* OTP */
+    {    400,    380, 1000, 3000}, /* OTW */
+    {    100,    120, 1000, 3000}, /* UTP */
+    {    150,    170, 1000, 3000}, /* UTW */
+    {    100,     50, 5000, 3000}, /* UBTW */
 
   /**OverVoltage**/
   /*Limit,Release,LimitTime,ReleaseTime*/
-    { 806000, 800000, 3000, 3000}, /*OVP*/
-    { 795000, 790000, 3000, 3000}, /*OVW*/
-    { 560000, 575000, 3000, 3000}, /*UVP*/
-    { 570000, 590000, 3000, 3000}, /*UVW*/
-    {    500,    200, 2000, 5000}, /*CellUBP*/
-    {    350,    300, 2000, 5000}, /*CellUBW*/
-    {   3650,   3600, 2000, 5000}, /*CellOVP*/
-    {   2500,   2600, 2000, 5000}, /*CellUVP*/
+    { 806000, 800000, 3000, 3000}, /* OVP */
+    { 795000, 790000, 3000, 3000}, /* OVW */
+    { 560000, 575000, 3000, 3000}, /* UVP */
+    { 570000, 590000, 3000, 3000}, /* UVW */
+    {    500,    200, 2000, 5000}, /* CellUBP */
+    {    350,    300, 2000, 5000}, /* CellUBW */
+    {   3650,   3600, 2000, 5000}, /* CellOVP */
+    {   2500,   2600, 2000, 5000}, /* CellUVP */
 
   /**OverCurrent**/
   /*Limit,Release,LimitTime,ReleaseTime*/
-    {-120000,  -1000, 1000, 1000}, /*ODCP*/
-    { -80000,  -1000, 1000, 1000}, /*ODCW*/
-    {  80000,   1000, 1000, 1000}, /*OCCP*/
+    {-120000,  -1000, 1000, 1000}, /* ODCP */
+    { -80000,  -1000, 1000, 1000}, /* ODCW */
+    {  80000,   1000, 1000, 1000}, /* OCCP */
     {  75000,   1000, 1000, 1000},
 
  /*OCCW*/
-  /*OCPLockTime*/
+  /* OCPLockTime */
     (60000 / 100),
 
  /***BMS Capacity Record***/
-    (78000 / 2), /*mAH?Batt FullCap*/
-    (0), /*SOH Decay Coefficient*/
+    (78000 / 2), /* mAH,Batt FullCap */
+    (0), /* SOH Decay Coefficient */
   /***BMS Factort Date***/
-    26U, /*FactoryDay*/
-    10U, /*FactoryMonth*/
-    2021UL, /*FactoryYear*/
+    26U, /* Factory Day */
+    10U, /* Factory Month */
+    2021UL, /* Factory Year */
     "0000000000000",
  // clang-format off
     {BAL_OFF, CELL_DESIGN_MAX_VOLT,   10     },
@@ -89,7 +89,7 @@ volatile const EEPROM_BMS_t eepBmsDef = {
     0,
     0,
  /******/
-    0, /*CheckSum*/
+    0, /* CheckSum */
 };
 
 volatile const EEPROM_EMERGENCY_t eepEmgDef = {
@@ -206,15 +206,15 @@ void APP_EepromPageErase(unsigned int startAddr, unsigned int dataSize) {
 unsigned char APP_EepromInitialize(void) {
     bool          ret      = false;
     unsigned char checkSum = 0;
-    /* Read All EEPROM Data*/
-    APP_EepromWordRead((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to Word
+    /* Read all EEPROM data*/
+    APP_EepromWordRead((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
                        EEPROM_SPE_START_ADDR);
-    APP_EepromWordRead((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to Word
+    APP_EepromWordRead((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
                        EEPROM_EMG_START_ADDR);
-    APP_EepromWordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
+    APP_EepromWordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
                        EEPROM_BMS_START_ADDR);
 
-    /*If Chip Is New, Write Default Data Into EEPROM*/
+    /*If Chip is new, write default data into EEPROM*/
     if (0xFF == eepSpe.BmsAddr) {
         eepEmg          = eepEmgDef;
         eepSpe          = eepSpeDef;
@@ -222,19 +222,19 @@ unsigned char APP_EepromInitialize(void) {
         checkSum        = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum = checkSum;
         // NVM_PageEraseTasks();
-        APP_EepromWordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to Word
+        APP_EepromWordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
                             EEPROM_SPE_START_ADDR);
-        APP_EepromWordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to Word
+        APP_EepromWordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
                             EEPROM_EMG_START_ADDR);
-        APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
+        APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
                             EEPROM_BMS_START_ADDR);
-    } /* If key & SVN Value Is Different From Default Value , Write Data Into EERPOM */
+    } /* If key & SVN value is different from default value , write data into EERPOM */
     else if ((EEP_KEY_ID != eepBms.EepromKey) || (SVN_NUMBER != eepBms.EepromSVN)) {
         eepBms          = eepBmsDef;
         checkSum        = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum = checkSum;
         APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4, EEPROM_BMS_START_ADDR);
-    } /* If CheckSum Value Is Different From EEPROM ,Set DTC  */
+    } /* If checkSum value is different from EEPROM ,Set DTC  */
     else {
         APP_EepromWordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
                            EEPROM_BMS_START_ADDR);
@@ -256,7 +256,7 @@ unsigned char APP_EepromInitialize(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void APP_EepromBmsWrite(void) {
-    eepWriteCmd.Emg = true;
+    eepWriteCmd.Bms = true;
 }
 /**
  * @brief      Write emergency data to EEPROM
@@ -270,8 +270,7 @@ void APP_EepromEmergencyWrite(void) {
     eepEmg.ChgCap    = bmsData.ChgCap;
     eepEmg.CycleLife = bmsData.CycleLife;
     eepEmg.DisChgCap = bmsData.DischgCap;
-
-    eepWriteCmd.Bms = true;
+    eepWriteCmd.Emg  = true;
 }
 /**
  * @brief      Write special data to EEPROM
@@ -293,7 +292,7 @@ void APP_EepromSpecialWrite(void) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromTask(void) {
+void APP_EepromTasks(void) {
     if (eepWriteCmd.Emg == true) {
         eepOpStatus     = EEPROM_WRITING;
         eepWriteCmd.Emg = false;

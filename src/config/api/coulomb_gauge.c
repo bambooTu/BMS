@@ -56,29 +56,53 @@ volatile const double OCV_Table[SOH2SFULLCAP_TABLE_SIZE] = {0,
                                                             (CELL_DESIGN_CAP * 0.9),
                                                             CELL_DESIGN_CAP};
 
-static bool          fDischgCapFull = false;
-static unsigned char gCgTaskState   = 0;
+static bool          fDischgCapFull  = false;
+static unsigned char gCgTaskState    = 0;
+static unsigned char gSelfDischgCurr = 0;
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Interface Functions                                               */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
-static void SOH_Calculate(BMS_DATA_t *self) {
+/**
+ * @brief      Calculate state of health
+ * 
+ * @param      self 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calculate_SOH(BMS_DATA_t *self) {
     unsigned short Decay = 0;
-
-    Decay     = self->CycleLife + self->DecayCoefficient;
-    self->SOH = (unsigned char)Lookup_Table(Decay, Decay2SOH_BP, Decay2SOH_Table, DECAY2SOH_TABLE_SIZE);
+    Decay                = self->CycleLife + self->DecayCoefficient;
+    self->SOH            = (unsigned char)Lookup_Table(Decay, Decay2SOH_BP, Decay2SOH_Table, DECAY2SOH_TABLE_SIZE);
 }
-
-static void SOC_Calculate(BMS_DATA_t *self) {
+/**
+ * @brief      Calculate state of charge
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calculate_SOC(BMS_DATA_t *self) {
     self->SOC = ((self->RemCap) * 100) / (self->FullCap);
     if (self->SOC > 99) {
         self->SOC = 100;
     }
 }
-
-static void Batt_RemCap_Calculate(BMS_DATA_t *self) {
+/**
+ * @brief      Calculate battery remaining capacity
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calculate_BattRemCap(BMS_DATA_t *self) {
     if (self->ChgCap > self->DischgCap) {
         self->RemCap = self->ChgCap - self->DischgCap;
         if (self->RemCap > self->FullCap) {
@@ -91,12 +115,19 @@ static void Batt_RemCap_Calculate(BMS_DATA_t *self) {
         self->DischgCap = 0;
     }
 }
-
-static void Cycle_Life_Count(BMS_DATA_t *self) {
+/**
+ * @brief      Calculate cycleLife
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calculate_CycleLife(BMS_DATA_t *self) {
     if ((self->ChgCap > self->FullCap) && (self->DischgCap > self->FullCap)) {
         self->ChgCap -= self->FullCap;
         self->DischgCap -= self->FullCap;
-
         (self->CycleLife)++;
     } else if ((fDischgCapFull == true) && (self->ChgCap > self->FullCap)) {
         fDischgCapFull = false;
@@ -105,14 +136,28 @@ static void Cycle_Life_Count(BMS_DATA_t *self) {
     } else {
     }
 }
-
+/**
+ * @brief      Coulomb counter 
+ * 
+ * @param      self BMS data
+ * @param      period_ms execution period
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void Coulomb_Counter(BMS_DATA_t *self, unsigned int period_ms) {
     period_ms = 1000 / period_ms;
 
-    if (self->BusCurrent > 0) {
+    if (self->BusCurrent > 0) {  // Charging
         self->ChgCap = self->ChgCap + (self->BusCurrent / period_ms / 3600.0f);
-    } else {
+    } else {  // Discharging 
         self->DischgCap = self->DischgCap + ((-1) * self->BusCurrent / period_ms / 3600.0f);
+    }
+
+    if (++gSelfDischgCurr > (3600 / 10 * period_ms)) {  // Self-Discharge
+        gSelfDischgCurr = 0;
+        self->DischgCap++;
     }
 }
 // static void OCV_CorrectDecayCoefficient(BMS_DATA_t *self) {
@@ -127,74 +172,131 @@ static void Coulomb_Counter(BMS_DATA_t *self, unsigned int period_ms) {
 //         self->DecayCoefficient += 2;
 //     }
 // }
-static void OCV_Calibration_Point(BMS_DATA_t *self) {
-    if (self->BusCurrent > 0) {
+/**
+ * @brief      OCV point calibrate charge/discharge capacity
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calibration_OcvPoint(BMS_DATA_t *self) {
+    if (self->BusCurrent > 0) {  // Charging
         if ((self->MinVcell > 3420UL) && (self->SOC < 80)) {
-            self->ChgCap += (CELL_DESIGN_CAP * (0.001f));
+            self->ChgCap += (CELL_DESIGN_CAP * (0.0001f));
         } else if ((self->MinVcell > 3454UL) && (self->SOC < 90)) {
-            self->ChgCap += (CELL_DESIGN_CAP * (0.002f));
+            self->ChgCap += (CELL_DESIGN_CAP * (0.0002f));
         } else {
         }
-    } else {
+    } else {  // Discharging
         if ((self->MinVcell < 3055UL) && (self->SOC > 5)) {
-            self->DischgCap += (CELL_DESIGN_CAP * 0.004f);
+            self->DischgCap += (CELL_DESIGN_CAP * 0.0004f);
         }
     }
 
     if (self->MinVcell > CELL_DESIGN_MAX_VOLT) {
         if (self->SOC > 99) {
-            fDischgCapFull  = 0;
+            fDischgCapFull  = false;
             self->RemCap    = self->FullCap;
             self->ChgCap    = self->RemCap;
             self->DischgCap = 0;
         } else if (self->BusCurrent > 0) {
-            self->ChgCap += (CELL_DESIGN_CAP * 0.005);
+            self->ChgCap += (CELL_DESIGN_CAP * 0.0005f);
         } else {
         }
     }
 }
-
-static void SOH_Correct_Full_Cap(BMS_DATA_t *self) {
+/**
+ * @brief      SOH calibrate full capacity
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void Calibration_SOH2FullCap(BMS_DATA_t *self) {
     self->FullCap = Lookup_Table(self->SOH, SOH2FullCap_BP, SOH2FullCap_Table, SOH2SFULLCAP_TABLE_SIZE);
 }
-
-inline static void CoulombGauge_ParameterInitialize(BMS_DATA_t *self) {
+/**
+ * @brief      Update remaining capacity
+ * 
+ * @param      self BMS data
+ * @param      newRemCap New remaining capacity
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+void CoulombGauge_UpdateRemCap(BMS_DATA_t *self, unsigned int newRemCap) {
+    fDischgCapFull  = false;
+    self->RemCap    = newRemCap;
+    self->ChgCap    = self->RemCap;
+    self->DischgCap = 0;
+}
+/**
+ * @brief      Coulomb gauge parameter initialize
+ * 
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void CoulombGauge_ParameterInitialize(BMS_DATA_t *self) {
     self->ChgCap           = eepEmg.ChgCap;
     self->CycleLife        = eepEmg.CycleLife;
     self->DischgCap        = eepEmg.DisChgCap;
     self->FullCap          = eepBms.FullCap;
     self->DecayCoefficient = eepBms.DecayCoefficient;
 }
-
+/**
+ * @brief      Coulomb gauge initialize
+ *  
+ * @param      self BMS data
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void CoulombGauge_Initialize(BMS_DATA_t *self) {
     CoulombGauge_ParameterInitialize(self);
-    SOH_Calculate(self);
-    Batt_RemCap_Calculate(self);
-    SOC_Calculate(self);
+    Calculate_SOH(self);
+    Calculate_BattRemCap(self);
+    Calculate_SOC(self);
 }
-
+/**
+ * @brief      Coulomb gauge polling tasks  
+ * 
+ * @param      self  BMS data  
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-09-13
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void CoulombGauge_Tasks(BMS_DATA_t *self) {
-    Coulomb_Counter(self, 20);
     switch (gCgTaskState) {
         case 0:
-            OCV_Calibration_Point(self);
+            Coulomb_Counter(self, 100);
             gCgTaskState++;
             break;
         case 1:
-            Cycle_Life_Count(self);
-            Batt_RemCap_Calculate(self);
+            Calibration_OcvPoint(self);
             gCgTaskState++;
             break;
         case 2:
-            SOH_Calculate(self);
-            SOH_Correct_Full_Cap(self);
+            Calculate_CycleLife(self);
+            Calculate_BattRemCap(self);
             gCgTaskState++;
             break;
         case 3:
-            SOC_Calculate(self);
+            Calculate_SOH(self);
+            Calibration_SOH2FullCap(self);
             gCgTaskState++;
             break;
         default:
+            Calculate_SOC(self);
             gCgTaskState = 0;
             break;
     }

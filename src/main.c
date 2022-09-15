@@ -26,10 +26,11 @@
 #include <stddef.h>   // Defines NULL
 #include <stdlib.h>   // Defines EXIT_FAILURE
 
+#include "config/api/coulomb_gauge.h"
 #include "config/api/sys_parameter.h"
 #include "definitions.h"  // SYS function prototypes
 
-#define CALCULTAE_TIME_MS(A) ((A < 10) ? 10 - 1 : 10 * A - 1)
+#define CALCULTAE_TIME_MS(A) ((A < 1) ? 10 - 1 : 10 * A - 1)
 
 // *****************************************************************************
 // *****************************************************************************
@@ -37,11 +38,17 @@
 // *****************************************************************************
 // *****************************************************************************
 
+typedef struct {
+    unsigned int cnt;
+    bool         flag;
+} TMR_DATA_t;
+
 struct {
-    unsigned _1ms   : 1;
-    unsigned _5ms   : 1;
-    unsigned _10ms  : 1;
-    unsigned _500ms : 1;
+    TMR_DATA_t _1ms;
+    TMR_DATA_t _5ms;
+    TMR_DATA_t _10ms;
+    TMR_DATA_t _20ms;
+    TMR_DATA_t _500ms;
 } tmrData;
 
 typedef enum {
@@ -61,8 +68,10 @@ struct {
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
 /* ************************************************************************** */
-unsigned int cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
-
+struct {
+    unsigned int duty;
+    unsigned int period;
+} ledPWM;
 // *****************************************************************************
 // *****************************************************************************
 // Section: Interrupt Handler
@@ -70,21 +79,33 @@ unsigned int cnt_1ms, cnt_5ms, cnt_10ms, cnt_500ms = 0;
 // *****************************************************************************
 
 void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
-    if (cnt_1ms++ >= CALCULTAE_TIME_MS(1)) {
-        cnt_1ms      = 0;
-        tmrData._1ms = true;
+    if (tmrData._1ms.cnt++ >= CALCULTAE_TIME_MS(1)) {
+        tmrData._1ms.cnt  = 0;
+        tmrData._1ms.flag = true;
     }
-    if (cnt_5ms++ >= CALCULTAE_TIME_MS(5)) {
-        cnt_5ms      = 0;
-        tmrData._5ms = true;
+    if (tmrData._5ms.cnt++ >= CALCULTAE_TIME_MS(5)) {
+        tmrData._5ms.cnt  = 0;
+        tmrData._5ms.flag = true;
     }
-    if (cnt_10ms++ >= CALCULTAE_TIME_MS(10)) {
-        cnt_10ms      = 0;
-        tmrData._10ms = true;
+    if (tmrData._10ms.cnt++ >= CALCULTAE_TIME_MS(10)) {
+        tmrData._10ms.cnt  = 0;
+        tmrData._10ms.flag = true;
     }
-    if (cnt_500ms++ >= CALCULTAE_TIME_MS(500)) {
-        cnt_500ms      = 0;
-        tmrData._500ms = true;
+    if (tmrData._20ms.cnt++ >= CALCULTAE_TIME_MS(20)) {
+        tmrData._20ms.cnt  = 0;
+        tmrData._20ms.flag = true;
+    }
+    if (tmrData._500ms.cnt++ >= CALCULTAE_TIME_MS(500)) {
+        tmrData._500ms.cnt  = 0;
+        tmrData._500ms.flag = true;
+    }
+    if (ledPWM.period++ >= 100) {
+        ledPWM.period = 0;
+    }
+    if (ledPWM.duty > ledPWM.period) {
+        YLED_Set();
+    } else {
+        YLED_Clear();
     }
     X2CScope_Update();
 }
@@ -98,6 +119,30 @@ void LVD_EvnetHandler(EXTERNAL_INT_PIN pin, uintptr_t context) {
 // Section: Main Entry Point
 // *****************************************************************************
 // *****************************************************************************
+
+void CAN_XferTest() {
+    can_msg_t canTxMsg;
+    canTxMsg.id             = 0x18FF4520;
+    canTxMsg.dlc            = 8;
+    static unsigned char rc = 0;
+    if (++rc > 0xff) {
+        rc = 0;
+    }
+    for (unsigned i = 0; i < 8; i++) {
+        canTxMsg.data[i] = 0;
+    }
+    canTxMsg.data[0] = rc;
+    CAN_PushTxQueue(CAN_2, &canTxMsg);
+}
+void CAN_RecvTest() {
+    can_msg_t canRxMsg;
+    if (CAN_GetRxQueueCount(CAN_2)) {
+        CAN_PullRxQueue(CAN_2, &canRxMsg);
+        if (canRxMsg.id == 0x18FF4510) {
+            ledPWM.duty = canRxMsg.data[0];
+        }
+    }
+}
 
 int main(void) {
     /* Initialize all modules */
@@ -124,30 +169,39 @@ int main(void) {
                 BMU_Initialize();
                 CAN_Initialize();
                 MCP3421_Initialize();
+                CoulombGauge_Initialize(&bmsData);
                 CurrentSensor_Intialize();
                 DIN_ParameterInitialize();
 
                 appData.state = APP_STATE_SERVICE_TASKS;
                 break;
             case APP_STATE_SERVICE_TASKS:
-                if (tmrData._1ms) {
-                    tmrData._1ms = false;
+                if (tmrData._1ms.flag) {
+                    tmrData._1ms.flag = false;
                     HV_1ms_Tasks();
                     // DTC_1ms_Tasks();
+
                     BMU_1ms_Tasks();
                     BMS_1ms_Tasks();
-                }
-                if (tmrData._5ms) {
-                    tmrData._5ms = false;
-                    DIN_5ms_Tasks();
                     CAN_QueueDataXfer(CAN_1);
                 }
-                if (tmrData._10ms) {
-                    tmrData._10ms = false;
-                    CurrentSensor_10ms_Tasks();
+                if (tmrData._5ms.flag) {
+                    tmrData._5ms.flag = false;
+                    DIN_5ms_Tasks();
                 }
-                if (tmrData._500ms) {
-                    tmrData._500ms = false;
+                if (tmrData._10ms.flag) {
+                    tmrData._10ms.flag = false;
+                    CurrentSensor_10ms_Tasks();
+                    CAN_XferTest();
+                    CAN_RecvTest();
+                    CAN_QueueDataXfer(CAN_2);
+                }
+                if (tmrData._20ms.flag) {
+                    tmrData._20ms.flag = false;
+                    CoulombGauge_Tasks(&bmsData);
+                }
+                if (tmrData._500ms.flag) {
+                    tmrData._500ms.flag = false;
                     RLED_Toggle();
                 }
                 break;
