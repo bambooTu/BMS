@@ -17,32 +17,7 @@ static DTC_EVENT_e   FaultIndicatorIndex = 0;
 static INTERVAL_e    IntervalStep        = INVTERVAL_RESET;
 static unsigned char fCompleteARound     = true;
 
-void Indicator_1ms_Tasks(void) {
-    if (FaultIndicator.l & FaultIndicatorMask.l) {
-        if (fCompleteARound) {
-            fCompleteARound = false;
-            debugLED_Off;
-            IntervalStep = INVTERVAL_RESET;
-            do {
-                FaultIndicatorIndex++;
-                if (((FaultIndicatorMask.l >> FaultIndicatorIndex) & 0x01) == false) {
-                    FaultIndicatorIndex++;
-                }
-                if (FaultIndicatorIndex >= DTC_EVENT_MAX_NUM) {
-                    FaultIndicatorIndex = 0;
-                }
-            } while (((FaultIndicator.l >> FaultIndicatorIndex) & 0x01) == false);
-        }
-        Indicator_WithFault(DTC_BMS_Message_Table[FaultIndicatorIndex].longCount,
-                            DTC_BMS_Message_Table[FaultIndicatorIndex].shortCount, &IntervalStep, &fCompleteARound);
-    } else {
-        fCompleteARound     = true;
-        FaultIndicatorIndex = 0;
-        Indicator_WithoutFault();
-    }
-}
-
-void Indicator_WithoutFault(void) {
+static void Indicator_WithoutFault(void) {
     static uint16_t IntervalCount = 0;
     if (IntervalCount >= NoFaultInterval_mS) {
         debugLED_Toggle;
@@ -51,7 +26,7 @@ void Indicator_WithoutFault(void) {
     IntervalCount += 1;
 }
 
-void Indicator_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
+static void Indicator_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
                          unsigned char* OneRound) {
     static unsigned char  ShortIntervalCount = 0;
     static unsigned char  LongIntervalCount  = 0;
@@ -108,6 +83,39 @@ void Indicator_WithFault(unsigned char longCount, unsigned char shortCount, INTE
     }
     IntervalCount += 1;
 }
+void Indicator_Initialize(void){
+    FaultIndicatorMask.l = 0x1FFFFFFFF;
+    FaultIndicatorMask.b.SHUT_DOWN = 0;
+    FaultIndicatorMask.b.EMERGENCY = 0;
+    FaultIndicatorMask.b.CURR_DIR_ERR = 0;
+}
+void Indicator_1ms_Tasks(void) {
+    FaultIndicator.l = FaultIndicator.l & FaultIndicatorMask.l;
+    if (FaultIndicator.l) {
+        if (fCompleteARound) {
+            fCompleteARound = false;
+            debugLED_Off;
+            IntervalStep = INVTERVAL_RESET;
+            do {
+                FaultIndicatorIndex++;
+                if (((FaultIndicatorMask.l >> FaultIndicatorIndex) & 0x01) == false) {
+                    FaultIndicatorIndex++;
+                }
+                if (FaultIndicatorIndex >= DTC_EVENT_MAX_NUM) {
+                    FaultIndicatorIndex = 0;
+                }
+            } while (((FaultIndicator.l >> FaultIndicatorIndex) & 0x01) == false);
+        }
+        Indicator_WithFault(DTC_BMS_Message_Table[FaultIndicatorIndex].longCount,
+                            DTC_BMS_Message_Table[FaultIndicatorIndex].shortCount, &IntervalStep, &fCompleteARound);
+    } else {
+        fCompleteARound     = true;
+        FaultIndicatorIndex = 0;
+        Indicator_WithoutFault();
+    }
+}
+
+
 
 /*******************************************************************************
  End of File

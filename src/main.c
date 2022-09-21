@@ -60,8 +60,9 @@ typedef enum {
 } APP_STATUS_e;
 
 struct {
-    APP_STATUS_e state;
-    unsigned     mainPWR : 1;
+    APP_STATUS_e   state;
+    unsigned       mainPWR : 1;
+    unsigned short bootTimeCount;
 } appData;
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -78,7 +79,7 @@ struct {
 // *****************************************************************************
 // *****************************************************************************
 
-void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
+void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {  // 0.1ms
     if (tmrData._1ms.cnt++ >= CALCULTAE_TIME_MS(1)) {
         tmrData._1ms.cnt  = 0;
         tmrData._1ms.flag = true;
@@ -102,6 +103,9 @@ void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
     if (ledPWM.period++ >= 100) {
         ledPWM.period = 0;
     }
+    if (appData.bootTimeCount) {
+        appData.bootTimeCount--;
+    }
     if (ledPWM.duty > ledPWM.period) {
         YLED_Set();
     } else {
@@ -112,14 +116,14 @@ void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {
 
 void LVD_EvnetHandler(EXTERNAL_INT_PIN pin, uintptr_t context) {
     GLED_Toggle();
-    EVIC_ExternalInterruptDisable(EXTERNAL_INT_2);
+    // EVIC_ExternalInterruptDisable(EXTERNAL_INT_2);
 }
 // *****************************************************************************
 // *****************************************************************************
 // Section: Main Entry Point
 // *****************************************************************************
 // *****************************************************************************
-
+// TODO : Delete ↓
 void CAN_XferTest() {
     can_msg_t canTxMsg;
     canTxMsg.id             = 0x18FF4520;
@@ -143,19 +147,21 @@ void CAN_RecvTest() {
         }
     }
 }
-
+// TODO : Delete ↑
 int main(void) {
     /* Initialize all modules */
+    WDT_Clear();
     SYS_Initialize(NULL);
     while (true) {
         SYS_Tasks();
         X2CScope_Communicate();
-
+        WDT_Clear();
         switch ((APP_STATUS_e)appData.state) {
             case APP_EEPROM_READ:
-                eepBms        = eepBmsDef;
-                eepSpe        = eepSpeDef;
-                appData.state = APP_STATE_INIT;
+                eepBms                = eepBmsDef;
+                eepSpe                = eepSpeDef;
+                appData.bootTimeCount = CALCULTAE_TIME_MS(100);
+                appData.state         = APP_STATE_INIT;
                 break;
             case APP_STATE_INIT:
                 /* APP low voltage detect start */
@@ -169,20 +175,20 @@ int main(void) {
                 BMU_Initialize();
                 CAN_Initialize();
                 MCP3421_Initialize();
-                CoulombGauge_Initialize(&bmsData);
                 CurrentSensor_Intialize();
                 DIN_ParameterInitialize();
-
-                appData.state = APP_STATE_SERVICE_TASKS;
+                CoulombGauge_Initialize(&bmsData);
+                if (!appData.bootTimeCount) {
+                    appData.state = APP_STATE_SERVICE_TASKS;
+                }
                 break;
             case APP_STATE_SERVICE_TASKS:
                 if (tmrData._1ms.flag) {
                     tmrData._1ms.flag = false;
                     HV_1ms_Tasks();
                     // DTC_1ms_Tasks();
-
                     BMU_1ms_Tasks();
-                    BMS_1ms_Tasks();
+                    BMS_Crtl_1ms_Tasks();
                     CAN_QueueDataXfer(CAN_1);
                 }
                 if (tmrData._5ms.flag) {
@@ -192,13 +198,15 @@ int main(void) {
                 if (tmrData._10ms.flag) {
                     tmrData._10ms.flag = false;
                     CurrentSensor_10ms_Tasks();
+                    // TODO : Delete ↓
                     CAN_XferTest();
                     CAN_RecvTest();
+                    // TODO : Delete ↑
                     CAN_QueueDataXfer(CAN_2);
                 }
                 if (tmrData._20ms.flag) {
                     tmrData._20ms.flag = false;
-                    CoulombGauge_Tasks(&bmsData);
+                    CoulombGauge_20ms_Tasks(&bmsData);
                 }
                 if (tmrData._500ms.flag) {
                     tmrData._500ms.flag = false;

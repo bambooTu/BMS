@@ -1,30 +1,21 @@
 /*******************************************************************************
-  SYS CLK Static Functions for Clock System Service
+  WDT Peripheral Library
 
   Company:
     Microchip Technology Inc.
 
   File Name:
-    plib_clk.c
+    plib_wdt.c
 
   Summary:
-    SYS CLK static function implementations for the Clock System Service.
+    WDT Source File
 
   Description:
-    The Clock System Service provides a simple interface to manage the
-    oscillators on Microchip microcontrollers. This file defines the static
-    implementation for the Clock System Service.
-
-  Remarks:
-    Static functions incorporate all system clock configuration settings as
-    determined by the user via the Microchip Harmony Configurator GUI.
-    It provides static version of the routines, eliminating the need for an
-    object ID or object handle.
-
-    Static single-open interfaces also eliminate the need for the open handle.
+    None
 
 *******************************************************************************/
 
+// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
 *
@@ -47,79 +38,50 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
+// DOM-IGNORE-END
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Include Files
+// Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
 #include "device.h"
-#include "plib_clk.h"
+#include "plib_wdt.h"
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: File Scope Functions
+// Section: WDT Implementation
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    void CLK_Initialize( void )
-
-  Summary:
-    Initializes hardware and internal data structure of the System Clock.
-
-  Description:
-    This function initializes the hardware and internal data structure of System
-    Clock Service.
-
-  Remarks:
-    This is configuration values for the static version of the Clock System
-    Service module is determined by the user via the MHC GUI.
-
-    The objective is to eliminate the user's need to be knowledgeable in the
-    function of the 'configuration bits' to configure the system oscillators.
-*/
-
-void CLK_Initialize( void )
+bool WDT_IsEnabled( void )
 {
-    /* unlock system for clock configuration */
-    SYSKEY = 0x00000000;
-    SYSKEY = 0xAA996655;
-    SYSKEY = 0x556699AA;
+    return((bool)WDTCONbits.ON);
+}
 
- 
-        /* Set up Reference Clock 1 */
-    /* REFO1CON register */
-    /* ROSEL =  SYSCLK */
-    /* DIVSWEN = 1 */
-    /* RODIV = 0 */
-    REFO1CON = 0x200;
+void WDT_WindowEnable( void )
+{
+    /* WDTWINEN = 1 */
+    WDTCONbits.WDTWINEN = 1;
+}
 
-    /* REFO1TRIM register */
-    /* ROTRIM = 0 */
-    REFO1TRIM = 0x0;
+void WDT_WindowDisable( void )
+{
+    /* WDTWINEN = 0 */
+    WDTCONbits.WDTWINEN = 0;
+}
 
-    /* Enable oscillator (ON bit) and Enable Output (OE bit) */
-    REFO1CONSET = 0x00001000 | 0x00008000;
+bool WDT_IsWindowEnabled( void )
+{
+    return((bool)WDTCONbits.WDTWINEN);
+}
 
-  
-
-    /* Peripheral Module Disable Configuration */
-
-    CFGCONbits.PMDLOCK = 0;
-
-    PMD1 = 0x171;
-    PMD2 = 0x17001f;
-    PMD3 = 0xffffffff;
-    PMD4 = 0xfff01f7;
-    PMD5 = 0x30e3f2f;
-    PMD6 = 0xf0d0000;
-    PMD7 = 0x0;
-
-    CFGCONbits.PMDLOCK = 1;
-
-    /* Lock system since done with clock configuration */
-    SYSKEY = 0x33333333;
+void WDT_Clear( void )
+{
+    /* Writing specific value to only upper 16 bits of WDTCON register clears WDT counter */
+    /* Only write to the upper 16 bits of the register when clearing. */
+    /* WDTCLRKEY = 0x5743 */
+    volatile uint16_t * wdtclrkey = ( (volatile uint16_t *)&WDTCON ) + 1;
+    *wdtclrkey = 0x5743;
 }

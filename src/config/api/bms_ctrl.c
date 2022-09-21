@@ -167,7 +167,7 @@ static void BMS_Emergency(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void BMS_CommandDetect(void) {
-    /*TODO: Engineer mode*/
+    // TODO: Engineer mode
     /*
         bool fProtectionProcess = false;
 
@@ -192,17 +192,27 @@ static void BMS_CommandDetect(void) {
         (fEmrgProcess == true)) {  // While the BMS_Emergency() is executing
         BMS_ModeCommand(BMS_OCCUR_EMRG);
         fEmrgProcess = true;
-    } /*Execute the fault protection command when the fault is occur
+    }
+    /*Execute the fault protection command when the fault is occur
         and the BMS_Emergency() has not been executed*/
     else if (((DTC_WorstLevelGet() == ERR_LEVEL_PROTECTION) && (fEmrgProcess == false)) ||
              (fProtectionProcess == true)) {  // While the BMS_Protection() is executing
         BMS_ModeCommand(BMS_OCCUR_FAULT);
         fProtectionProcess = true;
-    } /*If the fault occur,command BMS_OFF */
+    }
+    /*If the fault occur,command BMS_OFF */
     else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {
         BMS_ModeCommand(BMS_OFF);
     }
 
+    /*Clear the error code and reset BMS_Emergency() task state
+     when the BMS_Emergency() has been executed */
+    if (fEmrgProcess == false) {
+        DTC_FaultOccurClear(DIN_4);
+        gEmergencyState = 0;
+    }
+
+    // User part
     // TODO :DELETE Test Function ↓
     switch (step) {
         case 0:
@@ -228,13 +238,6 @@ static void BMS_CommandDetect(void) {
             break;
     }
     // TODO : DELETE ↑
-
-    /*Clear the error code and reset BMS_Emergency() task state
-     when the BMS_Emergency() has been executed */
-    if (fEmrgProcess == false) {
-        DTC_FaultOccurClear(DIN_4);
-        gEmergencyState = 0;
-    }
 }
 /**
  * @brief      BMS operation mode command
@@ -256,7 +259,7 @@ void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void BMS_1ms_Tasks(void) {
+void BMS_Crtl_1ms_Tasks(void) {
     BMS_CommandDetect();
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:

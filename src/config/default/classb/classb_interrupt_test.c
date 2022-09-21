@@ -42,30 +42,28 @@
  *     include files
  *----------------------------------------------------------------------------*/
 #include "classb/classb_interrupt_test.h"
+
 #include "definitions.h"
 
 /*----------------------------------------------------------------------------
  *     Constants
  *----------------------------------------------------------------------------*/
 
-
-#define CLASSB_INTR_MAX_INT_COUNT           (30U)
-
+#define CLASSB_INTR_MAX_INT_COUNT (100U)
 
 /*----------------------------------------------------------------------------
  *     Global Variables
  *----------------------------------------------------------------------------*/
 
-extern volatile uint8_t * interrupt_tests_status;
-extern volatile uint32_t * interrupt_count;
-static uint32_t ebase_org;
-static uint32_t off_org;
+extern volatile uint8_t*  interrupt_tests_status;
+extern volatile uint32_t* interrupt_count;
+static uint32_t           ebase_org;
+static uint32_t           off_org;
 
 /*----------------------------------------------------------------------------
  *     Functions
  *----------------------------------------------------------------------------*/
-extern void _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE test_type,
-        CLASSB_TEST_ID test_id, CLASSB_TEST_STATUS value);
+extern void _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE test_type, CLASSB_TEST_ID test_id, CLASSB_TEST_STATUS value);
 
 /*============================================================================
 static void _CLASSB_TMR2_Handler(void)
@@ -76,18 +74,31 @@ Input  : None.
 Output : None.
 Notes  : None.
 ============================================================================*/
-//void __attribute__((interrupt(IPL1SRS))) __attribute__((address(0x90002200), nomips16, nomicromips)) _CLASSB_TMR2_Handler(void) {
-//    /* Clear the status flag */
-//    
-//}
-void __ISR(_TIMER_2_VECTOR, IPL1SRS) _CLASSB_TMR2_Handler(void){
-    IFS0CLR = _IFS0_T2IF_MASK;
+// void __attribute__((interrupt(IPL1SRS))) __attribute__((address(0x90002200), nomips16, nomicromips))
+// _CLASSB_TMR2_Handler(void) {
+//     /* Clear the status flag */
+//        IFS0CLR = _IFS0_T2IF_MASK;
+//        (*interrupt_count)++;
+//         PORTGbits.RG12 = 1;
+// }
+
+void __ISR(_TIMER_2_VECTOR, ipl1SRS) TIMER_2_Handler(void) {
+    /* Clear the status flag */
+    IFS0CLR        = _IFS0_T2IF_MASK;
+    PORTGbits.RG12 ^= 1;
     (*interrupt_count)++;
 }
+
+// void __ISR(_TIMER_1_VECTOR, ipl7SRS) _CLASSB_TMR1_Handler(void) {
+//     __builtin_software_breakpoint();
+//     /* Clear the status flag */
+//     IFS0CLR = _IFS0_T1IF_MASK;
+// }
+
 /*============================================================================
 static void set_ebase(void)
 ------------------------------------------------------------------------------
-Purpose: Setting value of Ebase and TMR2 OFF register   
+Purpose: Setting value of Ebase and TMR2 OFF register
 Input  : None.
 Output : None.
 ============================================================================*/
@@ -97,40 +108,39 @@ static void set_ebase(unsigned int value) {
     SYSKEY = 0xAA996655;
     SYSKEY = 0x556699AA;
 
-
     /*Set the CP0 registers for multi-vector interrupt */
-    INTCONCLR = _INTCON_MVEC_MASK; // Set the MVEC bit
+    INTCONCLR = _INTCON_MVEC_MASK;  // Set the MVEC bit
 
-    unsigned int temp_CP0; // Temporary register for CP0 register storing 
-    asm volatile("di"); // Disable all interrupts 
-    asm volatile("ehb"); // Disable all interrupts 
+    unsigned int temp_CP0;  // Temporary register for CP0 register storing
+    asm volatile("di");     // Disable all interrupts
+    asm volatile("ehb");    // Disable all interrupts
 
-    temp_CP0 = _CP0_GET_STATUS(); // Get Status 
-    temp_CP0 |= 0x00400000; // Set Bev 
-    _CP0_SET_STATUS(temp_CP0); // Update Status
+    temp_CP0 = _CP0_GET_STATUS();  // Get Status
+    temp_CP0 |= 0x00400000;        // Set Bev
+    _CP0_SET_STATUS(temp_CP0);     // Update Status
     asm volatile("ehb");
 
     _CP0_SET_INTCTL(0x10 << 5);
     asm volatile("ehb");
 
     /****************Setting new ebase and offset *****************/
-    _CP0_SET_EBASE(value); // Set an EBase value
+    _CP0_SET_EBASE(value);  // Set an EBase value
     asm volatile("ehb");
-    OFF009 = 0x200; // setting new offset value
+    OFF009 = 0x200;  // setting new offset value
     /**********************************/
 
-    temp_CP0 = _CP0_GET_CAUSE(); // Get Cause 
-    temp_CP0 |= 0x00800000; // Set IV 
-    _CP0_SET_CAUSE(temp_CP0); // Update Cause
+    temp_CP0 = _CP0_GET_CAUSE();  // Get Cause
+    temp_CP0 |= 0x00800000;       // Set IV
+    _CP0_SET_CAUSE(temp_CP0);     // Update Cause
     asm volatile("ehb");
 
-    temp_CP0 = _CP0_GET_STATUS(); // Get Status 
-    //temp_CP0 &= 0xFFBFFFFD;//  
-    temp_CP0 &= 0xFFBFFFFF; //Clear Bev
-    _CP0_SET_STATUS(temp_CP0); // Update Status
+    temp_CP0 = _CP0_GET_STATUS();  // Get Status
+    // temp_CP0 &= 0xFFBFFFFD;//
+    temp_CP0 &= 0xFFBFFFFF;     // Clear Bev
+    _CP0_SET_STATUS(temp_CP0);  // Update Status
     asm volatile("ehb");
 
-    INTCONSET = _INTCON_MVEC_MASK; // Set the MVEC bit
+    INTCONSET = _INTCON_MVEC_MASK;  // Set the MVEC bit
     /* Lock system  */
     SYSKEY = 0x33333333;
 }
@@ -138,21 +148,20 @@ static void set_ebase(unsigned int value) {
 /*============================================================================
 static void _CLASSB_BuildVectorTable(void)
 ------------------------------------------------------------------------------
-Purpose: Build the vector table for Interrupt self-test . Internally it will call set_ebase function to set new ebase value and timer2 OFF register value
-Input  : None.
-Output : None.
+Purpose: Build the vector table for Interrupt self-test . Internally it will call set_ebase function to set new ebase
+value and timer2 OFF register value Input  : None. Output : None.
 ============================================================================*/
 static void _CLASSB_BuildVectorTable(void) {
     ebase_org = _CP0_GET_EBASE();
-    off_org = OFF009;
+    off_org   = OFF009;
     __builtin_disable_interrupts();
-    set_ebase(((uint32_t) & _CLASSB_TMR2_Handler) - 0x200);
+    set_ebase(((uint32_t)&TIMER_2_Handler) - 0x200);
 }
 
 /*============================================================================
 static void set_ebase_org(void)
 ------------------------------------------------------------------------------
-Purpose: Setting original value of Ebase and TMR2 OFF register   
+Purpose: Setting original value of Ebase and TMR2 OFF register
 Input  : None.
 Output : None.
 ============================================================================*/
@@ -162,40 +171,39 @@ static void set_ebase_org(unsigned int value) {
     SYSKEY = 0xAA996655;
     SYSKEY = 0x556699AA;
 
-
     /*Set the CP0 registers for multi-vector interrupt */
-    INTCONCLR = _INTCON_MVEC_MASK; // Set the MVEC bit
+    INTCONCLR = _INTCON_MVEC_MASK;  // Set the MVEC bit
 
-    unsigned int temp_CP0; // Temporary register for CP0 register storing 
-    asm volatile("di"); // Disable all interrupts 
-    asm volatile("ehb"); // Disable all interrupts 
+    unsigned int temp_CP0;  // Temporary register for CP0 register storing
+    asm volatile("di");     // Disable all interrupts
+    asm volatile("ehb");    // Disable all interrupts
 
-    temp_CP0 = _CP0_GET_STATUS(); // Get Status 
-    temp_CP0 |= 0x00400000; // Set Bev 
-    _CP0_SET_STATUS(temp_CP0); // Update Status
+    temp_CP0 = _CP0_GET_STATUS();  // Get Status
+    temp_CP0 |= 0x00400000;        // Set Bev
+    _CP0_SET_STATUS(temp_CP0);     // Update Status
     asm volatile("ehb");
 
     _CP0_SET_INTCTL(0x10 << 5);
     asm volatile("ehb");
 
     /****************Setting new ebase and offset *****************/
-    _CP0_SET_EBASE(value); // Set an EBase value
+    _CP0_SET_EBASE(value);  // Set an EBase value
     asm volatile("ehb");
-    OFF009 = off_org; // setting new offset value
+    OFF009 = off_org;  // setting new offset value
     /**********************************/
 
-    temp_CP0 = _CP0_GET_CAUSE(); // Get Cause 
-    temp_CP0 |= 0x00800000; // Set IV 
-    _CP0_SET_CAUSE(temp_CP0); // Update Cause
+    temp_CP0 = _CP0_GET_CAUSE();  // Get Cause
+    temp_CP0 |= 0x00800000;       // Set IV
+    _CP0_SET_CAUSE(temp_CP0);     // Update Cause
     asm volatile("ehb");
 
-    temp_CP0 = _CP0_GET_STATUS(); // Get Status 
-    //temp_CP0 &= 0xFFBFFFFD;//  
-    temp_CP0 &= 0xFFBFFFFF; //Clear Bev
-    _CP0_SET_STATUS(temp_CP0); // Update Status
+    temp_CP0 = _CP0_GET_STATUS();  // Get Status
+    // temp_CP0 &= 0xFFBFFFFD;//
+    temp_CP0 &= 0xFFBFFFFF;     // Clear Bev
+    _CP0_SET_STATUS(temp_CP0);  // Update Status
     asm volatile("ehb");
 
-    INTCONSET = _INTCON_MVEC_MASK; // Set the MVEC bit
+    INTCONSET = _INTCON_MVEC_MASK;  // Set the MVEC bit
     /* Lock system  */
     SYSKEY = 0x33333333;
 }
@@ -225,11 +233,6 @@ static void _CLASSB_INT_CLK_Initialize(void) {
     /* SPLLICLK     = POSC     */
     /* SPLL_BYP     = NO_BYPASS     */
 
-
-
-
-
-
     /* OSWEN    = SWITCH_COMPLETE    */
     /* SOSCEN   = OFF   */
     /* UFRCEN   = USBCLK   */
@@ -247,20 +250,19 @@ static void _CLASSB_INT_CLK_Initialize(void) {
     Nop();
     Nop();
 
-    while (OSCCONbits.OSWEN); /* wait for indication of successful clock change before proceeding */
-
+    while (OSCCONbits.OSWEN)
+        ; /* wait for indication of successful clock change before proceeding */
 
     /* Peripheral Module Disable Configuration */
-
-
+    CFGCONbits.PMDLOCK = 0;
     PMD2 = 0x17001f;
     PMD3 = 0xffffffff;
-    PMD4 = 0xfc;
+    PMD4 = 0xfc;  // fc
     PMD5 = 0x30f3f3c;
     PMD6 = 0x10000;
     PMD7 = 0x0;
 
-
+    CFGCONbits.PMDLOCK = 1;
     /* Lock system since done with clock configuration */
     SYSKEY = 0x33333333;
 }
@@ -286,15 +288,14 @@ void _CLASSB_TMR1_Initialize(void) {
     TSYNC = 0
     TCS = 0
      */
-    T1CONbits.TCS = 0;
-    T1CONSET = 0x00;
-    T1CONSET = 0x230;
 
     /* Clear counter */
-    TMR1 = 0x0;
-
+    T1CONbits.TCS = 0;
+    T1CONSET      = 0x00;
     /*Set period */
-    PR1 = 23437;;
+    PR1 = 23437;  // 23437
+    IFS0CLR = _IFS0_T1IF_MASK;
+    IEC0SET = _IEC0_T1IE_MASK;
 }
 
 /*============================================================================
@@ -340,11 +341,12 @@ void _CLASSB_TMR2_Initialize(void) {
     TMR2 = 0x0;
 
     /*Set period */
-    PR2 = 9375U;
+    PR2 = 937U;  // 9375
 
     /* Enable TMR Interrupt */
+    IFS0CLR = _IFS0_T2IF_MASK;
     IEC0SET = _IEC0_T2IE_MASK;
-
+ 
 }
 
 /*============================================================================
@@ -370,7 +372,7 @@ Notes  : None.
 ============================================================================*/
 static void _CLASSB_INT_TMR1_Start(void) {
     T1CONSET = _T1CON_ON_MASK;
-    EVIC_SourceEnable(INT_SOURCE_TIMER_1);
+    //EVIC_SourceEnable(INT_SOURCE_TIMER_1);
 }
 
 /*============================================================================
@@ -407,14 +409,13 @@ Output : Test status.
 Notes  : None.
 ============================================================================*/
 CLASSB_TEST_STATUS CLASSB_SST_InterruptTest(void) {
-
     CLASSB_TEST_STATUS intr_test_status = CLASSB_TEST_NOT_EXECUTED;
+    TRISGbits.TRISG12 = TRISGbits.TRISG13 = TRISGbits.TRISG14 = 0;
+
     EVIC_SourceStatusClear(INT_SOURCE_TIMER_1);
     // Reset the counter
     *interrupt_count = 0;
-    _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT,
-            CLASSB_TEST_INPROGRESS);
-
+    _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_INPROGRESS);
 
     _CLASSB_BuildVectorTable();
     __builtin_disable_interrupts();
@@ -422,34 +423,38 @@ CLASSB_TEST_STATUS CLASSB_SST_InterruptTest(void) {
     _CLASSB_TMR2_Initialize();
     _CLASSB_TMR1_Initialize();
     Classb_EVIC_Initialize();
-
+    _CLASSB_INT_TMR1_Period_Set(23437);
     /* Enable global interrupts */
     __builtin_enable_interrupts();
 
-    _CLASSB_INT_TMR1_Period_Set(23437);
+    
 
     _CLASSB_INT_TMR1_Start();
     _CLASSB_INT_TMR2_Start();
-__builtin_software_breakpoint();
-    while (!EVIC_SourceStatusGet(INT_SOURCE_TIMER_1));
+    //__builtin_software_breakpoint();
+
+    PORTGbits.RG14 = 1;
+
+    while (!EVIC_SourceStatusGet(INT_SOURCE_TIMER_1))
+        ;
+    
+    //__builtin_software_breakpoint();
     EVIC_SourceStatusClear(INT_SOURCE_TIMER_1);
+    //__builtin_software_breakpoint();
     _CLASSB_INT_TMR2_Stop();
-__builtin_software_breakpoint();
-    if ((*interrupt_count < CLASSB_INTR_MAX_INT_COUNT)
-            && (*interrupt_count > 0)) {
-        T1CONCLR = _T1CON_ON_MASK; // stop timer1
+    //__builtin_software_breakpoint();
+    //(*interrupt_count)=5;
+    if ((*interrupt_count < CLASSB_INTR_MAX_INT_COUNT) && (*interrupt_count > 0)) {PORTGbits.RG13 = 1;
+        T1CONCLR         = _T1CON_ON_MASK;  // stop timer1
         intr_test_status = CLASSB_TEST_PASSED;
-        _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT,
-                CLASSB_TEST_PASSED);
-        set_ebase_org(((uint32_t) ebase_org));
-    } else {
+        _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_PASSED);
+        set_ebase_org(((uint32_t)ebase_org));
+    } else { 
         intr_test_status = CLASSB_TEST_FAILED;
-        _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT,
-                CLASSB_TEST_FAILED);
-        set_ebase_org(((uint32_t) ebase_org));
+        _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_FAILED);
+        set_ebase_org(((uint32_t)ebase_org));
         // The failsafe function must not return.
         CLASSB_SelfTest_FailSafe(CLASSB_TEST_INTERRUPT);
     }
     return intr_test_status;
-
 }

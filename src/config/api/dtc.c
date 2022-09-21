@@ -232,17 +232,4 @@ void DTC_1ms_Tasks(void) {
     for (uint8_t event = 0; event < sizeof(FaultCheckTaskTable) / sizeof(DTC_FAULT_CHECK_TABLE_t); event++) {
         DTC_FaultOccureCheck(&FaultCheckTaskTable[event]);
     }
-
-    //    switch (DTC_WorstLevelGet()) {
-    //        case ERR_LEVEL_PROTECTION:
-    //            bmsData.WorkModeCmd = BMS_OCCUR_FAULT;
-    //            break;
-    //        case ERR_LEVEL_FAULT:
-    //            bmsData.WorkModeCmd = BMS_OFF;
-    //            break;
-    //        case ERR_LEVEL_WARNING:
-    //        case ERR_LEVEL_MESSAGE:
-    //        default:
-    //            break;
-    //    }
 }

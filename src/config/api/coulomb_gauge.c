@@ -275,7 +275,7 @@ void CoulombGauge_Initialize(BMS_DATA_t *self) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void CoulombGauge_Tasks(BMS_DATA_t *self) {
+void CoulombGauge_20ms_Tasks(BMS_DATA_t *self) {
     switch (gCgTaskState) {
         case 0:
             Coulomb_Counter(self, 100);

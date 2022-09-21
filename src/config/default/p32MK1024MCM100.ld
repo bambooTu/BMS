@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * MPLAB XC Compiler -  PIC32MK0512MCM100 linker script
+ * MPLAB XC Compiler -  PIC32MK1024MCM100 linker script
  * Build date : Feb 17 2022
  * 
  * Copyright (c) 2022, Microchip Technology Inc. and its subsidiaries ("Microchip")
@@ -112,7 +112,7 @@ _GEN_EXCPT_ADDR                = _ebase_address + 0x180;
 
 MEMORY
 {
-  kseg0_program_mem     (rx)  : ORIGIN = 0x9D000000, LENGTH = 0x80000
+  kseg0_program_mem     (rx)  : ORIGIN = 0x9D000000, LENGTH = 0x100000
   kseg0_boot_mem              : ORIGIN = 0x9FC004B0, LENGTH = 0x0
   debug_exec_mem              : ORIGIN = 0x9FC20490, LENGTH = 0x3AA0
   kseg0_boot_mem              : ORIGIN = 0x9FC20490, LENGTH = 0x0
@@ -196,7 +196,7 @@ MEMORY
   config_BFC63FEC             : ORIGIN = 0xBFC63FEC, LENGTH = 0x4
   config_BFC63FF0             : ORIGIN = 0xBFC63FF0, LENGTH = 0x4
   boot2lastpage               : ORIGIN = 0xBFC64000, LENGTH = 0x1000
-  kseg0_data_mem       (w!x)  : ORIGIN = 0x80000000, LENGTH = 0x20000
+  kseg0_data_mem       (w!x)  : ORIGIN = 0x80000000, LENGTH = 0x40000
   sfrs                        : ORIGIN = 0xBF800000, LENGTH = 0x100000
   configsfrs_BFC03F30         : ORIGIN = 0xBFC03F30, LENGTH = 0x1C
   configsfrs_BFC03FB0         : ORIGIN = 0xBFC03FB0, LENGTH = 0x1C

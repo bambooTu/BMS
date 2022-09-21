@@ -25,9 +25,6 @@ typedef enum {
 } INTERVAL_e;
 
 void Indicator_1ms_Tasks(void);
-void Indicator_WithoutFault(void);
-void Indicator_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
-                         unsigned char* OneRound);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus

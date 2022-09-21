@@ -56,7 +56,7 @@ extern "C" {
 // *****************************************************************************
 
 void CoulombGauge_Initialize(BMS_DATA_t *self);
-void CoulombGauge_Tasks(BMS_DATA_t *self);
+void CoulombGauge_20ms_Tasks(BMS_DATA_t *self);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

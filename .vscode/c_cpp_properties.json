@@ -1,0 +1,26 @@
+// {
+//     "configurations": [
+//         {
+//             "name": "xc32",
+//             "includePath": [
+//                 "${workspaceFolder}/src",
+//                 "${workspaceFolder}/src/config/",
+//                 "${workspaceFolder}/src/config/api",
+//                 "${workspaceFolder}/src/config/default",
+//                 "C:/Program Files/Microchip/xc32/v4.10/pic32mx/include"
+//             ],
+//             "defines": [
+//                 "_DEBUG",
+//                 "UNICODE",
+//                 "_UNICODE",
+//                 "__32MK1024MCM100__",
+//                 "__DEBUG"           
+//             ],
+//             "cStandard": "c99",
+//             "cppStandard": "c++17",
+//             "intelliSenseMode": "windows-gcc-x64",
+//             "compilerPath": "C:/Program Files/Microchip/xc32/v4.10/bin/xc32-gcc.exe"
+//         }
+//     ],
+//     "version": 4
+// }

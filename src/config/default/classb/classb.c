@@ -156,7 +156,7 @@ void CLASSB_WDT_Config(void) {
     SYSKEY = 0xAA996655;
     SYSKEY = 0x556699AA;
 
-    //DEVCFG1bits.WDTPS = 0b01011; //2 sec
+    //DEVCFG1bits.WDTPS = 0b01011; //FUSE WDT CAN'T WRITE
 
     SYSKEY = 0x33333333;
     Nop();
@@ -177,7 +177,7 @@ Notes  : The application decides the contents of this function. This function
 ============================================================================*/
 
 void CLASSB_SelfTest_FailSafe(CLASSB_TEST_ID cb_test_id) {
-#if (defined(__DEBUG) || defined(__DEBUG_D)) && defined(__XC32)
+#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
     __builtin_software_breakpoint();
 #endif
     // Infinite loop
@@ -225,7 +225,7 @@ Notes  : The application decides the contents of this function.
 
 
 static void CLASSB_App_WDT_Recovery(void) {
-#if (defined(__DEBUG) || defined(__DEBUG_D)) && defined(__XC32)
+#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
     __builtin_software_breakpoint();
 #endif
     // Infinite loop
@@ -243,7 +243,7 @@ Output : None
 Notes  : The application decides the contents of this function.
 ============================================================================*/
 void CLASSB_SST_WDT_Recovery(void) {
-#if (defined(__DEBUG) || defined(__DEBUG_D)) && defined(__XC32)
+#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
     __builtin_software_breakpoint();
 #endif
     // Infinite loop
@@ -325,7 +325,6 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
     interrupt_count = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
 
     CLASSB_INIT_STATUS ret_val = CLASSB_SST_NOT_DONE;
-
     resetReason = SYS_RESET_ReasonGet();
     SYS_RESET_ReasonClear(RESET_REASON_ALL);
 
@@ -394,7 +393,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     CLASSB_STARTUP_STATUS cb_temp_startup_status = CLASSB_STARTUP_TEST_NOT_EXECUTED;
     CLASSB_TEST_STATUS cb_test_status = CLASSB_TEST_NOT_EXECUTED;
     
-    //Enable watchdog if it is not enabled
+    // Enable watchdog if it is not enabled
     if (WDTCONbits.ON == 0) {
         // Configure timeout
         WDTCONbits.ON = 1;
@@ -421,7 +420,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     }
     CLASSB_WDT_Clear();
 
-    //SRAM test
+    // SRAM test
     *ongoing_sst_id = CLASSB_TEST_RAM;
     cb_test_status = CLASSB_SRAM_MarchTestInit((uint32_t *) CLASSB_SRAM_APP_AREA_START,
             CLASSB_SRAM_STARTUP_TEST_SIZE, CLASSB_SRAM_MARCH_C, false);
@@ -434,7 +433,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
-#ifndef __DEBUG_D
+#ifndef __DEBUG
     // Clock Test
     uint16_t clock_test_tmr1_cycles = ((5 * CLASSB_CLOCK_TEST_RATIO_NS_MS) / CLASSB_CLOCK_TEST_TMR1_RATIO_NS);
     *ongoing_sst_id = CLASSB_TEST_CLOCK;
@@ -447,7 +446,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     }
     CLASSB_WDT_Clear();
 #endif
-     //Flash Test
+    // Flash Test
     *ongoing_sst_id = CLASSB_TEST_FLASH;
     cb_test_status = CLASSB_FlashCRCTest(FLASH_START_ADDR, FLASH_SIZE, 0xC65B98A0, false);
     if (cb_test_status == CLASSB_TEST_PASSED) {
@@ -458,7 +457,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
-    //Interrupt Test
+    // Interrupt Test
     *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
     cb_test_status = CLASSB_SST_InterruptTest();
     if (cb_test_status == CLASSB_TEST_PASSED) {
@@ -491,11 +490,11 @@ void _on_bootstrap(void) {
     CLASSB_WDT_Config();
 
     CLASSB_STARTUP_STATUS startup_tests_status = CLASSB_STARTUP_TEST_FAILED;
-
     CLASSB_INIT_STATUS init_status = CLASSB_Init();
+
     Nop();
     if (init_status == CLASSB_SST_NOT_DONE) {
-
+        
         *classb_test_in_progress = CLASSB_TEST_STARTED;
         // Run all startup self-tests
         startup_tests_status = CLASSB_Startup_Tests();
@@ -504,13 +503,14 @@ void _on_bootstrap(void) {
             // Reset the device if all tests are passed.
             Classb_SystemReset();
         } else if (startup_tests_status == CLASSB_STARTUP_TEST_FAILED) {
-#if (defined(__DEBUG) || defined(__DEBUG_D)) && defined(__XC32)
+#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
             __builtin_software_breakpoint();
 #endif
 
             // Infinite loop
-
+            
             while (1) {
+                
                 ;
             }
 
