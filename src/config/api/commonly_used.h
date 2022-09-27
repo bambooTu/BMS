@@ -32,7 +32,7 @@ extern "C" {
 #define ABS(A)                 (((A) >= 0) ? (A) : -(A))          /* absolute value */
 #define DELTA(A, B)            (((A) >= (B)) ? (A - B) : (B - A)) /* defferrence */
 #define LOW_BYTE(A)            (*((unsigned char *)(&A)))
-#define HIGH_BYTE(A)           (*(((unsigned char *)(&A)) + 1))
+#define HIGH_BYTE(A)           (*((unsigned char *)(&A) + 1))
 #define LOW_WORD(A)            (*((unsigned short *)(&A)))
 #define HIGH_WORD(A)           (*((unsigned short *)(&A) + 1))
 #define BIT_SET(VAR, BIT_NUM)  ((VAR) |= 1UL << (BIT_NUM))
@@ -67,8 +67,8 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 double Lookup_Table(double input, volatile const double *bp0, volatile const double *table, unsigned int tableSize);
-float  Arr_Average(short *arr, unsigned int arrSize);
-float  Deadzone_Filter(float data, double threshold);
+float  Filter_Deadzone(float data, double threshold);
+float  Filter_ArrayAverage(short *arr, unsigned int arrSize);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

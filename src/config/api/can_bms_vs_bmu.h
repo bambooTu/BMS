@@ -1,13 +1,13 @@
 /**
  * @file       can_bms_vs_bmu.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-09-02
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 
@@ -67,6 +67,7 @@ extern "C" {
 /* USER CODE BEGIN 0 */
 unsigned short BMU_CellTempGet(unsigned char BMU_ID, unsigned char Cell_ID);
 unsigned short BMU_CellVoltGet(unsigned char BMU_ID, unsigned char Cell_ID);
+void           BMU_CheckQueueTasks(can_msg_t canRxMsg);
 void           BMU_Initialize(void);
 void           BMU_1ms_Tasks(void);
 /* USER CODE END 0 */

@@ -206,7 +206,7 @@ static void HV_SeqTurnOff(void) {
             HV.delayTimeCount = 0;
             RELAY_POS_OPEN;
             RELAY_NEG_OPEN;
-            Fault_EventSet(DTC_BMS_RELAY);
+            DTC_FaultOccurSet(DTC_BMS_RELAY);
             YLED_Clear();
             break;
     }

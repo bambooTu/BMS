@@ -1395,8 +1395,7 @@
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="core" name="!@#harmonyUserData"/>
          <value>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;UserData&gt;
   &lt;UserData dnOrder=&quot;0&quot;&gt;
-    &lt;GraphSettings canvasHeight=&quot;232&quot; canvasWidth=&quot;823&quot; dnOrder=&quot;0&quot;/&gt;
-    &lt;ComponentGraph dnOrder=&quot;1&quot; id=&quot;__ROOTVIEW&quot;&gt;
+    &lt;ComponentGraph dnOrder=&quot;0&quot; id=&quot;__ROOTVIEW&quot;&gt;
       &lt;ElementPositions dnOrder=&quot;0&quot;&gt;
         &lt;ElementPosition dnOrder=&quot;0&quot; id=&quot;HarmonyCore&quot; x=&quot;660&quot; y=&quot;20&quot;/&gt;
         &lt;ElementPosition dnOrder=&quot;1&quot; id=&quot;X2CScope&quot; x=&quot;395&quot; y=&quot;175&quot;/&gt;
@@ -1412,6 +1411,7 @@
         &lt;ElementPosition dnOrder=&quot;11&quot; id=&quot;uart5&quot; x=&quot;205&quot; y=&quot;175&quot;/&gt;
       &lt;/ElementPositions&gt;
     &lt;/ComponentGraph&gt;
+    &lt;GraphSettings canvasHeight=&quot;232&quot; canvasWidth=&quot;823&quot; dnOrder=&quot;1&quot;/&gt;
   &lt;/UserData&gt;
 &lt;/UserData&gt;
 </value>
@@ -6022,7 +6022,7 @@
       </entry>
       <entry>
          <file>..\src\config\default\definitions.h</file>
-         <hash>02ed44647c7e58796428bac6f1d62140110a5a8b4fb65b6b226d801ac8ba1ea0</hash>
+         <hash>d0a09d2eb4383d7d5ac985b24c1bf2c481eecc7f35b5ba191cff6a61f093c52d</hash>
       </entry>
       <entry>
          <file>..\src\config\default\device.h</file>
@@ -6034,7 +6034,7 @@
       </entry>
       <entry>
          <file>..\src\config\default\initialization.c</file>
-         <hash>d19840aef737dc52120cbb446a6d71929c96068b3d9b78ae7155c8e3617cc724</hash>
+         <hash>6ed4f9acc01f9b7f2c3180ef9f3cf63b9dc95b98684b849084a3fb8114f19358</hash>
       </entry>
       <entry>
          <file>..\src\config\default\interrupts.c</file>

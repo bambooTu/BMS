@@ -30,7 +30,7 @@ typedef enum {
     /* Internal Control */
     BMS_HAND_ON,     /* Manual Control */
     BMS_RESET,       /* BMS software reset */
-    BMS_OCCUR_FAULT, /* BMS occur fault  */
+    BMS_OCCUR_FAULT, /* BMS occur fault */
     BMS_OCCUR_EMRG,  /* EMS is pressed occur */
     BMS_CONTROL_MAX
 } BMS_WORK_MODE_e;

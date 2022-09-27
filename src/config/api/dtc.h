@@ -40,6 +40,48 @@ extern "C" {
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
+typedef union {
+    struct {
+        unsigned OCCP              : 1; /**Charge Over Current Protection*/
+        unsigned ODCP              : 1; /**Discharge OverCurrent Protection*/
+        unsigned OVP               : 1; /**(BUS Voltage) Over Voltage Protection*/
+        unsigned UVP               : 1; /**(BUS Voltage) Under Voltage Protection*/
+        unsigned OTP               : 1; /**Cell Over Temperature Protection*/
+        unsigned UTP               : 1; /**Cell Under Temperature Protection*/
+        unsigned VCELL_UNBALANCE_P : 1; /**Cell Unbalance Protection*/
+        unsigned OCCW              : 1; /**Over Charge Current Warning*/
+
+        unsigned ODCW              : 1; /**Over Discharge Current Warning*/
+        unsigned BUS_OVW           : 1; /**(BUS Voltage) Over Voltage Warning*/
+        unsigned BUS_UVW           : 1; /**(BUS Voltage) Under Voltage Warning*/
+        unsigned OTW               : 1; /**Cell Over Temperature Warning*/
+        unsigned UTW               : 1; /**Cell Under Temperature Warning*/
+        unsigned VCELL_UNBALANCE_W : 1; /**Cell Unbalance Warning*/
+        unsigned CELL_OVP          : 1; /**Cell Over Voltage Protection*/
+        unsigned CELL_UVP          : 1; /**Cell Under Voltage Protection*/
+
+        unsigned TCELL_UNBALANCE_W : 1; /**Temperature Unbalance Warning*/
+        unsigned BCU_COMM          : 1; /**Master BCU Communication Error*/
+        unsigned SAFETY_BCU_COMM   : 1; /**Safety BCU Communication Error*/
+        unsigned CURR_SEN_COMM     : 1; /***Shunt Communication Error*/
+        unsigned BMU_COMM          : 1; /**BMU Communication Error*/
+        unsigned PCS_COMM          : 1; /**PCS Communication Error*/
+        unsigned MBMS_COMM         : 1; /**MBMS Communication Error*/
+        unsigned AFE_COMM          : 1; /**AFE Communication Error*/
+
+        unsigned NTC_OPEN        : 1; /**NTC Disconnected*/
+        unsigned NTC_SHORT       : 1; /**NTC Short*/
+        unsigned SHUT_DOWN       : 1; /***BMS Shutdown?RecordData*/
+        unsigned POWER_LOSS      : 1; /***Power Loss(Occure Relay Cut off)*/
+        unsigned EMERGENCY       : 1; /***Emergency or EMS do not Install*/
+        unsigned EEPROM_CHECKSUM : 1; /**EEPROM CheckSum Error*/
+        unsigned BMS_RELAY       : 1; /**Relay Sticking*/
+        unsigned CURR_DIR_ERR    : 1; /**Current Direction Error*/
+
+        unsigned PCS_CMD : 1; /***PCS Command Error(OVP or UVP)*/
+    } b;
+    uint64_t l;
+} DTC_FAULT_t;
 
 typedef enum {
     DTC_OCCP,              /**Charge Over Current Protection*/
@@ -83,7 +125,7 @@ typedef struct {
     int            Release;     /*Protection Release Conditions*/
     unsigned short LimitTime;   /*Protection Timing,mSec*/
     unsigned short ReleaseTime; /*Release Timing,mSec*/
-} FAULT_PARAM_t;                 /*Protection/Warning Parameter*/
+} FAULT_PARAM_t;                /*Protection/Warning Parameter*/
 
 typedef enum {
     ERR_LEVEL_NONE,
@@ -101,8 +143,8 @@ typedef struct {
 } DTC_MESSAGE_TABLE_t;
 
 typedef struct {
-    DTC_EVENT_e   event;
-    int*          source;
+    DTC_EVENT_e    event;
+    int*           source;
     FAULT_PARAM_t* ptrObject;
 } DTC_FAULT_CHECK_TABLE_t;
 
@@ -111,8 +153,9 @@ typedef struct {
 // Section: Interface Functions
 // *****************************************************************************
 // *****************************************************************************
-
+void           DTC_Initialize(void);
 void           DTC_1ms_Tasks(void);
+bool           DTC_FaultEventGet(DTC_EVENT_e event);
 void           DTC_FaultOccurSet(DTC_EVENT_e event);
 void           DTC_FaultOccurClear(DTC_EVENT_e event);
 unsigned short DTC_ErrorCodeGet(DTC_EVENT_e DTC);

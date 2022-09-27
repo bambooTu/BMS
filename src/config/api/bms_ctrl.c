@@ -104,6 +104,7 @@ static void BMS_SoftWareReset(void) {
 static void BMS_Protection(void) {
     switch (gProtectionState) {
         case 0:
+            fProtectionProcess = true;
             HV_ModeCommand(MODE_OFF);
             if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
                 gProtectionState++;
@@ -135,6 +136,7 @@ static void BMS_Protection(void) {
 static void BMS_Emergency(void) {
     switch (gEmergencyState) {
         case 0:
+            fEmrgProcess = true;
             HV_ModeCommand(MODE_OFF);
             if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
                 gEmergencyState++;
@@ -169,7 +171,6 @@ static void BMS_Emergency(void) {
 static void BMS_CommandDetect(void) {
     // TODO: Engineer mode
     /*
-        bool fProtectionProcess = false;
 
         if(!ENGR){
             fProtectionProcess = false;
@@ -186,23 +187,19 @@ static void BMS_CommandDetect(void) {
         }
     else
     */
-    /*Execute the emergency stop command when the EMS is pressed
-     and the BMS_Protection() has not been executed*/
-    if (((DIN_StateGet(DIN_4) == true) && (fProtectionProcess == false)) ||
-        (fEmrgProcess == true)) {  // While the BMS_Emergency() is executing
-        BMS_ModeCommand(BMS_OCCUR_EMRG);
-        fEmrgProcess = true;
-    }
-    /*Execute the fault protection command when the fault is occur
-        and the BMS_Emergency() has not been executed*/
-    else if (((DTC_WorstLevelGet() == ERR_LEVEL_PROTECTION) && (fEmrgProcess == false)) ||
-             (fProtectionProcess == true)) {  // While the BMS_Protection() is executing
-        BMS_ModeCommand(BMS_OCCUR_FAULT);
-        fProtectionProcess = true;
-    }
-    /*If the fault occur,command BMS_OFF */
-    else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {
-        BMS_ModeCommand(BMS_OFF);
+
+    if (((DIN_StateGet(DIN_4) == true) &&                       // When the EMS is pressed
+         (fProtectionProcess == false)) ||                      // and the BMS_Protection() is not executing
+        (fEmrgProcess == true)) {                               // or the BMS_Emergency() is executing
+        BMS_ModeCommand(BMS_OCCUR_EMRG);                        // ,it execute the BMS_OCCUR_EMRG command
+    }                                                           /*-----------------------------------------------*/
+    else if (((DTC_WorstLevelGet() == ERR_LEVEL_PROTECTION) &&  // When the fault occurs
+              (fEmrgProcess == false)) ||                       // and the BMS_Emergency() is not executing
+             (fProtectionProcess == true)) {                    // or the BMS_Protection() is executing
+        BMS_ModeCommand(BMS_OCCUR_FAULT);                       // ,it execute the BMS_OCCUR_FAULT command
+    }                                                           /*-----------------------------------------------*/
+    else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {          // When the fault occur
+        BMS_ModeCommand(BMS_OFF);                               // ,it execute BMS_OFF command
     }
 
     /*Clear the error code and reset BMS_Emergency() task state
@@ -210,6 +207,9 @@ static void BMS_CommandDetect(void) {
     if (fEmrgProcess == false) {
         DTC_FaultOccurClear(DIN_4);
         gEmergencyState = 0;
+    }
+    if (fProtectionProcess == false) {
+        gProtectionState = 0;
     }
 
     // User part
@@ -275,10 +275,12 @@ void BMS_Crtl_1ms_Tasks(void) {
             HV_ModeCommand(MODE_OFF);
             break;
         case BMS_CHG_ON:
+            // Jump to next case
         case BMS_DISCHG_ON:
             HV_ModeCommand(MODE_ON);
             break;
         case BMS_CHG_PRE_ON:
+            // Jump to next case
         case BMS_DISCHG_PRE_ON:
             HV_ModeCommand(MODE_PRECHG);
             break;

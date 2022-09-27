@@ -52,9 +52,10 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 
-void CurrentSensor_ParamSet(short gainOffset, short zeroOffset);
-void CurrentSensor_Intialize(void);
-void CurrentSensor_10ms_Tasks(void);
+void CURRSNSR_ParamSet(short gainOffset, short zeroOffset);
+void CURRSNSR_CheckQueueTask(can_msg_t canRxMsg);
+void CURRSNSR_Intialize(void);
+void CURRSNSR_10ms_Tasks(void);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

@@ -69,7 +69,7 @@ volatile const EEPROM_BMS_t eepBmsDef = {
     {  80000,   1000, 1000, 1000}, /* OCCP */
     {  75000,   1000, 1000, 1000}, /* OCCW */
 
- /*OCCW*/
+  /*OCCW*/
   /* OCPLockTime */
     (60000 / 100),
 

@@ -347,7 +347,7 @@ void CAN_Initialize(void) {
     }
     /* Code begin */
     // CAN2_MessageAcceptanceFilterSet(1,0x18ff4520);
-    //  CAN2_MessageAcceptanceFilterMaskSet(1,0x7FFF0000);
+    // CAN2_MessageAcceptanceFilterMaskSet(1,0x7FFF0000);
     /* Code end */
 }
 

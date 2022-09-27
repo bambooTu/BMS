@@ -31,7 +31,6 @@
 #include "current_sensor.h"
 #include "debounce.h"
 #include "dtc.h"
-#include "fault.h"
 #include "hv_setup.h"
 #include "indicator.h"
 #include "mcp3421.h"

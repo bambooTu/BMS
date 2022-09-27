@@ -146,7 +146,7 @@ static void Calculate_CycleLife(BMS_DATA_t *self) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void Coulomb_Counter(BMS_DATA_t *self, unsigned int period_ms) {
+static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
     period_ms = 1000 / period_ms;
 
     if (self->BusCurrent > 0) {  // Charging
@@ -244,7 +244,7 @@ void CoulombGauge_UpdateRemCap(BMS_DATA_t *self, unsigned int newRemCap) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void CoulombGauge_ParameterInitialize(BMS_DATA_t *self) {
+static void CG_ParameterInitialize(BMS_DATA_t *self) {
     self->ChgCap           = eepEmg.ChgCap;
     self->CycleLife        = eepEmg.CycleLife;
     self->DischgCap        = eepEmg.DisChgCap;
@@ -260,8 +260,8 @@ static void CoulombGauge_ParameterInitialize(BMS_DATA_t *self) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void CoulombGauge_Initialize(BMS_DATA_t *self) {
-    CoulombGauge_ParameterInitialize(self);
+void CG_Initialize(BMS_DATA_t *self) {
+    CG_ParameterInitialize(self);
     Calculate_SOH(self);
     Calculate_BattRemCap(self);
     Calculate_SOC(self);
@@ -275,10 +275,10 @@ void CoulombGauge_Initialize(BMS_DATA_t *self) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void CoulombGauge_20ms_Tasks(BMS_DATA_t *self) {
+void CG_20ms_Tasks(BMS_DATA_t *self) {
     switch (gCgTaskState) {
         case 0:
-            Coulomb_Counter(self, 100);
+            CG_CoulombCounter(self, 100);
             gCgTaskState++;
             break;
         case 1:

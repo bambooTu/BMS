@@ -81,7 +81,9 @@ Notes  : None.
 //        (*interrupt_count)++;
 //         PORTGbits.RG12 = 1;
 // }
-
+//void __attribute__ ((IPL1SRS)) TIMER_2_Handler {
+//
+//}
 void __ISR(_TIMER_2_VECTOR, ipl1SRS) TIMER_2_Handler(void) {
     /* Clear the status flag */
     IFS0CLR        = _IFS0_T2IF_MASK;

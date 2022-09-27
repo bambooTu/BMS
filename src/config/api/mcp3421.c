@@ -83,8 +83,8 @@ static void APP_I2CCallback(uintptr_t context) {
  *
  * @param      addr   MCP3421's address
  * @param      config MPC3421's configuration (ref. Datasheet)
- * @return     true
- * @return     false
+ * @return     true   Command Successful
+ * @return     false  Command fail
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-05

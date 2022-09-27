@@ -97,7 +97,7 @@ double Lookup_Table(double input, volatile const double *bp0, volatile const dou
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-float Arr_Average(short *arr, unsigned int arrSize) {
+float Filter_ArrayAverage(short *arr, unsigned int arrSize) {
     float ret = 0;
 
     for (unsigned int index = 0; index < arrSize; index++) {
@@ -118,7 +118,7 @@ float Arr_Average(short *arr, unsigned int arrSize) {
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-float Deadzone_Filter(float data, double threshold) {
+float Filter_Deadzone(float data, double threshold) {
     if ((data < threshold) && (data > ((-1) * threshold))) {
         data = 0;
     }

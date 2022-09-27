@@ -11,7 +11,6 @@
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/commonly_used.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/current_sensor.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/dtc.h</itemPath>
-            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/fault.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/indicator.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/debounce.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/bms_ctrl.h</itemPath>
@@ -100,7 +99,6 @@
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/coulomb_gauge.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/current_sensor.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/dtc.c</itemPath>
-          <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/fault.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/indicator.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/sys_parameter.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/debounce.c</itemPath>
@@ -611,6 +609,8 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d07ffff"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/PIC32MK_MCM.X/debug/default/PIC32MK_MCM_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>

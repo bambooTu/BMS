@@ -34,6 +34,7 @@
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
 /* ************************************************************************** */
+DTC_FAULT_t FaultIndicator, FaultIndicatorMask;
 
 static unsigned short   gDtcTimeCount[(DTC_TCELL_UNBALANCE_W + 1)];
 DTC_FAULT_CHECK_TABLE_t FaultCheckTaskTable[] = {
@@ -97,7 +98,7 @@ volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM] = {
 /* ************************************************************************** */
 
 void DTC_FaultOccurClear(DTC_EVENT_e event) {
-    Fault_EventClear(event);
+    FaultIndicator.l &= ~(1 << event);
 }
 
 static void DTC_Store2Eeprom(DTC_EVENT_e event) {
@@ -127,27 +128,13 @@ static void DTC_Store2Eeprom(DTC_EVENT_e event) {
 }
 
 void DTC_FaultOccurSet(DTC_EVENT_e event) {
-    Fault_EventSet(event);
+    FaultIndicator.l |= 1 << event;
     DTC_Store2Eeprom(event);
-    // for (uint8_t event = 0; event < DTC_EVENT_MAX_NUM; event++) {
-    //     switch (DTC_BMS_Message_Table[event].errorLevel) {
-    //         case ERR_LEVEL_PROTECTION:
-    //             bmsData.WorkModeCmd = BMS_OCCUR_FAULT;
-    //             break;
-    //         case ERR_LEVEL_FAULT:
-    //             bmsData.WorkModeCmd = BMS_OFF;
-    //             break;
-    //         case ERR_LEVEL_WARNING:
-    //         case ERR_LEVEL_MESSAGE:
-    //         default:
-    //             break;
-    //     }
-    // }
 }
 
-static unsigned char DTC_FaultEventGet(DTC_EVENT_e event) {
-    unsigned char ret = true;
-    ret               = Fault_EventGet(event);
+bool DTC_FaultEventGet(DTC_EVENT_e event) {
+    bool ret = true;
+    ret = (FaultIndicator.l >> event) & 0x01;;
     return ret;
 }
 
@@ -224,6 +211,13 @@ ERROR_LEVEL_e DTC_WorstLevelGet(void) {
         if (ret == ERR_LEVEL_PROTECTION) break;
     }
     return ret;
+}
+void DTC_Initialize(void) {
+    FaultIndicator.l                  = 0;
+    FaultIndicatorMask.l              = 0x1FFFFFFFF;
+    FaultIndicatorMask.b.SHUT_DOWN    = 0;
+    FaultIndicatorMask.b.EMERGENCY    = 0;
+    FaultIndicatorMask.b.CURR_DIR_ERR = 0;
 }
 
 void DTC_1ms_Tasks(void) {

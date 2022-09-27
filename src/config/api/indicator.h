@@ -24,7 +24,8 @@ typedef enum {
     INVTERVAL_SHORT,
 } INTERVAL_e;
 
-void Indicator_1ms_Tasks(void);
+void IND_Initialize(void);
+void IND_1ms_Tasks(void);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus

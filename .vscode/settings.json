@@ -4,6 +4,9 @@
         "classb_common.h": "c",
         "sys_parameter.h": "c",
         "current_sensor.h": "c",
-        "coulomb_gauge.h": "c"
+        "coulomb_gauge.h": "c",
+        "cstdint": "c",
+        "definitions.h": "c",
+        "plib_tmr4.h": "c"
     }
 }
