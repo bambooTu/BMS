@@ -191,7 +191,7 @@ unsigned short MCP3421_AdcValueGet(void) {
                 I2C1_data.errorCount = SATURATION(I2C1_data.errorCount, I2C_ERROR_TIMES, 0);  // Saturation the value
                 I2C1_data.taskState  = APP_STATE_IDLE;
             } else {
-                if (I2C1_data.pastState <= APP_STATE_CHECK_SENSOR_READY) {
+                if (I2C1_data.pastState <= APP_STATE_CHECK_SENSOR_READY) { 
                     I2C1_data.taskState = APP_STATE_SENSOR_STATUS_VERIFY;
                 } else {
                     I2C1_data.taskState = APP_STATE_READ_ADC_VALUE;

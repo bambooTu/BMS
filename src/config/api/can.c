@@ -21,10 +21,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef bool (*CAN_MESSAGERECEIVE)(uint32_t* id, uint8_t* length, uint8_t* data, uint32_t* timestamp, uint8_t fifoNum,
-                                   CANFD_MSG_RX_ATTRIBUTE* msgAttr);
+typedef bool (*CAN_MESSAGE_RECEIVE)(uint32_t* id, uint8_t* length, uint8_t* data, uint32_t* timestamp, uint8_t fifoNum,
+                                    CANFD_MSG_RX_ATTRIBUTE* msgAttr);
 
-typedef CANFD_ERROR (*CAN_ERRORGET)(void);
+typedef bool (*CAN_MESSAGE_TRANSMIT)(uint32_t id, uint8_t length, uint8_t* data, uint8_t fifoQueueNum, CANFD_MODE mode,
+                                     CANFD_MSG_TX_ATTRIBUTE msgAttr);
+
+typedef bool (*CAN_TX_FIFOQUEUE_IS_Full)(uint8_t fifoQueueNum);
+
+typedef CANFD_ERROR (*CAN_ERROR_GET)(void);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -53,14 +58,26 @@ union {
     uint64_t u64;
 } Data;
 
-const CAN_MESSAGERECEIVE CANx_MessageReceive[CAN_NUMBER_OF_MODULE] = {
+const CAN_MESSAGE_RECEIVE CANx_MessageReceive[CAN_NUMBER_OF_MODULE] = {
     CAN1_MessageReceive,
     CAN2_MessageReceive,
     CAN3_MessageReceive,
     CAN4_MessageReceive,
 };
+const CAN_MESSAGE_TRANSMIT CANx_MessageTransmit[CAN_NUMBER_OF_MODULE] = {
+    CAN1_MessageTransmit,
+    CAN2_MessageTransmit,
+    CAN3_MessageTransmit,
+    CAN4_MessageTransmit,
+};
+const CAN_TX_FIFOQUEUE_IS_Full CANx_TxFIFOQueueIsFull[CAN_NUMBER_OF_MODULE] = {
+    CAN1_TxFIFOQueueIsFull,
+    CAN2_TxFIFOQueueIsFull,
+    CAN3_TxFIFOQueueIsFull,
+    CAN4_TxFIFOQueueIsFull,
+};
 
-const CAN_ERRORGET CANx_ErrorGet[CAN_NUMBER_OF_MODULE] = {
+const CAN_ERROR_GET CANx_ErrorGet[CAN_NUMBER_OF_MODULE] = {
     CAN1_ErrorGet,
     CAN2_ErrorGet,
     CAN3_ErrorGet,
@@ -303,7 +320,7 @@ static void CAN4_Callback(uintptr_t contextHandle) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void initializeQueue(CAN_MODULE Instance) {
+static void CAN_InitializeQueue(CAN_MODULE Instance) {
     /*CAN Queue Initialize*/
     Object[Instance].txQueue.pHead          = txQueue[Instance];
     Object[Instance].txQueue.pTail          = txQueue[Instance];
@@ -340,10 +357,10 @@ void CAN_Initialize(void) {
     // TODO(Chiou): Only filter for BMS communication protocol address, can be removed if you want accept all messages
 
     for (CAN_MODULE Instance = CAN_1; Instance < CAN_NUMBER_OF_MODULE; Instance++) {
+        CAN_InitializeQueue(Instance);
         CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc, recvMessage[Instance].data,
                                       &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
                                       &recvMessage[Instance].msgAttr);
-        initializeQueue(Instance);
     }
     /* Code begin */
     // CAN2_MessageAcceptanceFilterSet(1,0x18ff4520);
@@ -518,27 +535,11 @@ uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance) {
 bool CAN_QueueDataXfer(CAN_MODULE Instance) {
     bool      ret = false;
     can_msg_t canTxMsg;
-    if (CAN_GetTxQueueCount(Instance) > 0) {
-        CAN_PullTxQueue(Instance, &canTxMsg);
-        switch (Instance) {
-            case CAN_1:
-                ret = CAN1_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
-                                           CANFD_MSG_TX_DATA_FRAME);
-                break;
-            case CAN_2:
-                ret = CAN2_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
-                                           CANFD_MSG_TX_DATA_FRAME);
-                break;
-            case CAN_3:
-                ret = CAN3_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
-                                           CANFD_MSG_TX_DATA_FRAME);
-                break;
-            case CAN_4:
-                ret = CAN4_MessageTransmit(canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
-                                           CANFD_MSG_TX_DATA_FRAME);
-                break;
-            default:
-                break;
+    if (!CANx_TxFIFOQueueIsFull[Instance](CAN_FIFONUM_TX0)) {
+        if (CAN_GetTxQueueCount(Instance) > 0) {
+            CAN_PullTxQueue(Instance, &canTxMsg);
+            ret = CANx_MessageTransmit[Instance](canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
+                                       CANFD_MSG_TX_DATA_FRAME);
         }
     }
     return ret;

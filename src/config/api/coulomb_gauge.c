@@ -66,8 +66,8 @@ static unsigned char gSelfDischgCurr = 0;
 /* ************************************************************************** */
 /**
  * @brief      Calculate state of health
- * 
- * @param      self 
+ *
+ * @param      self
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-13
@@ -80,7 +80,7 @@ static void Calculate_SOH(BMS_DATA_t *self) {
 }
 /**
  * @brief      Calculate state of charge
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -95,7 +95,7 @@ static void Calculate_SOC(BMS_DATA_t *self) {
 }
 /**
  * @brief      Calculate battery remaining capacity
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -109,7 +109,7 @@ static void Calculate_BattRemCap(BMS_DATA_t *self) {
             self->RemCap = self->FullCap;
         }
     } else {
-        fDischgCapFull  = 1;
+        fDischgCapFull  = true;
         self->RemCap    = 1;
         self->ChgCap    = 0;
         self->DischgCap = 0;
@@ -117,7 +117,7 @@ static void Calculate_BattRemCap(BMS_DATA_t *self) {
 }
 /**
  * @brief      Calculate cycleLife
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -137,8 +137,8 @@ static void Calculate_CycleLife(BMS_DATA_t *self) {
     }
 }
 /**
- * @brief      Coulomb counter 
- * 
+ * @brief      Coulomb counter
+ *
  * @param      self BMS data
  * @param      period_ms execution period
  * @version    0.1
@@ -151,7 +151,7 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
 
     if (self->BusCurrent > 0) {  // Charging
         self->ChgCap = self->ChgCap + (self->BusCurrent / period_ms / 3600.0f);
-    } else {  // Discharging 
+    } else if (self->BusCurrent < 0) {  // Discharging
         self->DischgCap = self->DischgCap + ((-1) * self->BusCurrent / period_ms / 3600.0f);
     }
 
@@ -174,7 +174,7 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
 // }
 /**
  * @brief      OCV point calibrate charge/discharge capacity
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -189,7 +189,7 @@ static void Calibration_OcvPoint(BMS_DATA_t *self) {
             self->ChgCap += (CELL_DESIGN_CAP * (0.0002f));
         } else {
         }
-    } else {  // Discharging
+    } else if (self->BusCurrent < 0) {  // Discharging
         if ((self->MinVcell < 3055UL) && (self->SOC > 5)) {
             self->DischgCap += (CELL_DESIGN_CAP * 0.0004f);
         }
@@ -209,7 +209,7 @@ static void Calibration_OcvPoint(BMS_DATA_t *self) {
 }
 /**
  * @brief      SOH calibrate full capacity
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -221,7 +221,7 @@ static void Calibration_SOH2FullCap(BMS_DATA_t *self) {
 }
 /**
  * @brief      Update remaining capacity
- * 
+ *
  * @param      self BMS data
  * @param      newRemCap New remaining capacity
  * @version    0.1
@@ -237,7 +237,7 @@ void CoulombGauge_UpdateRemCap(BMS_DATA_t *self, unsigned int newRemCap) {
 }
 /**
  * @brief      Coulomb gauge parameter initialize
- * 
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -253,7 +253,7 @@ static void CG_ParameterInitialize(BMS_DATA_t *self) {
 }
 /**
  * @brief      Coulomb gauge initialize
- *  
+ *
  * @param      self BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -267,9 +267,9 @@ void CG_Initialize(BMS_DATA_t *self) {
     Calculate_SOC(self);
 }
 /**
- * @brief      Coulomb gauge polling tasks  
- * 
- * @param      self  BMS data  
+ * @brief      Coulomb gauge polling tasks
+ *
+ * @param      self  BMS data
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-09-13

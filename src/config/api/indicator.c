@@ -25,7 +25,7 @@ static void IND_WithoutFault(void) {
 }
 
 static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
-                                unsigned char* fCompleteARound) {
+                          unsigned char* fCompleteARound) {
     static unsigned char  ShortIntervalCount = 0;
     static unsigned char  LongIntervalCount  = 0;
     static unsigned short IntervalCount      = 0;
@@ -72,6 +72,7 @@ static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INT
             break;
 
         case INVTERVAL_RESET:
+            // jump to default
         default:
             ShortIntervalCount = 0;
             LongIntervalCount  = 0;
@@ -110,8 +111,7 @@ void IND_1ms_Tasks(void) {
             }
         } else {
             IND_WithFault(DTC_BMS_Message_Table[FaultIndicatorIndex - 1].longCount,
-                                DTC_BMS_Message_Table[FaultIndicatorIndex - 1].shortCount, &IntervalStep,
-                                &fCompleteARound);
+                          DTC_BMS_Message_Table[FaultIndicatorIndex - 1].shortCount, &IntervalStep, &fCompleteARound);
         }
     } else {
         fCompleteARound     = true;

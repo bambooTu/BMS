@@ -48,40 +48,40 @@
 
 typedef struct {
     /*BMU*/
-    unsigned char BmuConnected[(BMU_MAX_NUM >> 3) + 1]; /* BMU comm status 1: Connected 0: Disconnected*/
-    unsigned char BmuTimeout[(BMU_MAX_NUM >> 3) + 1]; /* BMU comm status，1: Timeout 0: Normal */
-    int BmuVcell[BMU_MAX_NUM][BMU_VCELL_MAX_NUM]; /* Unit:mV,Volt. of all cell in the BMU */
-    int BmuVoltage[BMU_MAX_NUM]; /* Unit:mV,Sum of Vcell voltage */
-    int BmuMaxVcell[BMU_MAX_NUM]; /* Max. Volt. in the BMU */
-    int BmuMinVcell[BMU_MAX_NUM]; /* Max. Volt. in the BMU */
-    unsigned char BmuMaxVcellID[BMU_MAX_NUM]; /* ID of the Max. Vcell in the BMU */
-    unsigned char BmuMinVcellID[BMU_MAX_NUM]; /* ID of the Min. Vcell in the BMU */
-    int BmuTcell[BMU_MAX_NUM][BMU_TCELL_MAX_NUM]; /* Unit:0.1 Deg. C,Temp. of all cell in the BMU */
-    int BmuMaxTcell[BMU_MAX_NUM]; /* Max. Temp. in the BMU */
-    int BmuMinTcell[BMU_MAX_NUM]; /* Max. Temp. in the BMU */
-    unsigned char BmuMaxTcellID[BMU_MAX_NUM]; /* ID of the Max. Tcell in the BMU */
-    unsigned char BmuMinTcellID[BMU_MAX_NUM]; /* ID of the Min. Tcell in the BMU */
-    unsigned char BmuMsgFlag[BMU_MAX_NUM]; /* unit: bitmap,The number of packets is recieved  */
-    unsigned char BmuFaultLed[BMU_MAX_NUM]; /* Fault indicator number of the BMU */
+    unsigned char BmuConnected[(BMU_MAX_NUM >> 3) + 1];     /* BMU comm status 1: Connected 0: Disconnected*/
+    unsigned char BmuTimeout[(BMU_MAX_NUM >> 3) + 1];       /* BMU comm status，1: Timeout 0: Normal */
+    int           BmuVcell[BMU_MAX_NUM][BMU_VCELL_MAX_NUM]; /* Unit:mV,Volt. of all cell in the BMU */
+    int           BmuVoltage[BMU_MAX_NUM];                  /* Unit:mV,Sum of Vcell voltage */
+    int           BmuMaxVcell[BMU_MAX_NUM];                 /* Max. Volt. in the BMU */
+    int           BmuMinVcell[BMU_MAX_NUM];                 /* Max. Volt. in the BMU */
+    unsigned char BmuMaxVcellID[BMU_MAX_NUM];               /* ID of the Max. Vcell in the BMU */
+    unsigned char BmuMinVcellID[BMU_MAX_NUM];               /* ID of the Min. Vcell in the BMU */
+    int           BmuTcell[BMU_MAX_NUM][BMU_TCELL_MAX_NUM]; /* Unit:0.1 Deg. C,Temp. of all cell in the BMU */
+    int           BmuMaxTcell[BMU_MAX_NUM];                 /* Max. Temp. in the BMU */
+    int           BmuMinTcell[BMU_MAX_NUM];                 /* Max. Temp. in the BMU */
+    unsigned char BmuMaxTcellID[BMU_MAX_NUM];               /* ID of the Max. Tcell in the BMU */
+    unsigned char BmuMinTcellID[BMU_MAX_NUM];               /* ID of the Min. Tcell in the BMU */
+    unsigned char BmuMsgFlag[BMU_MAX_NUM];                  /* unit: bitmap,The number of packets is recieved  */
+    unsigned char BmuFaultLed[BMU_MAX_NUM];                 /* Fault indicator number of the BMU */
 
     /*Branch*/
     int Voltage; /* Unit:mV, Branch Voltage = Sum of Bmu Voltage */
 
-    int MaxVcell; /* Max. Volt. in the branch */
+    int           MaxVcell;      /* Max. Volt. in the branch */
     unsigned char MaxVcellBmuID; /* BMU ID of the Max. Vcell in the branch */
-    unsigned char MaxVcellID; /* ID of the Max. Vcell in the branch */
+    unsigned char MaxVcellID;    /* ID of the Max. Vcell in the branch */
 
-    int MinVcell; /* Min. Volt. in the branch */
+    int           MinVcell;      /* Min. Volt. in the branch */
     unsigned char MinVcellBmuID; /* BMU ID of the Min. Vcell in the branch */
-    unsigned char MinVcellID; /* ID of the Min. Vcell in the branch   */
+    unsigned char MinVcellID;    /* ID of the Min. Vcell in the branch   */
 
-    int MaxTcell; /* Max. Temp. in the branch  */
+    int           MaxTcell;      /* Max. Temp. in the branch  */
     unsigned char MaxTcellBmuID; /* BMU ID of the Max. Tcell in the branch */
-    unsigned char MaxTcellID; /* ID of the Max. Tcell in the branch   */
+    unsigned char MaxTcellID;    /* ID of the Max. Tcell in the branch   */
 
-    int MinTcell; /* Min. Temp. in the branch */
+    int           MinTcell;      /* Min. Temp. in the branch */
     unsigned char MinTcellBmuID; /* BMU ID of the Min. Tcell in the branch */
-    unsigned char MinTcellID; /* ID of the Min. Tcell in the branch */
+    unsigned char MinTcellID;    /* ID of the Min. Tcell in the branch */
 
 } BRANCH_INFO_t;
 
@@ -112,14 +112,14 @@ typedef enum {
 
 /* Globalvariables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
-BMS_BMU_TASK_STATE_e BMU_taskState = BMS_BMU_REQ_CMD;
-unsigned int BMU_ID = 0;
-unsigned int BMU_retryCount = 0;
-unsigned int BMU_tasksTimeCount = 0;
-unsigned int gBmuFaultLed1msDEC = 0;
-unsigned int BMU_responseTimeoutCount = 0;
-unsigned char BMU_rxMessageFlag = 0;
-unsigned char BMS_SourceAddrBackup = 0;
+BMS_BMU_TASK_STATE_e BMU_taskState            = BMS_BMU_REQ_CMD;
+unsigned int         BMU_ID                   = 0;
+unsigned int         BMU_retryCount           = 0;
+unsigned int         BMU_tasksTimeCount       = 0;
+unsigned int         gBmuFaultLed1msDEC       = 0;
+unsigned int         BMU_responseTimeoutCount = 0;
+unsigned char        BMU_rxMessageFlag        = 0;
+unsigned char        BMS_SourceAddrBackup     = 0;
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
@@ -168,22 +168,22 @@ static void BMU_ResponseCheck(unsigned int BMU_ID, can_msg_t canRxMsg) {
 
 bool BMU_XtrmVcellSearch(unsigned int BMU_ID) {
     /* Search BMU Max. Min. Voltage Value */
-    bool ret = false;
-    unsigned char fCommOkAFE = 0;
-    BR.BmuMaxVcell[BMU_ID] = BR.BmuVcell[BMU_ID][0];
-    BR.BmuMinVcell[BMU_ID] = BR.BmuVcell[BMU_ID][0];
+    bool          ret             = false;
+    unsigned char fCommOkAFE      = 0;
+    BR.BmuMaxVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
+    BR.BmuMinVcell[BMU_ID]        = BR.BmuVcell[BMU_ID][0];
     unsigned short pastBmuVoltage = BR.BmuVoltage[BMU_ID];
-    BR.BmuVoltage[BMU_ID] = 0;
+    BR.BmuVoltage[BMU_ID]         = 0;
 
     for (unsigned char i = 0; i < BMU_VCELL_MAX_NUM; i++) {
         if (BR.BmuVcell[BMU_ID][i] == BMU_AFE_COMM_ERR) {
             BR.BmuVoltage[BMU_ID] = pastBmuVoltage;
             break;
         } else if (BR.BmuVcell[BMU_ID][i] > BR.BmuMaxVcell[BMU_ID]) {
-            BR.BmuMaxVcell[BMU_ID] = BR.BmuVcell[BMU_ID][i];
+            BR.BmuMaxVcell[BMU_ID]   = BR.BmuVcell[BMU_ID][i];
             BR.BmuMaxVcellID[BMU_ID] = i;
         } else if (BR.BmuVcell[BMU_ID][i] < BR.BmuMinVcell[BMU_ID]) {
-            BR.BmuMinVcell[BMU_ID] = BR.BmuVcell[BMU_ID][i];
+            BR.BmuMinVcell[BMU_ID]   = BR.BmuVcell[BMU_ID][i];
             BR.BmuMinVcellID[BMU_ID] = i;
         }
         BR.BmuVoltage[BMU_ID] += BR.BmuVcell[BMU_ID][i];
@@ -202,23 +202,23 @@ static void BMU_XtrmTcellSearch(unsigned int BMU_ID) {
     BR.BmuMinTcell[BMU_ID] = BR.BmuTcell[BMU_ID][0];
     for (unsigned char i = 0; i < BMU_TCELL_MAX_NUM; i++) {
         if (BR.BmuTcell[BMU_ID][i] > BR.BmuMaxTcell[BMU_ID]) {
-            BR.BmuMaxTcell[BMU_ID] = BR.BmuTcell[BMU_ID][i];
+            BR.BmuMaxTcell[BMU_ID]   = BR.BmuTcell[BMU_ID][i];
             BR.BmuMaxTcellID[BMU_ID] = i;
         } else if (BR.BmuTcell[BMU_ID][i] < BR.BmuMinTcell[BMU_ID]) {
-            BR.BmuMinTcell[BMU_ID] = BR.BmuTcell[BMU_ID][i];
+            BR.BmuMinTcell[BMU_ID]   = BR.BmuTcell[BMU_ID][i];
             BR.BmuMinTcellID[BMU_ID] = i;
         }
     }
 }
 
 static void BMU_XferMsgInit(can_msg_t *canTxMsg) {
-    canTxMsg->J1939.priority = 6; /* 0~7(3bits), 6:0x18, 7:0x1C */
-    canTxMsg->J1939.reserved = 1; /* EDP?X?ibit */
-    canTxMsg->J1939.dataPage = 0;
-    canTxMsg->J1939.pduFormat = 0x00;
-    canTxMsg->J1939.pduSpecific = 0x00; /* DestinationAddress */
+    canTxMsg->J1939.priority      = 6; /* 0~7(3bits), 6:0x18, 7:0x1C */
+    canTxMsg->J1939.reserved      = 1; /* EDP?X?ibit */
+    canTxMsg->J1939.dataPage      = 0;
+    canTxMsg->J1939.pduFormat     = 0x00;
+    canTxMsg->J1939.pduSpecific   = 0x00; /* DestinationAddress */
     canTxMsg->J1939.sourceAddress = BMS_SourceAddrBackup;
-    canTxMsg->dlc = 8;
+    canTxMsg->dlc                 = 8;
 
     for (unsigned i = 0; i < 8; i++) {
         *(canTxMsg->data + i) = 0xAA;
@@ -228,7 +228,7 @@ static void BMU_XferMsgInit(can_msg_t *canTxMsg) {
 static void BMU_RequestDataMsg(unsigned int BMU_ID) {
     can_msg_t canTxMsg;
     BMU_XferMsgInit(&canTxMsg);
-    canTxMsg.J1939.pduFormat = 0xEA;
+    canTxMsg.J1939.pduFormat   = 0xEA;
     canTxMsg.J1939.pduSpecific = BMU_ID;
 
     canTxMsg.data[0] = 0x00;
@@ -240,16 +240,16 @@ static void BMU_RequestDataMsg(unsigned int BMU_ID) {
 static void BMU_BalanceParamMsg(unsigned int BMU_ID) {
     can_msg_t canTxMsg;
     BMU_XferMsgInit(&canTxMsg);
-    canTxMsg.J1939.pduFormat = 0xBC;
+    canTxMsg.J1939.pduFormat   = 0xBC;
     canTxMsg.J1939.pduSpecific = BMU_ID;
 
-    canTxMsg.data[0] = (unsigned char) (eepBms.BalanceDef.Mode);
-    canTxMsg.data[1] = (unsigned char) (eepBms.BalanceDef.VoltDiff);
-    canTxMsg.data[2] = (unsigned char) (eepBms.BalanceDef.Volt & 0xFF);
-    canTxMsg.data[3] = (unsigned char) ((eepBms.BalanceDef.Volt & 0xFF00) >> 8);
-    canTxMsg.data[4] = (unsigned char) (bmsData.MinVcell & 0xFF);
-    canTxMsg.data[5] = (unsigned char) ((bmsData.MinVcell & 0xFF00) >> 8);
-    canTxMsg.data[6] = (unsigned char) (bmsData.Status);
+    canTxMsg.data[0] = (unsigned char)(eepBms.BalanceDef.Mode);
+    canTxMsg.data[1] = (unsigned char)(eepBms.BalanceDef.VoltDiff);
+    canTxMsg.data[2] = (unsigned char)(eepBms.BalanceDef.Volt & 0xFF);
+    canTxMsg.data[3] = (unsigned char)((eepBms.BalanceDef.Volt & 0xFF00) >> 8);
+    canTxMsg.data[4] = (unsigned char)(bmsData.MinVcell & 0xFF);
+    canTxMsg.data[5] = (unsigned char)((bmsData.MinVcell & 0xFF00) >> 8);
+    canTxMsg.data[6] = (unsigned char)(bmsData.Status);
     canTxMsg.data[7] = BR.BmuFaultLed[(BMU_ID)];
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
@@ -273,25 +273,25 @@ static void BMU_ResponseComplete(unsigned char BMU_ID) {
 
 static inline void BRANCH_XtrmVoltSearch(void) {
     unsigned char Bit;
-    unsigned int BmuVoltSum = 0;
+    unsigned int  BmuVoltSum = 0;
 
     /* Search  Max. Min. voltage value in Branch*/
 
-    BR.MaxVcell = BR.BmuMaxVcell[0];
+    BR.MaxVcell      = BR.BmuMaxVcell[0];
     BR.MaxVcellBmuID = 0;
 
-    BR.MinVcell = BR.BmuMinVcell[0];
+    BR.MinVcell      = BR.BmuMinVcell[0];
     BR.MinVcellBmuID = 0;
 
     for (unsigned char i = 0; i < BMU_MAX_NUM; i++) {
         Bit = 1 << (i & 0x07);
         if ((BR.BmuTimeout[(i >> 3)] & Bit) == 0) {
             if (BR.BmuMaxVcell[i] > BR.MaxVcell) {
-                BR.MaxVcell = BR.BmuMaxVcell[i];
+                BR.MaxVcell      = BR.BmuMaxVcell[i];
                 BR.MaxVcellBmuID = i;
             }
             if (BR.BmuMinVcell[i] < BR.MinVcell) {
-                BR.MinVcell = BR.BmuMinVcell[i];
+                BR.MinVcell      = BR.BmuMinVcell[i];
                 BR.MinVcellBmuID = i;
             }
             /* BMU fault LED indicator */
@@ -319,10 +319,10 @@ static inline void BRANCH_XtrmTempSearch(void) {
     unsigned char Bit;
     unsigned char fErrNTC = 0;
     /* Search  Max. Min. voltage value in Branch*/
-    BR.MaxTcell = BR.BmuMaxTcell[0];
+    BR.MaxTcell      = BR.BmuMaxTcell[0];
     BR.MaxTcellBmuID = 0;
 
-    BR.MinTcell = BR.BmuMinTcell[0];
+    BR.MinTcell      = BR.BmuMinTcell[0];
     BR.MinTcellBmuID = 0;
 
     for (unsigned char i = 0; i < BMU_MAX_NUM; i++) {
@@ -336,10 +336,10 @@ static inline void BRANCH_XtrmTempSearch(void) {
                 fErrNTC++;
             } else {
                 if (BR.BmuMaxTcell[i] > BR.MaxTcell) {
-                    BR.MaxTcell = BR.BmuMaxTcell[i];
+                    BR.MaxTcell      = BR.BmuMaxTcell[i];
                     BR.MaxTcellBmuID = i;
                 } else if (BR.BmuMinTcell[i] < BR.MinTcell) {
-                    BR.MinTcell = BR.BmuMinTcell[i];
+                    BR.MinTcell      = BR.BmuMinTcell[i];
                     BR.MinTcellBmuID = i;
                 }
             }
@@ -347,13 +347,13 @@ static inline void BRANCH_XtrmTempSearch(void) {
             /* BMU fault LED indicator */
             if (DTC_FaultEventGet(DTC_OTP) == true) {
                 if (BR.BmuMaxTcell[i] > eepBms.OTP.Limit) {
-                    BR.BmuFaultLed[i] = 1;
+                    BR.BmuFaultLed[i]  = 1;
                     gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
                 }
             }
             if (DTC_FaultEventGet(DTC_UTP) == true) {
                 if (BR.BmuMinTcell[i] < eepBms.UTP.Limit) {
-                    BR.BmuFaultLed[i] = 1;
+                    BR.BmuFaultLed[i]  = 1;
                     gBmuFaultLed1msDEC = BMU_FAULT_LED_DELAY;
                 }
             }
@@ -377,7 +377,7 @@ static void BRANCH_XtrmVcellIDSearch(void) {
 
 static void BMU_CommStatusCheck(void) {
     static unsigned char ErrCnt = 0;
-    unsigned char Err = 0;
+    unsigned char        Err    = 0;
 
     for (unsigned i = 0; i < BMU_MAX_NUM; i++) {
         if (BR.BmuMsgFlag[i] != BMU_RECV_MSG_FLAG) {
@@ -444,34 +444,33 @@ static inline void BMU_DataInterchange(void) {
     bmsData.BmuMaxVcellID = BR.MaxVcellID;
     bmsData.BmuMinTcellID = BR.MinTcellID;
     bmsData.BmuMinVcellID = BR.MinVcellID;
-    bmsData.BusVolt = BR.Voltage;
-    bmsData.MaxTcell = BR.MaxTcell;
+    bmsData.BusVolt       = BR.Voltage;
+    bmsData.MaxTcell      = BR.MaxTcell;
     bmsData.MaxTcellBmuID = BR.MaxTcellBmuID;
-    bmsData.MaxVcell = BR.MaxVcell;
+    bmsData.MaxVcell      = BR.MaxVcell;
     bmsData.MaxVcellBmuID = BR.MaxVcellBmuID;
-    bmsData.MinTcell = BR.MinTcell;
+    bmsData.MinTcell      = BR.MinTcell;
     bmsData.MinTcellBmuID = BR.MinTcellBmuID;
-    bmsData.MinVcell = BR.MinVcell;
+    bmsData.MinVcell      = BR.MinVcell;
     bmsData.MinVcellBmuID = BR.MinVcellBmuID;
 }
 
 static void BMU_CtrlSM(void) {
     if (BMU_tasksTimeCount == 0) {
-        BMU_taskState = BMS_BMU_SRCH_DATA;
-        BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
+        BMU_taskState      = BMS_BMU_SRCH_DATA;
+        BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME-1;
     }
     switch (BMU_taskState) {
         case BMS_BMU_REQ_CMD:
-            BMU_rxMessageFlag = 0;
-            BMU_responseTimeoutCount = BMU_RESPONSE_TIMEOUT_TIME;
+            BMU_rxMessageFlag        = 0;
+            BMU_responseTimeoutCount = BMU_RESPONSE_TIMEOUT_TIME-1;
             BMU_BalanceParamMsg(BMU_ID);
             BMU_RequestDataMsg(BMU_ID);
             BMU_taskState = BMS_BMU_CHK_RSP;
             break;
         case BMS_BMU_CHK_RSP:
             if (BMU_ID < BMU_MAX_NUM) {
-
-                BMU_rxMessageFlag = 0x07; // TODO: Delete
+                //BMU_rxMessageFlag = 0x07;  // TODO: Delete
                 if (BMU_rxMessageFlag == BMU_RECV_MSG_FLAG) {
                     BMU_ResponseComplete(BMU_ID);
                     if (BMU_XtrmVcellSearch(BMU_ID)) {
@@ -493,7 +492,7 @@ static void BMU_CtrlSM(void) {
             }
             break;
         case BMS_BMU_SRCH_DATA:
-            BMU_ID = 0;
+            BMU_ID        = 0;
             BMU_taskState = BMS_BMU_REQ_CMD;
 
             BMU_CommStatusCheck();
@@ -504,15 +503,16 @@ static void BMU_CtrlSM(void) {
 
             break;
         default:
+            BMU_taskState = BMS_BMU_REQ_CMD;
             break;
     }
 }
 
 void BMU_Initialize(void) {
     BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
-    BMU_taskState = BMS_BMU_REQ_CMD;
+    BMU_taskState      = BMS_BMU_REQ_CMD;
     can_msg_t canRxMsg;
-    if (0x00 == eepSpe.BmsAddr) { // TODO:
+    if (0x00 == eepSpe.BmsAddr) {  // TODO:
         /* 測試時如果沒有變更位址，各BMU回覆0xC0(BCU)的位址，
             避免造成Slave BCU的負擔，Slave BCU預設位址0xC0 */
         BMS_SourceAddrBackup = 0xD0;

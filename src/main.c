@@ -153,7 +153,7 @@ int main(void) {
         SYS_Tasks();
         X2CScope_Communicate();
         WDT_Clear();
-
+        CAN_QueueDataXfer(CAN_1);
         switch ((APP_STATUS_e) appData.state) {
             case APP_EEPROM_READ:
                 eepBms = eepBmsDef;
@@ -172,9 +172,9 @@ int main(void) {
                 HV_Initialize();
                 BMU_Initialize();
                 CAN_Initialize();
+                IND_Initialize();
                 MCP3421_Initialize();
                 CURRSNSR_Intialize();
-                IND_Initialize();
                 CG_Initialize(&bmsData);
                 DIN_ParameterInitialize();
                 if (!appData.bootTimeCount) {
@@ -189,11 +189,11 @@ int main(void) {
                     BMU_1ms_Tasks();
                     BMS_Crtl_1ms_Tasks();
                     IND_1ms_Tasks();
-                    CAN_QueueDataXfer(CAN_1);
+                    
                     if (CAN_GetRxQueueCount(CAN_1)) {
                         CAN_PullRxQueue(CAN_1, &gCanRxMsg);
                         if (gCanRxMsg.id == 0x3C2) {
-                            CURRSNSR_CheckQueueTask(gCanRxMsg);
+                            CURRSNSR_CheckQueueTasks(gCanRxMsg);
                         } else if (gCanRxMsg.id == 0x18FF4510) {
                             ledPWM.duty = gCanRxMsg.data[0];
                         } else {

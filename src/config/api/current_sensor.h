@@ -53,7 +53,7 @@ extern "C" {
 // *****************************************************************************
 
 void CURRSNSR_ParamSet(short gainOffset, short zeroOffset);
-void CURRSNSR_CheckQueueTask(can_msg_t canRxMsg);
+void CURRSNSR_CheckQueueTasks(can_msg_t canRxMsg);
 void CURRSNSR_Intialize(void);
 void CURRSNSR_10ms_Tasks(void);
 
