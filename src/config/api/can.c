@@ -16,7 +16,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sys_parameter.h"
-
+#include "can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -85,8 +85,8 @@ const CAN_ERROR_GET CANx_ErrorGet[CAN_NUMBER_OF_MODULE] = {
 };
 
 // CAN Variable
-static can_msg_t    txQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE], rxQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE];
-static can_msg_t    recvMessage[CAN_NUMBER_OF_MODULE] = {};
+static CAN_MSG_t    txQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE], rxQueue[CAN_NUMBER_OF_MODULE][CAN_QUEUE_SIZE];
+static CAN_MSG_t    recvMessage[CAN_NUMBER_OF_MODULE] = {};
 static can_object_t Object[CAN_NUMBER_OF_MODULE]      = {};
 /* USER CODE END PV */
 
@@ -108,7 +108,7 @@ static can_object_t Object[CAN_NUMBER_OF_MODULE]      = {};
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void CAN1_Callback(uintptr_t contextHandle) {
-    CAN_MODULE Instance = CAN_1;
+    CAN_MODULE_e Instance = CAN_1;
     switch (contextHandle) {
         case CAN_EVENT_RX:
             CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc,
@@ -161,7 +161,7 @@ static void CAN1_Callback(uintptr_t contextHandle) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void CAN2_Callback(uintptr_t contextHandle) {
-    CAN_MODULE Instance = CAN_2;
+    CAN_MODULE_e Instance = CAN_2;
     switch (contextHandle) {
         case CAN_EVENT_RX:
             CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc,
@@ -215,7 +215,7 @@ static void CAN2_Callback(uintptr_t contextHandle) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void CAN3_Callback(uintptr_t contextHandle) {
-    CAN_MODULE Instance = CAN_3;
+    CAN_MODULE_e Instance = CAN_3;
     switch (contextHandle) {
         case CAN_EVENT_RX:
             CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc,
@@ -268,7 +268,7 @@ static void CAN3_Callback(uintptr_t contextHandle) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void CAN4_Callback(uintptr_t contextHandle) {
-    CAN_MODULE Instance = CAN_4;
+    CAN_MODULE_e Instance = CAN_4;
     switch (contextHandle) {
         case CAN_EVENT_RX:
             CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc,
@@ -320,7 +320,7 @@ static void CAN4_Callback(uintptr_t contextHandle) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void CAN_InitializeQueue(CAN_MODULE Instance) {
+static void CAN_InitializeQueue(CAN_MODULE_e Instance) {
     /*CAN Queue Initialize*/
     Object[Instance].txQueue.pHead          = txQueue[Instance];
     Object[Instance].txQueue.pTail          = txQueue[Instance];
@@ -344,7 +344,7 @@ static void CAN_InitializeQueue(CAN_MODULE Instance) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void CAN_Initialize(void) {
-    // can_msg_t settingMessage = {};
+    // CAN_MSG_t settingMessage = {};
 
     CAN1_CallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_RX, CAN_FIFONUM_RX0);
     CAN1_ErrorCallbackRegister(CAN1_Callback, (uintptr_t)CAN_EVENT_ERR);
@@ -356,7 +356,7 @@ void CAN_Initialize(void) {
     CAN4_ErrorCallbackRegister(CAN4_Callback, (uintptr_t)CAN_EVENT_ERR);
     // TODO(Chiou): Only filter for BMS communication protocol address, can be removed if you want accept all messages
 
-    for (CAN_MODULE Instance = CAN_1; Instance < CAN_NUMBER_OF_MODULE; Instance++) {
+    for (CAN_MODULE_e Instance = CAN_1; Instance < CAN_NUMBER_OF_MODULE; Instance++) {
         CAN_InitializeQueue(Instance);
         CANx_MessageReceive[Instance](&recvMessage[Instance].id, &recvMessage[Instance].dlc, recvMessage[Instance].data,
                                       &recvMessage[Instance].timestamp, CAN_FIFONUM_RX0,
@@ -379,7 +379,7 @@ void CAN_Initialize(void) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint8_t CAN_PushTxQueue(CAN_MODULE Instance, can_msg_t* txMessage) {
+uint8_t CAN_PushTxQueue(CAN_MODULE_e Instance, CAN_MSG_t* txMessage) {
     // check if there is space in the queue
     if (Object[Instance].txQueue.Status.b.full == false) {
         *Object[Instance].txQueue.pTail = *txMessage;
@@ -413,7 +413,7 @@ uint8_t CAN_PushTxQueue(CAN_MODULE Instance, can_msg_t* txMessage) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint8_t CAN_PullTxQueue(CAN_MODULE Instance, can_msg_t* txMessage) {
+uint8_t CAN_PullTxQueue(CAN_MODULE_e Instance, CAN_MSG_t* txMessage) {
     if (Object[Instance].txQueue.Status.b.empty != true) {
         *txMessage = *Object[Instance].txQueue.pHead;
         Object[Instance].txQueue.pHead++;
@@ -447,7 +447,7 @@ uint8_t CAN_PullTxQueue(CAN_MODULE Instance, can_msg_t* txMessage) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint8_t CAN_PushRxQueue(CAN_MODULE Instance, can_msg_t* rxMessage) {
+uint8_t CAN_PushRxQueue(CAN_MODULE_e Instance, CAN_MSG_t* rxMessage) {
     // check if there is space in the queue
     if (Object[Instance].rxQueue.Status.b.full == false) {
         *Object[Instance].rxQueue.pTail = *rxMessage;
@@ -482,7 +482,7 @@ uint8_t CAN_PushRxQueue(CAN_MODULE Instance, can_msg_t* rxMessage) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint8_t CAN_PullRxQueue(CAN_MODULE Instance, can_msg_t* rxMessage) {
+uint8_t CAN_PullRxQueue(CAN_MODULE_e Instance, CAN_MSG_t* rxMessage) {
     if (Object[Instance].rxQueue.Status.b.empty != true) {
         *rxMessage = *Object[Instance].rxQueue.pHead;
         Object[Instance].rxQueue.pHead++;
@@ -514,7 +514,7 @@ uint8_t CAN_PullRxQueue(CAN_MODULE Instance, can_msg_t* rxMessage) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint32_t CAN_GetTxQueueCount(CAN_MODULE Instance) {
+uint32_t CAN_GetTxQueueCount(CAN_MODULE_e Instance) {
     return (Object[Instance].txQueue.Count);
 }
 
@@ -528,13 +528,13 @@ uint32_t CAN_GetTxQueueCount(CAN_MODULE Instance) {
  * @date       2022-08-18
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance) {
+uint32_t CAN_GetRxQueueCount(CAN_MODULE_e Instance) {
     return (Object[Instance].rxQueue.Count);
 }
 
-bool CAN_QueueDataXfer(CAN_MODULE Instance) {
+bool CAN_QueueDataXfer(CAN_MODULE_e Instance) {
     bool      ret = false;
-    can_msg_t canTxMsg;
+    CAN_MSG_t canTxMsg;
     if (!CANx_TxFIFOQueueIsFull[Instance](CAN_FIFONUM_TX0)) {
         if (CAN_GetTxQueueCount(Instance) > 0) {
             CAN_PullTxQueue(Instance, &canTxMsg);

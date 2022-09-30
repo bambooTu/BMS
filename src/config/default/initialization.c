@@ -167,15 +167,15 @@ void SYS_Initialize(void* data) {
 
     TMR4_Initialize();
     I2C1_Initialize();
-    CAN3_Initialize();
-    //
-    //    CAN4_Initialize();
+    //CAN3_Initialize();
+    
+    CAN4_Initialize();
 
     CAN1_Initialize();
 
     EEPROM_Initialize();
 
-    CAN2_Initialize();
+    //CAN2_Initialize();
 
     UART5_Initialize();
 

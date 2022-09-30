@@ -19,9 +19,9 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
+#include "current_sensor.h"
 
 #include "sys_parameter.h"
-
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
@@ -128,9 +128,9 @@ static int CURRSNSR_AdcValueToCurr(int adcValue) {
     return ret;
 }
 /**
- * @brief      Sensor Type 0: Get the MCP3421 ADC value and do a moving average, then convert the value to the current value (mA).
- *             Sensor Type 1: Get the CSNVC500 current value(mA) after doing the moving average.
- *            
+ * @brief      Sensor Type 0: Get the MCP3421 ADC value and do a moving average, then convert the value to the current
+ * value (mA). Sensor Type 1: Get the CSNVC500 current value(mA) after doing the moving average.
+ *
  * @param      arr
  * @param      arrSize
  * @return     int
@@ -140,9 +140,9 @@ static int CURRSNSR_AdcValueToCurr(int adcValue) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static inline int CURRSNSR_ProcessedCurrGet(void) {
-    int                  ret   = 0;
-    static unsigned char Index = 0;
+    int                  ret = 0;
     static double        Buffer[MOVING_AVG_TIMES];
+    static unsigned char Index = 0;
 
 #if (CURR_SNSR_TYPE == 0)
     Buffer[adcIndex] = MCP3421_AdcValueGet();
@@ -154,7 +154,7 @@ static inline int CURRSNSR_ProcessedCurrGet(void) {
 #elif (CURR_SNSR_TYPE == 1)
 
     Buffer[Index] = CSNVC500_CurrGet(CSNVC500.ipValue);
-    if (++Index > MOVING_AVG_TIMES) {
+    if (++Index > MOVING_AVG_TIMES - 1) {
         Index = 0;
     }
     ret = (int)Filter_ArrayAverage(Buffer, MOVING_AVG_TIMES);
@@ -186,16 +186,22 @@ void CURRSNSR_ParamSet(short gainOffset, short zeroOffset) {
  * @date       2022-09-28
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void CURRSNSR_CheckQueueTasks(can_msg_t canRxMsg) {
+void CURRSNSR_CheckQueueTasks(CAN_MSG_t canRxMsg) {
     gCurrSnsrTimeoutCount = CURR_SNSR_TIMEOUT_TIMES;
 
     if (CURRSNSR_CalculateCRC8(canRxMsg.data, 7) == canRxMsg.data[7]) {
-        CSNVC500.ipValue = (canRxMsg.data[3])           //
-                           + (canRxMsg.data[2] << 8)    //
-                           + (canRxMsg.data[1] << 16)   //
-                           + (canRxMsg.data[0] << 24);  //
+        CSNVC500.vacantData      = (canRxMsg.data[6]) + (canRxMsg.data[5] << 8);
         CSNVC500.errorInfo       = (canRxMsg.data[4] & 0xFE) >> 1;
         CSNVC500.errorIndication = (canRxMsg.data[4] & 0x01);
+
+        if (CSNVC500.errorIndication == true) {
+            CSNVC500.ipValue = IP_VALUE_OFFSET;
+        } else {
+            CSNVC500.ipValue = (canRxMsg.data[3])           //
+                               + (canRxMsg.data[2] << 8)    //
+                               + (canRxMsg.data[1] << 16)   //
+                               + (canRxMsg.data[0] << 24);  //
+        }
     }
 }
 /**
@@ -224,19 +230,12 @@ void CURRSNSR_Intialize(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void CURRSNSR_10ms_Tasks(void) {
-    
     // Current sensor timeout check
+
     if (gCurrSnsrTimeoutCount) {
         gCurrSnsrTimeoutCount--;
     } else {
         CSNVC500.ipValue = IP_VALUE_OFFSET;
     }
-
-    // Current sensor error check
-    if (CSNVC500.errorIndication == true) {
-        CSNVC500.ipValue = IP_VALUE_OFFSET;
-    }
-
     bmsData.BusCurrent = CURRSNSR_ProcessedCurrGet() * gCurrentSensorGain;
 }
-

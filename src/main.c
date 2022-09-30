@@ -25,13 +25,21 @@
 #include <stdbool.h>  // Defines true
 #include <stddef.h>   // Defines NULL
 #include <stdlib.h>   // Defines EXIT_FAILURE
-
-#include "config/api/coulomb_gauge.h"
-#include "config/api/sys_parameter.h"
 #include "definitions.h"  // SYS function prototypes
+
+#include "config/api/can.h"
+#include "config/api/mcp3421.h"
+#include "config/api/sys_parameter.h"
+#include "config/api/coulomb_gauge.h"
+#include "config/api/current_sensor.h"
+#include "config/api/can_bms_vs_bmu.h"
+#include "config/api/can_bms_vs_mbms.h"
+
 
 #define CALCULTAE_TIME_MS(A) ((A < 1) ? 10 - 1 : 10 * A - 1)
 
+#define CSNVC500_CAN_ID 0x3C2
+#define TEST_GUI_CAN_ID 0x18FF4510
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types
@@ -75,7 +83,6 @@ struct {
     unsigned int period;
 } ledPWM;
 
-can_msg_t gCanRxMsg;
 // *****************************************************************************
 // *****************************************************************************
 // Section: Interrupt Handler
@@ -129,7 +136,7 @@ void LVD_EvnetHandler(EXTERNAL_INT_PIN pin, uintptr_t context) {
 // TODO : Delete ↓
 
 void CAN_XferTest() {
-    can_msg_t canTxMsg;
+    CAN_MSG_t canTxMsg;
     canTxMsg.id = 0x18FF4520;
     canTxMsg.dlc = 8;
     static unsigned char rc = 0;
@@ -140,9 +147,32 @@ void CAN_XferTest() {
         canTxMsg.data[i] = 0;
     }
     canTxMsg.data[0] = rc;
-    CAN_PushTxQueue(CAN_1, &canTxMsg);
+    CAN_PushTxQueue(CAN_4, &canTxMsg);
 }
 
+static void CAN_QueueDateRecv(void) {
+    CAN_MSG_t canRxMsg;
+    if (CAN_GetRxQueueCount(CAN_1)) {
+        CAN_PullRxQueue(CAN_1, &canRxMsg);
+        MBMS_CheckQueueTasks(&canRxMsg);
+    }
+    if (CAN_GetRxQueueCount(CAN_2)) {
+        CAN_PullRxQueue(CAN_1, &canRxMsg);
+    }
+    if (CAN_GetRxQueueCount(CAN_3)) {
+        CAN_PullRxQueue(CAN_1, &canRxMsg);
+    }
+    if (CAN_GetRxQueueCount(CAN_4)) {
+        CAN_PullRxQueue(CAN_4, &canRxMsg);
+        if (canRxMsg.id == CSNVC500_CAN_ID) {
+            CURRSNSR_CheckQueueTasks(canRxMsg);
+        } else if (canRxMsg.id == TEST_GUI_CAN_ID) {
+            ledPWM.duty = canRxMsg.data[0];
+        } else {
+            BMU_CheckQueueTasks(canRxMsg);
+        }
+    }
+}
 // TODO : Delete ↑
 
 int main(void) {
@@ -153,7 +183,6 @@ int main(void) {
         SYS_Tasks();
         X2CScope_Communicate();
         WDT_Clear();
-        CAN_QueueDataXfer(CAN_1);
         switch ((APP_STATUS_e) appData.state) {
             case APP_EEPROM_READ:
                 eepBms = eepBmsDef;
@@ -182,24 +211,18 @@ int main(void) {
                 }
                 break;
             case APP_STATE_SERVICE_TASKS:
+                CAN_QueueDataXfer(CAN_1);
+                CAN_QueueDataXfer(CAN_4);
+                CAN_QueueDateRecv();
                 if (tmrData._1ms.flag) {
                     tmrData._1ms.flag = false;
                     HV_1ms_Tasks();
-                    // DTC_1ms_Tasks();
-                    BMU_1ms_Tasks();
-                    BMS_Crtl_1ms_Tasks();
                     IND_1ms_Tasks();
+                    BMU_1ms_Tasks();
+                    //DTC_1ms_Tasks();
+                    MBMS_1ms_tasks();
                     
-                    if (CAN_GetRxQueueCount(CAN_1)) {
-                        CAN_PullRxQueue(CAN_1, &gCanRxMsg);
-                        if (gCanRxMsg.id == 0x3C2) {
-                            CURRSNSR_CheckQueueTasks(gCanRxMsg);
-                        } else if (gCanRxMsg.id == 0x18FF4510) {
-                            ledPWM.duty = gCanRxMsg.data[0];
-                        } else {
-                            BMU_CheckQueueTasks(gCanRxMsg);
-                        }
-                    }
+                    BMS_Crtl_1ms_Tasks();
                 }
                 if (tmrData._5ms.flag) {
                     tmrData._5ms.flag = false;

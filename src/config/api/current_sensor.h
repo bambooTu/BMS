@@ -23,7 +23,7 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
+#include "can.h"
 /* This section lists the other files that are included in this file.
  */
 
@@ -53,7 +53,7 @@ extern "C" {
 // *****************************************************************************
 
 void CURRSNSR_ParamSet(short gainOffset, short zeroOffset);
-void CURRSNSR_CheckQueueTasks(can_msg_t canRxMsg);
+void CURRSNSR_CheckQueueTasks(CAN_MSG_t canRxMsg);
 void CURRSNSR_Intialize(void);
 void CURRSNSR_10ms_Tasks(void);
 

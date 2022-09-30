@@ -19,6 +19,7 @@
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_bmu.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/mcp3421.h</itemPath>
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/coulomb_gauge.h</itemPath>
+            <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_mbms.h</itemPath>
           </logicalFolder>
           <logicalFolder name="f1" displayName="classb" projectFiles="true">
             <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/default/classb/classb.h</itemPath>
@@ -107,6 +108,7 @@
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_bmu.c</itemPath>
           <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/mcp3421.c</itemPath>
+          <itemPath>C:/Users/a01347/HarmonyProjects/MyProject_4/firmware/src/config/api/can_bms_vs_mbms.c</itemPath>
         </logicalFolder>
         <logicalFolder name="default" displayName="default" projectFiles="true">
           <logicalFolder name="f1" displayName="classb" projectFiles="true">

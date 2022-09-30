@@ -19,7 +19,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys_parameter.h"
+#include "mcp3421.h"
+#include "commonly_used.h"
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/

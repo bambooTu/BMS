@@ -458,13 +458,13 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     }
     CLASSB_WDT_Clear();
     // Interrupt Test
-    // *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
-    // cb_test_status = CLASSB_SST_InterruptTest();
-    // if (cb_test_status == CLASSB_TEST_PASSED) {
-    //     cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
-    // } else if (cb_test_status == CLASSB_TEST_FAILED) {
-    //     cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
-    // }
+     *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
+     cb_test_status = CLASSB_SST_InterruptTest();
+     if (cb_test_status == CLASSB_TEST_PASSED) {
+         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
+     } else if (cb_test_status == CLASSB_TEST_FAILED) {
+         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
+     }
     CLASSB_WDT_Clear();
 
     if (cb_temp_startup_status == CLASSB_STARTUP_TEST_PASSED) {

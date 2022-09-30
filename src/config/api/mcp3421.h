@@ -19,7 +19,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "definitions.h"  // SYS function prototypes
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

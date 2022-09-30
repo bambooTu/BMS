@@ -20,19 +20,7 @@
 
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
-#define BMU_MAX_NUM               32U      /* The number of bmu */
-#define BMU_VCELL_MAX_NUM         7U       /* The number of Vcell in the BMU */
-#define BMU_TCELL_MAX_NUM         2U       /* The number of Tcell in the BMU */
-#define BMU_ID_OFFSET             1U       /* BMU start ID */
-#define GUI_ID_OFFSET             1U       /* PC GUI軟體，從1開始編號 */
-#define BMU_RESPONSE_TIMEOUT_TIME 10       /* unit:ms */
-#define BMU_TASK_CYCLE_TIME       1000     /* Unit:ms */
-#define BMU_RECV_MSG_FLAG         0x07     /* BMU recieve all packet */
-#define BMU_NTC_OPEN              (-1000L) /* NTC Open Value  -100.0 Deg. C */
-#define BMU_NTC_SHOTR             5000L    /* NTC Short Value  500.0 Deg. C */
-#define BMU_AFE_COMM_ERR          9999L    /* AFE I2C communication fault value */
-#define BMU_CAN_COMM_ERR          0xFFFF   /* BMU communication fault value */
-#define BMU_FAULT_LED_DELAY       2000     /* Unit:ms */
+
 /* USER CODE END GD */
 
 /* Includes ------------------------------------------------------------------*/
@@ -40,6 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sys_parameter.h"
+#include "can_bms_vs_bmu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -136,7 +125,7 @@ unsigned char        BMS_SourceAddrBackup     = 0;
 /* USER CODE BEGIN 0 */
 BRANCH_INFO_t BR = {0};
 
-static void BMU_ResponseCheck(unsigned int BMU_ID, can_msg_t canRxMsg) {
+static void BMU_ResponseCheck(unsigned int BMU_ID, CAN_MSG_t canRxMsg) {
     if ((BMU_ID + 1) == canRxMsg.J1939.sourceAddress) {
         switch (canRxMsg.J1939.pduFormat) {
             case PNG_TEMP_GET_G1:
@@ -211,7 +200,7 @@ static void BMU_XtrmTcellSearch(unsigned int BMU_ID) {
     }
 }
 
-static void BMU_XferMsgInit(can_msg_t *canTxMsg) {
+static void BMU_XferMsgInit(CAN_MSG_t *canTxMsg) {
     canTxMsg->J1939.priority      = 6; /* 0~7(3bits), 6:0x18, 7:0x1C */
     canTxMsg->J1939.reserved      = 1; /* EDP?X?ibit */
     canTxMsg->J1939.dataPage      = 0;
@@ -226,7 +215,7 @@ static void BMU_XferMsgInit(can_msg_t *canTxMsg) {
 }
 
 static void BMU_RequestDataMsg(unsigned int BMU_ID) {
-    can_msg_t canTxMsg;
+    CAN_MSG_t canTxMsg;
     BMU_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduFormat   = 0xEA;
     canTxMsg.J1939.pduSpecific = BMU_ID;
@@ -234,11 +223,11 @@ static void BMU_RequestDataMsg(unsigned int BMU_ID) {
     canTxMsg.data[0] = 0x00;
     canTxMsg.data[1] = 0xBB;
     canTxMsg.data[2] = 0x00;
-    CAN_PushTxQueue(CAN_1, &canTxMsg);
+    CAN_PushTxQueue(CAN_4, &canTxMsg);
 }
 
 static void BMU_BalanceParamMsg(unsigned int BMU_ID) {
-    can_msg_t canTxMsg;
+    CAN_MSG_t canTxMsg;
     BMU_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduFormat   = 0xBC;
     canTxMsg.J1939.pduSpecific = BMU_ID;
@@ -251,7 +240,7 @@ static void BMU_BalanceParamMsg(unsigned int BMU_ID) {
     canTxMsg.data[5] = (unsigned char)((bmsData.MinVcell & 0xFF00) >> 8);
     canTxMsg.data[6] = (unsigned char)(bmsData.Status);
     canTxMsg.data[7] = BR.BmuFaultLed[(BMU_ID)];
-    CAN_PushTxQueue(CAN_1, &canTxMsg);
+    CAN_PushTxQueue(CAN_4, &canTxMsg);
 }
 
 static void BMU_ResponseTimeout(unsigned char BMU_ID) {
@@ -458,19 +447,19 @@ static inline void BMU_DataInterchange(void) {
 static void BMU_CtrlSM(void) {
     if (BMU_tasksTimeCount == 0) {
         BMU_taskState      = BMS_BMU_SRCH_DATA;
-        BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME-1;
+        BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
     }
     switch (BMU_taskState) {
         case BMS_BMU_REQ_CMD:
             BMU_rxMessageFlag        = 0;
-            BMU_responseTimeoutCount = BMU_RESPONSE_TIMEOUT_TIME-1;
+            BMU_responseTimeoutCount = BMU_RESPONSE_TIMEOUT_TIME;
             BMU_BalanceParamMsg(BMU_ID);
             BMU_RequestDataMsg(BMU_ID);
             BMU_taskState = BMS_BMU_CHK_RSP;
             break;
         case BMS_BMU_CHK_RSP:
             if (BMU_ID < BMU_MAX_NUM) {
-                //BMU_rxMessageFlag = 0x07;  // TODO: Delete
+                // BMU_rxMessageFlag = 0x07;  // TODO: Delete
                 if (BMU_rxMessageFlag == BMU_RECV_MSG_FLAG) {
                     BMU_ResponseComplete(BMU_ID);
                     if (BMU_XtrmVcellSearch(BMU_ID)) {
@@ -511,23 +500,23 @@ static void BMU_CtrlSM(void) {
 void BMU_Initialize(void) {
     BMU_tasksTimeCount = BMU_TASK_CYCLE_TIME;
     BMU_taskState      = BMS_BMU_REQ_CMD;
-    can_msg_t canRxMsg;
+    CAN_MSG_t canRxMsg;
     if (0x00 == eepSpe.BmsAddr) {  // TODO:
         /* 測試時如果沒有變更位址，各BMU回覆0xC0(BCU)的位址，
             避免造成Slave BCU的負擔，Slave BCU預設位址0xC0 */
         BMS_SourceAddrBackup = 0xD0;
     } else {
-        /* Avoid changing BMS Address when application executing */
-        BMS_SourceAddrBackup = (eepSpe.BmsAddr | 0xC0); /* Intranet communication address */
+        // Avoid changing BMS Address when application executing
+        BMS_SourceAddrBackup = (eepSpe.BmsAddr | 0xC0);  // Intranet communication address
     }
 
     /* Clear Queue */
-    while (CAN_GetRxQueueCount(CAN_1) != 0) {
-        CAN_PullRxQueue(CAN_1, &canRxMsg);
+    while (CAN_GetRxQueueCount(CAN_4) != 0) {
+        CAN_PullRxQueue(CAN_4, &canRxMsg);
     }
 }
 
-void BMU_CheckQueueTasks(can_msg_t canRxMsg) {
+void BMU_CheckQueueTasks(CAN_MSG_t canRxMsg) {
     BMU_ResponseCheck(BMU_ID, canRxMsg);
 }
 

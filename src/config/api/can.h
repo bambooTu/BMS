@@ -30,6 +30,66 @@ extern "C" {
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
 #define SYSPARAM_CAN_DATA_LENGTH 8
+// define J1939 structure size
+#define J1939_MSG_LENGTH         5
+#define J1939_DATA_LENGTH        8
+
+// define J1939 queue buffer size
+#define J1939_RX1_QUEUE_SIZE 50
+#define J1939_TX1_QUEUE_SIZE 50
+#define J1939_RX2_QUEUE_SIZE 50
+#define J1939_TX2_QUEUE_SIZE 50
+#define J1939_RX3_QUEUE_SIZE 50
+#define J1939_TX3_QUEUE_SIZE 50
+#define J1939_RX4_QUEUE_SIZE 50
+#define J1939_TX4_QUEUE_SIZE 50
+
+// J1939 Default Priorities
+#define J1939_CONTROL_PRIORITY     0x03
+#define J1939_INFO_PRIORITY        0x06
+#define J1939_PROPRIETARY_PRIORITY 0x06
+#define J1939_REQUEST_PRIORITY     0x06
+#define J1939_ACK_PRIORITY         0x06
+#define J1939_TP_CM_PRIORITY       0x07
+#define J1939_TP_DT_PRIORITY       0x07
+
+// J1939 Defined Addresses
+#define J1939_GLOBAL_ADDRESS 255
+#define J1939_NULL_ADDRESS   254
+
+// Some J1939 PDU Formats, Control Bytes, and PGN's
+#define J1939_PF_REQUEST2 201
+#define J1939_PF_TRANSFER 202
+
+#define J1939_PF_ACKNOWLEDGMENT           232
+#define J1939_ACK_CONTROL_BYTE            0
+#define J1939_NACK_CONTROL_BYTE           1
+#define J1939_ACCESS_DENIED_CONTROL_BYTE  2
+#define J1939_CANNOT_RESPOND_CONTROL_BYTE 3
+
+#define J1939_PF_REQUEST 234
+
+#define J1939_PF_DT 235  // Data Transfer message
+
+#define J1939_PF_TP_CM               236  // Connection Management message
+#define J1939_RTS_CONTROL_BYTE       16   // Request to Send control byte of CM message
+#define J1939_CTS_CONTROL_BYTE       17   // Clear to Send control byte of CM message
+#define J1939_EOMACK_CONTROL_BYTE    19   // End of Message control byte of CM message
+#define J1939_BAM_CONTROL_BYTE       32   // BAM control byte of CM message
+#define J1939_CONNABORT_CONTROL_BYTE 255  // Connection Abort control byte of CM message
+
+#define J1939_PGN2_REQ_ADDRESS_CLAIM 0x00
+#define J1939_PGN1_REQ_ADDRESS_CLAIM 0xEA
+#define J1939_PGN0_REQ_ADDRESS_CLAIM 0x00
+
+#define J1939_PGN2_COMMANDED_ADDRESS 0x00
+#define J1939_PGN1_COMMANDED_ADDRESS 0xFE  // (-81 PDU Format)
+#define J1939_PGN0_COMMANDED_ADDRESS 0xD8  // (-81 PDU Specific)
+
+#define J1939_PF_ADDRESS_CLAIMED      238  // With global address
+#define J1939_PF_CANNOT_CLAIM_ADDRESS 238  // With null address
+#define J1939_PF_PROPRIETARY_A        239
+#define J1939_PF_PROPRIETARY_B        255
 /* USER CODE END GD */
 /* Includes ------------------------------------------------------------------*/
 
@@ -45,46 +105,51 @@ typedef enum {
     CL_DEVICE_SLAVE = 0x05,  // Controlled devices such as BMS Host, BMS, MBMS,
                              // parallel controller, Slave device etc.
     CL_DEVICE_MASTER,        // PCS, GC, Master device...etc.
-} AMITA_CL;
+} AMITA_CTRL_DEVICE_e;
 
 typedef enum {
-    CMD_DATA_GET            = 0xEA,  // Request for response information
-    CMD_SET_COMMS_ADDR      = 0xEF,  // Change mailing address
-    CMD_SET_PROD_MFG_DATE   = 0x11,  // Set Product manufacturing date
-    CMD_SET_PROD_SN1        = 0x12,  // Set Product serial number1
-    CMD_SET_PROD_SN2        = 0x13,  // Set Product serial number2
-    CMD_WR_PARAM_TO_EEPROM  = 0x15,  // Execute write EEPROM(command:0x84 ~ 0x8F)
-    CMD_EX_CTL_CMD          = 0x1A,  // Execute control commands
-    CMD_ENTER_ENG_MODE      = 0x1E,  // Request to switch to engineering mode
-    CMD_EXT_TIME            = 0x1F,  // Requesting "Engineering Mode" extension time
-    CMD_SET_CURR_PARAM      = 0x75,  // Set Current protection parameters
-    CMD_SET_VOLT_PARAM      = 0x76,  // Set Voltage protection parameters
-    CMD_SET_TEMP_PARAM      = 0x77,  // Set Temperature protection parameters
-    CMD_SET_OTHERS_PARAM    = 0x7A,  // Set Other types of protection parameters
-    CMD_SET_CURR_CORR_PARAM = 0x8F,  // Current Sensor Correction Parameters
-    CMD_REM_CTL_RLY         = 0x90,  // Remote control(Relay)
-    CMD_SET_BAL_DATA_PARAM  = 0xBC,  // Set Balance Data parameter(BQ76930)
-    CMD_ENTER_BOOTLOADER    = 0x1C,  // Enter Bootloader mode
-} AMITA_CMD;
+    CMD_DATA_GET             = 0xEA,  // Request for response information
+    CMD_SET_COMM_ADDR        = 0xEF,  // Change mailing address
+    CMD_SET_PROD_MFG_DATE    = 0x11,  // Set Product manufacturing date
+    CMD_SET_PROD_SN1         = 0x12,  // Set Product serial number1
+    CMD_SET_PROD_SN2         = 0x13,  // Set Product serial number2
+    CMD_WR_PARAM_TO_EEPROM   = 0x15,  // Execute write EEPROM(command:0x84 ~ 0x8F)
+    CMD_EX_CTRL_CMD          = 0x1A,  // Execute control commands
+    CMD_ENTER_ENGR_MODE      = 0x1E,  // Request to switch to engineering mode
+    CMD_EXT_TIME             = 0x1F,  // Requesting "Engineering Mode" extension time
+    CMD_SET_CURR_PARAM       = 0x75,  // Set Current protection parameters
+    CMD_SET_VOLT_PARAM       = 0x76,  // Set Voltage protection parameters
+    CMD_SET_TEMP_PARAM       = 0x77,  // Set Temperature protection parameters
+    CMD_SET_OTHERS_PARAM     = 0x7A,  // Set Other types of protection parameters
+    CMD_SET_CURR_CALIB_PARAM = 0x8F,  // Current Sensor Correction Parameters
+    CMD_RMT_CTRL_RLY         = 0x90,  // Remote control(Relay)
+    CMD_SET_BAL_DATA_PARAM   = 0xBC,  // Set Balance Data parameter(BQ76930)
+    CMD_ENTER_BOOTLOADER     = 0x1C,  // Enter Bootloader mode
+} AMITA_CMD_e;
 
 typedef enum {
-    PF_GET_PROTO_VER      = 0x01,  // Get communication protocol version
-    PF_GET_SEED           = 0x02,  // Get the Seed
-    PF_GET_PROD_MFG_DATE  = 0x11,  // Get product manufacturing date
-    PF_GET_PROD_SN        = 0x12,  // Get product serial number
-    PF_GET_HW_SW_VER      = 0x14,  // Get hardware and firmware version
-    PF_GET_CURR_PARM      = 0x75,  // Set current protection parameters
-    PF_GET_VOLT_PARM      = 0x76,  // Set voltage protection parameters
-    PF_GET_TEMP_PARM      = 0x77,  // Set temperature protection parameters
-    PF_GET_OTHERS_PARM    = 0x7A,  // Set other types of protection parameters
-    PF_GET_CURR_SENS_PARM = 0x8F,  // Get current sensor parameters
-    PF_GET_SYS_INFO       = 0x91,  // Get system parameters(PCS Only)
-    PF_GET_BMU_TEMP_VCELL = 0xA0,  // Get the BMU temperature reading and the voltage value of each Cell
-    PF_GET_BAL_DATA       = 0xBC,  // Get the currently executed Balance Data
-    PF_GET_GAS_GA         = 0xCB,  // Read gas Gauge
-    PF_GET_FLT_EVENT      = 0xD0,  // Log fault code message log
-    PF_GET_FLT_EVENT_FLAG = 0xD8,  // Get fault message status flag
-} AMITA_PF;
+    PF_GET_COMM_VER           = 0x01,  // Get communication protocol version
+    PF_GET_MFG_DATE           = 0x11,  // Get product manufacturing date
+    PF_GET_SEED               = 0x02,  // Get the Seed
+    PF_GET_PROD_SN            = 0x12,  // Get product serial number
+    PF_GET_SW_HW_VER          = 0x14,  // Get hardware and firmware version
+    PF_GET_CURR_GRP_PARAM     = 0x75,  // Set current protection parameters
+    PF_GET_VOLT_GRP_PARAM     = 0x76,  // Set voltage protection parameters
+    PF_GET_TEMP_GRP_PARAM     = 0x77,  // Set temperature protection parameters
+    PF_GET_OTHER_GRP_PARAM    = 0x7A,  // Set other types of protection parameters
+    PF_GET_CURR_CALIB_PARAM   = 0x8F,  // Get current sensor parameters
+    PF_GET_SYS_PARAM_G1       = 0x91,  // Get system parameters(PCS Only)
+    PF_GET_SYS_PARAM_G2       = 0x91,
+    PF_GET_SYS_PARAM_G3       = 0x94,
+    PF_GET_SYS_PARAM_G4       = 0x95,
+    PF_GET_CELL_DATA_G1       = 0xA0,  // Get the BMU temperature reading and the voltage value of each Cell
+    PF_GET_CELL_DATA_G2       = 0xA8,
+    PF_GET_CELL_DATA_G3       = 0xA9,
+    PF_GET_BALANCE_DATA       = 0xBC,  // Get the currently executed Balance Data
+    PF_GET_COULOMB_GAUGE_DATA = 0xCB,  // Read gas Gauge
+    PF_GET_DTC_LOG_DATA       = 0xDC,  // Log fault code message log
+    PF_GET_DTC_FLAG           = 0xD8,  // Get fault message status flag
+} AMITA_PF_e;
 
 typedef struct {
     union {
@@ -98,32 +163,32 @@ typedef struct {
         } J1939;
 
         struct {  // Amita Protocol
-            uint8_t   sourceAddress : 8;
-            uint8_t   destAddress   : 8;
-            AMITA_CMD command       : 8;
-            uint8_t   dataPage      : 1;
-            uint8_t   reserved      : 1;
-            AMITA_CL class          : 3;
+            uint8_t     sourceAddress : 8;
+            uint8_t     destAddress   : 8;
+            AMITA_CMD_e command       : 8;
+            uint8_t     dataPage      : 1;
+            uint8_t     reserved      : 1;
+            AMITA_CTRL_DEVICE_e class : 3;
         } Amita;
         uint32_t id;
     };
     uint8_t                dlc;
-    uint8_t                data[SYSPARAM_CAN_DATA_LENGTH];
+    uint8_t                data[J1939_DATA_LENGTH];
     uint32_t               timestamp;
     CANFD_MSG_RX_ATTRIBUTE msgAttr;
-} can_msg_t;
+} CAN_MSG_t;
 
 typedef enum {
     CAN_EVENT_ERR,
     CAN_EVENT_RX,
     CAN_EVENT_TX,
-} CAN_EVENT;
+} CAN_EVENT_e;
 typedef enum {
     CAN_1,
     CAN_2,
     CAN_3,
     CAN_4,
-} CAN_MODULE;
+} CAN_MODULE_e;
 
 typedef union {
     struct {
@@ -132,18 +197,18 @@ typedef union {
         uint8_t reserved : 6;
     } b;
     uint8_t byte;
-} can_queue_status_t;
+} CAN_QUEUE_STATUS_t;
 
 typedef struct {
-    can_msg_t*         pHead;
-    can_msg_t*         pTail;
-    can_queue_status_t Status;
+    CAN_MSG_t*         pHead;
+    CAN_MSG_t*         pTail;
+    CAN_QUEUE_STATUS_t Status;
     uint32_t           Count;
-} can_queue_t;
+} CAN_QUEUE_t;
 
 typedef struct {
-    can_queue_t txQueue;
-    can_queue_t rxQueue;
+    CAN_QUEUE_t txQueue;
+    CAN_QUEUE_t rxQueue;
     uint16_t    errorCount;
     CANFD_ERROR errorStatus;
 
@@ -173,15 +238,15 @@ typedef struct {
 /* USER CODE BEGIN PFP */
 void CAN_Initialize(void);
 
-uint8_t CAN_PushTxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
-uint8_t CAN_PushRxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
-uint8_t CAN_PullTxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
-uint8_t CAN_PullRxQueue(CAN_MODULE Instance, can_msg_t* pMessage);
+uint8_t CAN_PushTxQueue(CAN_MODULE_e Instance, CAN_MSG_t* pMessage);
+uint8_t CAN_PushRxQueue(CAN_MODULE_e Instance, CAN_MSG_t* pMessage);
+uint8_t CAN_PullTxQueue(CAN_MODULE_e Instance, CAN_MSG_t* pMessage);
+uint8_t CAN_PullRxQueue(CAN_MODULE_e Instance, CAN_MSG_t* pMessage);
 
-uint32_t CAN_GetTxQueueCount(CAN_MODULE Instance);
-uint32_t CAN_GetRxQueueCount(CAN_MODULE Instance);
+uint32_t CAN_GetTxQueueCount(CAN_MODULE_e Instance);
+uint32_t CAN_GetRxQueueCount(CAN_MODULE_e Instance);
 
-bool CAN_QueueDataXfer(CAN_MODULE Instance);
+bool CAN_QueueDataXfer(CAN_MODULE_e Instance);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/

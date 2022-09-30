@@ -1,8 +1,9 @@
+#ifndef _CAN_BMS_VS_MBMS_H
+#define _CAN_BMS_VS_MBMS_H
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
 extern "C" {
-
 #endif
 // DOM-IGNORE-END
 
@@ -15,50 +16,20 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum {
-    SYS_INIT = 0,
-    SYS_TURN_OFF, /*Relay Open*/
-    SYS_TURN_ON,  /*Relay Close @ 0 Ampere*/
-    SYS_CHARGING,
-    SYS_DISCHARGING,
-    SYS_FAULT,      /*System Fault?Waiting For Reset*/
-    SYS_GOTO_RESET, /*Reset Mode*/
-    SYS_EMERGENCY,  /*Emergency Relay Off*/
-    SYS_PRE_ON,     /*PreChg Relay Close*/
-    SYS_BMS_MAX
-} BMS_STATUS_e; /*BMS Status*/
-
-typedef enum {
-    /* Remote Control */
-    BMS_OFF = 0,       /* Power Off */
-    BMS_CHG_ON,        /* Remote Control Power On @ Charge Mode */
-    BMS_DISCHG_ON,     /* Remote Control Power On @ Discharge Mode */
-    BMS_CHG_PRE_ON,    /* Remote Control Pre-Power On @ Charge Mode @ Branch Parrellel */
-    BMS_DISCHG_PRE_ON, /* Remote Control Pre-Power On @ Discharge Mode @ Branch Parrellel */
-    /* Internal Control */
-    BMS_HAND_ON,     /* Manual Control */
-    BMS_RESET,       /* BMS software reset */
-    BMS_OCCUR_FAULT, /* BMS occur fault */
-    BMS_OCCUR_EMRG,  /* EMS is pressed occur */
-    BMS_CONTROL_MAX
-} BMS_WORK_MODE_e;
-
-typedef enum {
-    HV_OFF = 0, /**Relay Open*/
-    HV_PRECHG,  /**Relay Pre-Close*/
-    HV_ON,      /**Relay Close*/
-    HV_FAULT,
-} HV_STATUS_e;
+typedef struct {
+    unsigned short subCmd;
+    unsigned char  length;
+    void          *ptrVariable;
+} PARAM_POINT_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -66,7 +37,7 @@ typedef enum {
 
 /* USER CODE END PM */
 
-/* Globalvariables -----------------------------------------------------------*/
+/* Global variables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
 
 /* USER CODE END GV */
@@ -78,9 +49,8 @@ typedef enum {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void        BMS_ModeCommand(BMS_WORK_MODE_e opMode);
-void        BMS_Crtl_1ms_Tasks(void);
-HV_STATUS_e BMS_HvStatusGet(void);
+void MBMS_1ms_tasks(void);
+void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg);
 /* USER CODE END FP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -92,6 +62,7 @@ HV_STATUS_e BMS_HvStatusGet(void);
 }
 #endif
 // DOM-IGNORE-END
+#endif /* _CAN_BMS_VS_MBMS_H */
 /*******************************************************************************
  End of File
  */

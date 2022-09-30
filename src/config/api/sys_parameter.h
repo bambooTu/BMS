@@ -25,15 +25,11 @@
 /* ************************************************************************** */
 
 #include "bms_ctrl.h"
-#include "can.h"
-#include "can_bms_vs_bmu.h"
 #include "commonly_used.h"
-#include "current_sensor.h"
 #include "debounce.h"
 #include "dtc.h"
 #include "hv_setup.h"
 #include "indicator.h"
-#include "mcp3421.h"
 
 
 /* Provide C++ Compatibility */
@@ -86,27 +82,6 @@ extern "C" {
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
-
-typedef enum {
-    SYS_INIT = 0,
-    SYS_TURN_OFF, /*Relay Open*/
-    SYS_TURN_ON,  /*Relay Close @ 0 Ampere*/
-    SYS_CHARGING,
-    SYS_DISCHARGING,
-    SYS_FAULT,      /*System Fault?Waiting For Reset*/
-    SYS_GOTO_RESET, /*Reset Mode*/
-    SYS_EMERGENCY,  /*Emergency Relay Off*/
-    SYS_PRE_ON,     /*PreChg Relay Close*/
-    SYS_BMS_MAX
-} BMS_STATUS_e; /*BMS Status*/
-
-typedef enum {
-    RLY_OFF = 0, /**Relay Open*/
-    RLY_PRE_ON,  /**Relay Pre-Close*/
-    RLY_ON,      /**Relay Close*/
-    RLY_FAULT,
-} RELAY_STATUS_e;
-
 typedef enum {
     BAL_OFF = 0,      /* Balance Off */
     BAL_CHG,          /* Balance @ Charging */
@@ -192,9 +167,8 @@ typedef struct {
     BMS_WORK_MODE_e WorkModeCmd; /* BMS Receive Command */
     BMS_STATUS_e    Status;      /* BMS Status */
 
-    RELAY_STATUS_e PosRlyStatus; /* Positive Relay Status */
-    RELAY_STATUS_e NegRlyStatus; /* BMS_Slave response Negative Relay Status */
-    BALANCE_PARA_t Balance;      /* BMU Balance Parameter */
+    HV_STATUS_e    HvStatus; /* Positive Relay Status */
+    BALANCE_PARA_t Balance;  /* BMU Balance Parameter */
 
     int           BusCurrent;    /* unit:mA RawData */
     int           BusVolt_mV;    /* unit:mV */
@@ -205,21 +179,21 @@ typedef struct {
     int           MinTcell;      /* unit:0.1 degC */
     int           MaxTcell;      /* unit:0.1 degC */
     int           DeltaTemp;     /* unit:0.1 degC */
-    unsigned char MinVcellBmuID;  /* BMU ID For Min. Volt */
-    unsigned char MaxVcellBmuID;  /* BMU ID For Max. Volt */
+    unsigned char MinVcellBmuID; /* BMU ID For Min. Volt */
+    unsigned char MaxVcellBmuID; /* BMU ID For Max. Volt */
     unsigned char BmuMinVcellID; /* Min.Volt Cell ID In BMU */
     unsigned char BmuMaxVcellID; /* Max.Volt Cell ID In BMU */
-    unsigned char MinTcellBmuID;  /* BMU ID for Min.Temp Cell */
-    unsigned char MaxTcellBmuID;  /* BMU ID for Max.Temp Cell */
+    unsigned char MinTcellBmuID; /* BMU ID for Min.Temp Cell */
+    unsigned char MaxTcellBmuID; /* BMU ID for Max.Temp Cell */
     unsigned char BmuMinTcellID; /* Min.Temp Cell ID In BMU */
     unsigned char BmuMaxTcellID; /* Max.Temp Cell ID In BMU */
 
     unsigned char  SOC;       /* unit: % */
     unsigned char  SOH;       /* unit: %,According to the Cycle Life Calculation */
-    float          RemCap;    /* unit: mAh */
-    float          ChgCap;    /* unit: mAh */
-    float          DischgCap; /* unit: mAh */
-    float          FullCap;   /* unit: mAh */
+    unsigned int   RemCap;    /* unit: mAh */
+    unsigned int   ChgCap;    /* unit: mAh */
+    unsigned int   DischgCap; /* unit: mAh */
+    unsigned int   FullCap;   /* unit: mAh */
     unsigned int   DesingCap; /* unit: mAh */
     unsigned short CycleLife; /* Fixed Eeprom Locations */
     unsigned short DecayCoefficient;

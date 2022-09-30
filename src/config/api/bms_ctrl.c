@@ -21,6 +21,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sys_parameter.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,6 +121,7 @@ static void BMS_Protection(void) {
         case 2:
             BMS_SoftWareReset();
             gProtectionState = 0;
+            break;
         default:
             gProtectionState = 0;
             break;
@@ -233,6 +235,7 @@ static void BMS_CommandDetect(void) {
                 BMS_ModeCommand(BMS_OFF);
             }
             step = 0;
+            break;
         default:
             step = 0;
             break;
@@ -251,6 +254,19 @@ static void BMS_CommandDetect(void) {
 void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
     bmsData.WorkModeCmd = opMode;
 }
+
+HV_STATUS_e BMS_HvStatusGet(void) {
+    if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
+        bmsData.HvStatus = HV_OFF;
+    } else if (HV_SetupStatusGet() == HV_SETUP_FINISH) {
+        bmsData.HvStatus = HV_ON;
+    } else if (HV_SetupStatusGet() == HV_SETUP_FAULT) {
+        bmsData.HvStatus = HV_FAULT;
+    } else if (HV_SetupStatusGet() == HV_PRECHG_START) {
+        bmsData.HvStatus = HV_PRECHG;
+    }
+    return bmsData.HvStatus;
+}
 /**
  * @brief     BMS control task flow
  *
@@ -261,6 +277,7 @@ void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
  */
 void BMS_Crtl_1ms_Tasks(void) {
     BMS_CommandDetect();
+
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:
             BMS_SoftWareReset();

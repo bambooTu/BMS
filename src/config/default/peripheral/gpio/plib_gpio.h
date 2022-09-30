@@ -66,6 +66,14 @@
 #define CAN3RX_Get()               ((PORTG >> 6) & 0x1U)
 #define CAN3RX_PIN                  GPIO_PIN_RG6
 
+/*** Macros for CAN4TX pin ***/
+#define CAN4TX_Get()               ((PORTB >> 1) & 0x1U)
+#define CAN4TX_PIN                  GPIO_PIN_RB1
+
+/*** Macros for CAN4RX pin ***/
+#define CAN4RX_Get()               ((PORTC >> 2) & 0x1U)
+#define CAN4RX_PIN                  GPIO_PIN_RC2
+
 /*** Macros for SW1 pin ***/
 #define SW1_Set()               (LATGSET = (1U<<11))
 #define SW1_Clear()             (LATGCLR = (1U<<11))
@@ -97,9 +105,17 @@
 #define CAN1RX_Get()               ((PORTE >> 14) & 0x1U)
 #define CAN1RX_PIN                  GPIO_PIN_RE14
 
+/*** Macros for CAN2TX pin ***/
+#define CAN2TX_Get()               ((PORTE >> 15) & 0x1U)
+#define CAN2TX_PIN                  GPIO_PIN_RE15
+
 /*** Macros for CAN1TX pin ***/
 #define CAN1TX_Get()               ((PORTE >> 0) & 0x1U)
 #define CAN1TX_PIN                  GPIO_PIN_RE0
+
+/*** Macros for CAN2RX pin ***/
+#define CAN2RX_Get()               ((PORTE >> 1) & 0x1U)
+#define CAN2RX_PIN                  GPIO_PIN_RE1
 
 /*** Macros for CAN3TX pin ***/
 #define CAN3TX_Get()               ((PORTC >> 15) & 0x1U)

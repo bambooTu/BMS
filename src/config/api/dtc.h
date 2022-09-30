@@ -80,7 +80,7 @@ typedef union {
 
         unsigned PCS_CMD : 1; /***PCS Command Error(OVP or UVP)*/
     } b;
-    uint64_t l;
+    unsigned long long l;
 } DTC_FAULT_t;
 
 typedef enum {

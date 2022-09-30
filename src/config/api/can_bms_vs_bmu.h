@@ -23,14 +23,26 @@ extern "C" {
 
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
-
+#define BMU_MAX_NUM               32U      /* The number of bmu */
+#define BMU_VCELL_MAX_NUM         7U       /* The number of Vcell in the BMU */
+#define BMU_TCELL_MAX_NUM         2U       /* The number of Tcell in the BMU */
+#define BMU_ID_OFFSET             1U       /* BMU start ID */
+#define GUI_ID_OFFSET             1U       /* PC GUI軟體，從1開始編號 */
+#define BMU_RESPONSE_TIMEOUT_TIME 10       /* unit:ms */
+#define BMU_TASK_CYCLE_TIME       1000     /* Unit:ms */
+#define BMU_RECV_MSG_FLAG         0x07     /* BMU recieve all packet */
+#define BMU_NTC_OPEN              (-1000L) /* NTC Open Value  -100.0 Deg. C */
+#define BMU_NTC_SHOTR             5000L    /* NTC Short Value  500.0 Deg. C */
+#define BMU_AFE_COMM_ERR          9999L    /* AFE I2C communication fault value */
+#define BMU_CAN_COMM_ERR          0xFFFF   /* BMU communication fault value */
+#define BMU_FAULT_LED_DELAY       2000     /* Unit:ms */
 /* USER CODE END GD */
 
 /* Includes ------------------------------------------------------------------*/
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,7 +79,7 @@ extern "C" {
 /* USER CODE BEGIN 0 */
 unsigned short BMU_CellTempGet(unsigned char BMU_ID, unsigned char Cell_ID);
 unsigned short BMU_CellVoltGet(unsigned char BMU_ID, unsigned char Cell_ID);
-void           BMU_CheckQueueTasks(can_msg_t canRxMsg);
+void           BMU_CheckQueueTasks(CAN_MSG_t canRxMsg);
 void           BMU_Initialize(void);
 void           BMU_1ms_Tasks(void);
 /* USER CODE END 0 */
