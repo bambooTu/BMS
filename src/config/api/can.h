@@ -99,12 +99,13 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+
 /* USER CODE BEGIN PTD */
 
 typedef enum {
     CL_DEVICE_SLAVE = 0x05,  // Controlled devices such as BMS Host, BMS, MBMS,
-                             // parallel controller, Slave device etc.
-    CL_DEVICE_MASTER,        // PCS, GC, Master device...etc.
+    // parallel controller, Slave device etc.
+    CL_DEVICE_MASTER,  // PCS, GC, Master device...etc.
 } AMITA_CTRL_DEVICE_e;
 
 typedef enum {
@@ -183,6 +184,7 @@ typedef enum {
     CAN_EVENT_RX,
     CAN_EVENT_TX,
 } CAN_EVENT_e;
+
 typedef enum {
     CAN_1,
     CAN_2,

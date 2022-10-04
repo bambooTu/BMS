@@ -22,12 +22,39 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "definitions.h"
 #include "sys_parameter.h"
+#include "commonly_used.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef enum {
+    HV_OFF_INIT,
+    HV_OFF_PREWORK,
+    HV_OFF_FAIL,
+    HV_OFF_FINISH,
+    HV_OFF_FORCE,
+} HV_OFF_STATUS_e;
 
+typedef enum {
+    HV_SETUP_INIT,
+    HV_PRECHG_START,
+    HV_PRECHG_FAIL,
+    HV_PRECHG_FINISH,
+    HV_SETUP_FINISH,
+    HV_SETUP_FAULT,
+} HV_SETUP_STATUS_e;
+
+
+
+typedef struct {
+    HV_SETUP_STATUS_e   setupStatus;
+    HV_OFF_STATUS_e     offStatus;
+    HV_OPERATION_MODE_e opMode;
+    unsigned int        errorCount;
+    unsigned int        delayTimeCount;
+} HV_DATA_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -139,7 +166,7 @@ static void HV_SeqTurnOn(void) {
             RELAY_PRECHG_OPEN;
             if (HV.opMode == MODE_PRECHG) {
                 RELAY_PRECHG_CLOSE;
-                if (HV.delayTimeCount++ >= TURN_OFF_PRECHG_DELAY_MS) {
+                if (HV.delayTimeCount++ >= TURN_ON_PRECHG_DELAY_MS) {
                     HV.delayTimeCount = 0;
                     HV.opMode         = HV_PRECHG_START;
                 }
@@ -149,6 +176,7 @@ static void HV_SeqTurnOn(void) {
         case HV_SETUP_FAULT:
             HV.delayTimeCount = 0;
             RELAY_NEG_OPEN;
+            DTC_FaultOccurSet(DTC_BMS_RELAY);
             break;
     }
 }
@@ -175,7 +203,7 @@ static void HV_SeqTurnOff(void) {
             }
             break;
         case HV_OFF_PREWORK:
-            if (ABS(bmsData.BusCurrent) < PRECHG_CURRENT_OFFSET) { 
+            if (ABS(bmsData.BusCurrent) < PRECHG_CURRENT_OFFSET) {
                 if (HV.delayTimeCount++ >= TURN_OFF_POS_DELAY_MS) {
                     HV.delayTimeCount = 0;
                     RELAY_POS_OPEN;
@@ -200,14 +228,13 @@ static void HV_SeqTurnOff(void) {
             break;
         case HV_OFF_FINISH:
             RELAY_NEG_OPEN;
-            YLED_Clear();
+            YLED_Clear();  // TODO:Delete
             break;
         case HV_OFF_FORCE:
             HV.delayTimeCount = 0;
             RELAY_POS_OPEN;
             RELAY_NEG_OPEN;
-            DTC_FaultOccurSet(DTC_BMS_RELAY);
-            YLED_Clear();
+            YLED_Clear();  // TODO:Delete
             break;
     }
 }
@@ -221,7 +248,7 @@ static void HV_SeqTurnOff(void) {
  * @date       2022-08-31
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-HV_SETUP_STATUS_e HV_SetupStatusGet(void) {
+static HV_SETUP_STATUS_e HV_SetupStatusGet(void) {
     return HV.setupStatus;
 }
 
@@ -234,10 +261,23 @@ HV_SETUP_STATUS_e HV_SetupStatusGet(void) {
  * @date       2022-08-31
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-HV_OFF_STATUS_e HV_OffStatusGet(void) {
+static HV_OFF_STATUS_e HV_OffStatusGet(void) {
     return HV.offStatus;
 }
 
+HV_STATUS_e HV_StatusGet(void) {
+    HV_STATUS_e ret = HV_OFF;
+    if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
+        ret = HV_OFF;
+    } else if (HV_SetupStatusGet() == HV_SETUP_FINISH) {
+        ret = HV_ON;
+    } else if (HV_SetupStatusGet() == HV_SETUP_FAULT) {
+        ret = HV_FAULT;
+    } else if (HV_SetupStatusGet() == HV_PRECHG_START) {
+        ret = HV_PRECHG;
+    }
+    return ret;
+}
 /**
  * @brief      High-voltage PDU operation command
  *

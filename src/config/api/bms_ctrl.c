@@ -20,8 +20,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys_parameter.h"
+#include "bms_ctrl.h"
 
+#include "can_bms_vs_mbms.h"
+#include "debounce.h"
+#include "definitions.h"
+#include "dtc.h"
+#include "hv_setup.h"
+#include "sys_parameter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,7 +81,7 @@ static unsigned char step  = 0;
  */
 static void BMS_SoftWareReset(void) {
     HV_ModeCommand(MODE_OFF);
-    if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
+    if (HV_StatusGet() == HV_OFF) {
         __builtin_disable_interrupts();
 
         /* Unlock System */
@@ -107,7 +113,7 @@ static void BMS_Protection(void) {
         case 0:
             fProtectionProcess = true;
             HV_ModeCommand(MODE_OFF);
-            if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
+            if (HV_StatusGet() == HV_OFF) {
                 gProtectionState++;
             }
             break;
@@ -127,6 +133,7 @@ static void BMS_Protection(void) {
             break;
     }
 }
+
 /**
  * @brief      BMS emergency handler
  *
@@ -140,7 +147,7 @@ static void BMS_Emergency(void) {
         case 0:
             fEmrgProcess = true;
             HV_ModeCommand(MODE_OFF);
-            if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
+            if (HV_StatusGet() == HV_OFF) {
                 gEmergencyState++;
             }
             break;
@@ -162,6 +169,7 @@ static void BMS_Emergency(void) {
             break;
     }
 }
+
 /**
  * @brief      BMS operation command detection
  *
@@ -188,7 +196,7 @@ static void BMS_CommandDetect(void) {
             }
         }
     else
-    */
+     */
 
     if (((DIN_StateGet(DIN_4) == true) &&                       // When the EMS is pressed
          (fProtectionProcess == false)) ||                      // and the BMS_Protection() is not executing
@@ -202,8 +210,37 @@ static void BMS_CommandDetect(void) {
     }                                                           /*-----------------------------------------------*/
     else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {          // When the fault occur
         BMS_ModeCommand(BMS_OFF);                               // ,it execute BMS_OFF command
-    }
+    }                                                           /*-----------------------------------------------*/
+    else {                                                      // User part
 
+        BMS_ModeCommand(MBMS_RelayCommandGet());
+        // TODO :DELETE Test Function ↓
+        switch (step) {
+            case 0:
+                if (DIN_StateGet(DIN_2) == true) {
+                    step++;
+                }
+                break;
+            case 1:
+                if (DIN_StateGet(DIN_2) == false) {
+                    step++;
+                }
+                break;
+            case 2:
+                polar = !polar;
+                if (polar) {
+                    BMS_ModeCommand(BMS_DISCHG_ON);
+                } else {
+                    BMS_ModeCommand(BMS_OFF);
+                }
+                step = 0;
+                break;
+            default:
+                step = 0;
+                break;
+        }
+        // TODO : DELETE ↑
+    }
     /*Clear the error code and reset BMS_Emergency() task state
      when the BMS_Emergency() has been executed */
     if (fEmrgProcess == false) {
@@ -213,35 +250,8 @@ static void BMS_CommandDetect(void) {
     if (fProtectionProcess == false) {
         gProtectionState = 0;
     }
-
-    // User part
-    // TODO :DELETE Test Function ↓
-    switch (step) {
-        case 0:
-            if (DIN_StateGet(DIN_2) == true) {
-                step++;
-            }
-            break;
-        case 1:
-            if (DIN_StateGet(DIN_2) == false) {
-                step++;
-            }
-            break;
-        case 2:
-            polar = !polar;
-            if (polar) {
-                BMS_ModeCommand(BMS_DISCHG_ON);
-            } else {
-                BMS_ModeCommand(BMS_OFF);
-            }
-            step = 0;
-            break;
-        default:
-            step = 0;
-            break;
-    }
-    // TODO : DELETE ↑
 }
+
 /**
  * @brief      BMS operation mode command
  *
@@ -255,18 +265,6 @@ void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
     bmsData.WorkModeCmd = opMode;
 }
 
-HV_STATUS_e BMS_HvStatusGet(void) {
-    if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
-        bmsData.HvStatus = HV_OFF;
-    } else if (HV_SetupStatusGet() == HV_SETUP_FINISH) {
-        bmsData.HvStatus = HV_ON;
-    } else if (HV_SetupStatusGet() == HV_SETUP_FAULT) {
-        bmsData.HvStatus = HV_FAULT;
-    } else if (HV_SetupStatusGet() == HV_PRECHG_START) {
-        bmsData.HvStatus = HV_PRECHG;
-    }
-    return bmsData.HvStatus;
-}
 /**
  * @brief     BMS control task flow
  *
@@ -277,7 +275,7 @@ HV_STATUS_e BMS_HvStatusGet(void) {
  */
 void BMS_Crtl_1ms_Tasks(void) {
     BMS_CommandDetect();
-
+    bmsData.HvStatus = HV_StatusGet();
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:
             BMS_SoftWareReset();

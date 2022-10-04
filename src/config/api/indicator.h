@@ -6,7 +6,7 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "definitions.h"  // SYS function prototypes
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 

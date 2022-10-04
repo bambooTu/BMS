@@ -15,8 +15,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys_parameter.h"
 #include "can.h"
+
+#include "sys_parameter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -538,8 +539,8 @@ bool CAN_QueueDataXfer(CAN_MODULE_e Instance) {
     if (!CANx_TxFIFOQueueIsFull[Instance](CAN_FIFONUM_TX0)) {
         if (CAN_GetTxQueueCount(Instance) > 0) {
             CAN_PullTxQueue(Instance, &canTxMsg);
-            ret = CANx_MessageTransmit[Instance](canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0, CANFD_MODE_NORMAL,
-                                       CANFD_MSG_TX_DATA_FRAME);
+            ret = CANx_MessageTransmit[Instance](canTxMsg.id, canTxMsg.dlc, canTxMsg.data, CAN_FIFONUM_TX0,
+                                                 CANFD_MODE_NORMAL, CANFD_MSG_TX_DATA_FRAME);
         }
     }
     return ret;

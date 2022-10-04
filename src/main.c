@@ -27,14 +27,17 @@
 #include <stdlib.h>   // Defines EXIT_FAILURE
 #include "definitions.h"  // SYS function prototypes
 
-#include "config/api/can.h"
-#include "config/api/mcp3421.h"
-#include "config/api/sys_parameter.h"
-#include "config/api/coulomb_gauge.h"
-#include "config/api/current_sensor.h"
-#include "config/api/can_bms_vs_bmu.h"
-#include "config/api/can_bms_vs_mbms.h"
 
+#include "can.h"
+#include "mcp3421.h"
+#include "coulomb_gauge.h"
+#include "debounce.h"
+#include "current_sensor.h"
+#include "can_bms_vs_bmu.h"
+#include "can_bms_vs_mbms.h"
+#include "indicator.h"
+#include "bms_ctrl.h"
+#include "sys_parameter.h"
 
 #define CALCULTAE_TIME_MS(A) ((A < 1) ? 10 - 1 : 10 * A - 1)
 
@@ -221,7 +224,6 @@ int main(void) {
                     BMU_1ms_Tasks();
                     //DTC_1ms_Tasks();
                     MBMS_1ms_tasks();
-                    
                     BMS_Crtl_1ms_Tasks();
                 }
                 if (tmrData._5ms.flag) {
@@ -233,8 +235,6 @@ int main(void) {
                     CURRSNSR_10ms_Tasks();
                     // TODO : Delete ↓
                     CAN_XferTest();
-                    // TODO : Delete ↑
-                    CAN_QueueDataXfer(CAN_2);
                 }
                 if (tmrData._20ms.flag) {
                     tmrData._20ms.flag = false;

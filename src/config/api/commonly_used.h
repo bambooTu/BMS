@@ -67,8 +67,8 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 double Lookup_Table(double input, volatile const double *bp0, volatile const double *table, unsigned int tableSize);
-double  Filter_Deadzone(double data, double threshold);
-double  Filter_ArrayAverage(double *arr, double arrSize);
+double Filter_Deadzone(double data, double threshold);
+double Filter_ArrayAverage(double *arr, double arrSize);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

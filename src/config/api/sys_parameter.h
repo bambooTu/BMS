@@ -1,44 +1,29 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       sys_parameter.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-04
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
-
-#ifndef _SYS_PARAMETER_H /* Guard against multiple inclusion */
+#ifndef _SYS_PARAMETER_H
 #define _SYS_PARAMETER_H
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-#include "bms_ctrl.h"
-#include "commonly_used.h"
-#include "debounce.h"
-#include "dtc.h"
-#include "hv_setup.h"
-#include "indicator.h"
-
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
 extern "C" {
+
 #endif
+// DOM-IGNORE-END
 
+/* Global define -------------------------------------------------------------*/
+
+/* USER CODE BEGIN GD */
 //#define NVM_MODE
-
 #define APP_FLASH_ADDRESS 0
 #define EEPROM_START_ADDR APP_FLASH_ADDRESS
 
@@ -76,12 +61,19 @@ extern "C" {
 
 #define CELL_DESIGN_CAP      78000UL /*unit:Ah*/
 #define CELL_DESIGN_MAX_VOLT 4100UL
+/* USER CODE END GD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "bms_ctrl.h"
+#include "dtc.h"
+#include "hv_setup.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 typedef enum {
     BAL_OFF = 0,      /* Balance Off */
     BAL_CHG,          /* Balance @ Charging */
@@ -165,7 +157,7 @@ typedef struct {
 
 typedef struct {
     BMS_WORK_MODE_e WorkModeCmd; /* BMS Receive Command */
-    BMS_STATUS_e    Status;      /* BMS Status */
+    SYS_STATUS_e    Status;      /* BMS Status */
 
     HV_STATUS_e    HvStatus; /* Positive Relay Status */
     BALANCE_PARA_t Balance;  /* BMU Balance Parameter */
@@ -202,40 +194,49 @@ typedef struct {
     unsigned char FaultBitArrayHold[(DTC_EVENT_MAX_NUM / 8) + 1];
 } BMS_DATA_t;
 
-typedef enum {
-    EEPROM_READY = 0,
-    EEPROM_READING,
-    EEPROM_WRITING,
-    EEPROM_MAX
-} EEPROM_OPERATION_STATUS_e; /*Operation Status*/
+/* USER CODE END PTD */
 
-extern volatile const EEPROM_BMS_t        eepBmsDef; /* EEPROM default data */
-extern volatile const EEPROM_SPECIAL_t    eepSpeDef; /* EEPROM default data */
-extern BMS_DATA_t                         bmsData;
-extern EEPROM_BMS_t                       eepBms;
-extern EEPROM_EMERGENCY_t                 eepEmg;
-extern EEPROM_SPECIAL_t                   eepSpe;
-extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* USER CODE END PD */
 
-unsigned char APP_EepromInitialize(void);
-void          APP_EepromBmsWrite(void);
-void          APP_EepromEmergencyWrite(void);
-void          APP_EepromSpecialWrite(void);
-void          APP_EepromTasks(void);
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
-/* Provide C++ Compatibility */
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+extern volatile const EEPROM_BMS_t       eepBmsDef; /* EEPROM default data */
+extern volatile const EEPROM_SPECIAL_t   eepSpeDef; /* EEPROM default data */
+extern volatile const EEPROM_EMERGENCY_t eepEmgDef; /* EEPROM default data */
+extern BMS_DATA_t                        bmsData;
+extern EEPROM_BMS_t                      eepBms;
+extern EEPROM_EMERGENCY_t                eepEmg;
+extern EEPROM_SPECIAL_t                  eepSpe;
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _EXAMPLE_FILE_NAME_H */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+#endif /* _SYS_PARAMETER_H */
+/*******************************************************************************
  End of File
  */

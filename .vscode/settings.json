@@ -9,6 +9,11 @@
         "can.h": "c",
         "stdbool.h": "c",
         "current_sensor.h": "c",
-        "definitions.h": "c"
+        "definitions.h": "c",
+        "mcp3421.h": "c",
+        "dtc.h": "c",
+        "indicator.h": "c",
+        "hv_setup.h": "c",
+        "debounce.h": "c"
     }
 }

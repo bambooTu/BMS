@@ -23,7 +23,9 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
+#include <stdbool.h>  // Defines true
+#include <stddef.h>   // Defines NULL
+#include <stdlib.h>   // Defines EXIT_FAILURE
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
@@ -153,15 +155,17 @@ typedef struct {
 // Section: Interface Functions
 // *****************************************************************************
 // *****************************************************************************
-void           DTC_Initialize(void);
-void           DTC_1ms_Tasks(void);
-bool           DTC_FaultEventGet(DTC_EVENT_e event);
-void           DTC_FaultOccurSet(DTC_EVENT_e event);
-void           DTC_FaultOccurClear(DTC_EVENT_e event);
-unsigned short DTC_ErrorCodeGet(DTC_EVENT_e DTC);
-ERROR_LEVEL_e  DTC_ErrorLevelGet(DTC_EVENT_e DTC);
-ERROR_LEVEL_e  DTC_WorstLevelGet(void);
+void               DTC_Initialize(void);
+void               DTC_1ms_Tasks(void);
+unsigned long long DTC_FaultMapGet(void);
+bool               DTC_FaultEventGet(DTC_EVENT_e event);
+void               DTC_FaultOccurSet(DTC_EVENT_e event);
+void               DTC_FaultOccurClear(DTC_EVENT_e event);
+unsigned short     DTC_ErrorCodeGet(DTC_EVENT_e DTC);
+ERROR_LEVEL_e      DTC_ErrorLevelGet(DTC_EVENT_e DTC);
+ERROR_LEVEL_e      DTC_WorstLevelGet(void);
 
+extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

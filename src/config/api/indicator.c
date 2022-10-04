@@ -1,4 +1,6 @@
-#include "sys_parameter.h"
+#include "indicator.h"
+#include "definitions.h"
+#include "dtc.h"
 
 #define INDICATOR_ON         GLED_Set()
 #define INDICATOR_OFF        GLED_Clear()
@@ -10,7 +12,8 @@
 #define SHORT_INTVL_MS       250
 #define SHORT_DELAY_INTVL_MS 1500
 
-static DTC_FAULT_t   FaultIndicator, FaultIndicatorMask;
+static DTC_FAULT_t   FaultIndicator      = {.l = 0};
+static DTC_FAULT_t   FaultIndicatorMask  = {.l = 0};
 static DTC_EVENT_e   FaultIndicatorIndex = 0;
 static INTERVAL_e    IntervalStep        = INVTERVAL_RESET;
 static unsigned char fCompleteARound     = true;
@@ -92,8 +95,9 @@ void IND_Initialize(void) {
 }
 
 void IND_1ms_Tasks(void) {
-    FaultIndicator.b.AFE_COMM = 1;
-    FaultIndicator.b.ODCP     = 1;
+    FaultIndicator.l          = DTC_FaultMapGet();
+    FaultIndicator.b.AFE_COMM = 1;  // TODO:DELETE
+    FaultIndicator.b.ODCP     = 1;  // TODO:DELETE
     FaultIndicator.l          = FaultIndicator.l & FaultIndicatorMask.l;
     if (FaultIndicator.l) {
         if (fCompleteARound) {

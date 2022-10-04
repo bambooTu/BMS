@@ -24,8 +24,7 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
- */
+/* This section lists the other files that are included in this file.*/
 #include "sys_parameter.h"
 /* TODO:  Include other files here if needed. */
 
