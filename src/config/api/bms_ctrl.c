@@ -180,65 +180,51 @@ static void BMS_Emergency(void) {
  */
 static void BMS_CommandDetect(void) {
     // TODO: Engineer mode
-    /*
 
-        if(!ENGR){
-            fProtectionProcess = false;
-        }
-
-        if(ENGR){
-            if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE) || fProtectionProcess) {
-                BMS_EngineerMode();
-            }
-            esle{
-                BMS_ModeCommand(BMS_OFF);
-                fProtectionProcess = ture;
-            }
-        }
-    else
-     */
-
-    if (((DIN_StateGet(DIN_4) == true) &&                       // When the EMS is pressed
-         (fProtectionProcess == false)) ||                      // and the BMS_Protection() is not executing
-        (fEmrgProcess == true)) {                               // or the BMS_Emergency() is executing
-        BMS_ModeCommand(BMS_OCCUR_EMRG);                        // ,it execute the BMS_OCCUR_EMRG command
+    if (MBMS_EngrModeStatusGet() == true) {
+        BMS_ModeCommand(MBMS_RelayCommandGet());                
+    }                                                           /*-----------------------------------------------*/
+    else if (((DIN_StateGet(DIN_4) == true) &&                  // When the EMS is pressed
+              (fProtectionProcess == false)) ||                 // and the BMS_Protection() is not executing
+             (fEmrgProcess == true)) {                          // or the BMS_Emergency() is executing
+        BMS_ModeCommand(BMS_OCCUR_EMRG);                        // ,it execute the BMS_OCCUR_EMRG command.
+        DTC_FaultOccurSet(DTC_EMERGENCY);                       // Set the error code.
     }                                                           /*-----------------------------------------------*/
     else if (((DTC_WorstLevelGet() == ERR_LEVEL_PROTECTION) &&  // When the fault occurs
               (fEmrgProcess == false)) ||                       // and the BMS_Emergency() is not executing
              (fProtectionProcess == true)) {                    // or the BMS_Protection() is executing
-        BMS_ModeCommand(BMS_OCCUR_FAULT);                       // ,it execute the BMS_OCCUR_FAULT command
+        BMS_ModeCommand(BMS_OCCUR_FAULT);                       // ,it execute the BMS_OCCUR_FAULT command.
     }                                                           /*-----------------------------------------------*/
     else if (DTC_WorstLevelGet() == ERR_LEVEL_FAULT) {          // When the fault occur
-        BMS_ModeCommand(BMS_OFF);                               // ,it execute BMS_OFF command
+        BMS_ModeCommand(BMS_OFF);                               // ,it execute BMS_OFF command.
     }                                                           /*-----------------------------------------------*/
     else {                                                      // User part
-
         BMS_ModeCommand(MBMS_RelayCommandGet());
         // TODO :DELETE Test Function ↓
-        switch (step) {
-            case 0:
-                if (DIN_StateGet(DIN_2) == true) {
-                    step++;
-                }
-                break;
-            case 1:
-                if (DIN_StateGet(DIN_2) == false) {
-                    step++;
-                }
-                break;
-            case 2:
-                polar = !polar;
-                if (polar) {
-                    BMS_ModeCommand(BMS_DISCHG_ON);
-                } else {
-                    BMS_ModeCommand(BMS_OFF);
-                }
-                step = 0;
-                break;
-            default:
-                step = 0;
-                break;
-        }
+        // switch (step) {
+        //     case 0:
+        //         if (DIN_StateGet(DIN_2) == true) {
+        //             step++;
+        //         }
+        //         break;
+        //     case 1:
+        //         if (DIN_StateGet(DIN_2) == false) {
+        //             step++;
+        //         }
+        //         break;
+        //     case 2:
+        //         polar = !polar;
+        //         if (polar) {
+        //             BMS_ModeCommand(BMS_DISCHG_ON);
+        //         } else {
+        //             BMS_ModeCommand(BMS_OFF);
+        //         }
+        //         step = 0;
+        //         break;
+        //     default:
+        //         step = 0;
+        //         break;
+        // }
         // TODO : DELETE ↑
     }
     /*Clear the error code and reset BMS_Emergency() task state
