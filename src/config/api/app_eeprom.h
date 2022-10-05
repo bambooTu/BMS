@@ -1,13 +1,13 @@
 /**
  * @file       app_eeprom.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _APP_EEPROM_H

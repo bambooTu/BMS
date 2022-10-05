@@ -1,13 +1,13 @@
 /**
  * @file       can_bms_vs_mbms.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _CAN_BMS_VS_MBMS_H
@@ -28,8 +28,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "can.h"
 #include "bms_ctrl.h"
+#include "can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,10 +58,10 @@ extern "C" {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void MBMS_1ms_tasks(void);
-bool MBMS_EngrModeStatusGet(void);
+void            MBMS_1ms_tasks(void);
+bool            MBMS_EngrModeStatusGet(void);
 BMS_WORK_MODE_e MBMS_RelayCommandGet(void);
-void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg);
+void            MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg);
 /* USER CODE END FP */
 
 /* Private user code ---------------------------------------------------------*/

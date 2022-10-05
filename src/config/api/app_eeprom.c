@@ -1,13 +1,13 @@
 /**
  * @file       app_eeprom.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 /* Global define -------------------------------------------------------------*/
@@ -19,8 +19,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys_parameter.h"
 #include "definitions.h"  // SYS function prototypes
+#include "sys_parameter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

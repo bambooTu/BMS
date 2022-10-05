@@ -1,13 +1,13 @@
 /**
  * @file       sys_parameter.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _SYS_PARAMETER_H
@@ -75,47 +75,47 @@ extern "C" {
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 typedef enum {
-    BAL_OFF = 0,      /* Balance Off */
-    BAL_CHG,          /* Balance @ Charging */
-    BAL_DISCHG,       /* Balance @ Dischging */
-    BAL_CHG_N_DISCHG, /* Balance @ Discharging & Charging */
-    BAL_FORCE,        /* ForceBalance*/
+    BAL_OFF = 0,       // Balance Off
+    BAL_CHG,           // Balance @ Charging
+    BAL_DISCHG,        // Balance @ Dischging
+    BAL_CHG_N_DISCHG,  // Balance @ Discharging & Charging
+    BAL_FORCE,         // Force Balance
     BAL_MAX
 } BALANCE_MODE_e;
 
 typedef struct {
-    BALANCE_MODE_e Mode;     /* Balance Mode */
-    unsigned short Volt;     /* unit:m,Balance Target Voltage */
-    unsigned char  VoltDiff; /* unit:mV,Voltage Different */
+    BALANCE_MODE_e Mode;      // Balance Mode
+    unsigned short Volt;      // unit:m,Balance Target Voltage
+    unsigned char  VoltDiff;  // unit:mV,Voltage Different
 } BALANCE_PARA_t;
 
 typedef struct {
-    unsigned char  EepromKey; /* Eeprom Identifier */
-    unsigned short EepromSVN; /* Eeprom Sub Version */
+    unsigned char  EepromKey;  // Eeprom Identifier
+    unsigned short EepromSVN;  // Eeprom Sub Version
 
     /***BMS Parameter Setting***/
     /**Over/Under Temperature**/
-    FAULT_PARAM_t OTP;  /* Over Temperature Protection */
-    FAULT_PARAM_t OTW;  /* Over Temperature Warning */
-    FAULT_PARAM_t UTP;  /* Under Temperature Protection */
-    FAULT_PARAM_t UTW;  /* Under Temperature Warning */
-    FAULT_PARAM_t UBTW; /* Unbalance Temperature Warning */
+    FAULT_PARAM_t OTP;   // Over Temperature Protection
+    FAULT_PARAM_t OTW;   // Over Temperature Warning
+    FAULT_PARAM_t UTP;   // Under Temperature Protection
+    FAULT_PARAM_t UTW;   // Under Temperature Warning
+    FAULT_PARAM_t UBTW;  // Unbalance Temperature Warning
 
     /**Over/Under Voltage**/
-    FAULT_PARAM_t BusOVP;  /* Bus OverVoltage Protection */
-    FAULT_PARAM_t BusOVW;  /* Bus OverVoltage Warning */
-    FAULT_PARAM_t BusUVP;  /* Bus UnderVoltage Protection */
-    FAULT_PARAM_t BusUVW;  /* Bus UnderVoltage Warning */
-    FAULT_PARAM_t CellUBP; /* Cell Unbalance VoltageWarning */
-    FAULT_PARAM_t CellUBW; /* Cell Unbalance VoltageWarning */
-    FAULT_PARAM_t CellOVP; /* Cell OverVoltage Warning */
-    FAULT_PARAM_t CellUVP; /* Cell OverVoltage Warning */
+    FAULT_PARAM_t BusOVP;   // Bus OverVoltage Protection
+    FAULT_PARAM_t BusOVW;   // Bus OverVoltage Warning
+    FAULT_PARAM_t BusUVP;   // Bus UnderVoltage Protection
+    FAULT_PARAM_t BusUVW;   // Bus UnderVoltage Warning
+    FAULT_PARAM_t CellUBP;  // Cell Unbalance VoltageWarning
+    FAULT_PARAM_t CellUBW;  // Cell Unbalance VoltageWarning
+    FAULT_PARAM_t CellOVP;  // Cell OverVoltage Warning
+    FAULT_PARAM_t CellUVP;  // Cell OverVoltage Warning
 
     /**OverCurrent**/
-    FAULT_PARAM_t ODCP; /*Over Discharge Current Protection*/
-    FAULT_PARAM_t ODCW; /*Over Discharge Current Warning*/
-    FAULT_PARAM_t OCCP; /*Over Charge Current Protection*/
-    FAULT_PARAM_t OCCW; /*Over Charge Current Warning*/
+    FAULT_PARAM_t ODCP;  // Over Discharge Current Protection*
+    FAULT_PARAM_t ODCW;  // Over Discharge Current Warning
+    FAULT_PARAM_t OCCP;  // Over Charge Current Protection
+    FAULT_PARAM_t OCCW;  // Over Charge Current Warning
 
     unsigned short LockTimeOCP; /*unit:100mS*/
 
@@ -141,14 +141,14 @@ typedef struct {
 } EEPROM_BMS_t;
 
 typedef struct {
-    float          ChgCap;                    /* unit:Ah  Fixed Eeprom Locations */
-    float          DisChgCap;                 /* unit:Ah Fixed Eeprom Locations */
-    unsigned short CycleLife;                 /* Fixed Eeprom Locations */
-    unsigned short ErrorCode[DTC_LOG_LENGTH]; /* Diagnostic Trouble Code */
+    float          ChgCap;                     // unit:Ah  Fixed Eeprom Locations
+    float          DisChgCap;                  // unit:Ah Fixed Eeprom Locations
+    unsigned short CycleLife;                  // Fixed Eeprom Locations
+    unsigned short ErrorCode[DTC_LOG_LENGTH];  // Diagnostic Trouble Code
 } EEPROM_EMERGENCY_t;
 
 typedef struct {
-    unsigned char BmsAddr; /* BMS Module Address Fixed Eeprom Locations */
+    unsigned char BmsAddr;  // BMS Module Address Fixed Eeprom Locations
     /* MCP3421 */
     unsigned short AdcZeroOffset;
     unsigned short AdcGainOffset;
@@ -156,38 +156,38 @@ typedef struct {
 } EEPROM_SPECIAL_t;
 
 typedef struct {
-    BMS_WORK_MODE_e WorkModeCmd; /* BMS Receive Command */
-    SYS_STATUS_e    Status;      /* BMS Status */
+    BMS_WORK_MODE_e WorkModeCmd;  // BMS Receive Command
+    SYS_STATUS_e    Status;       // BMS Status
 
-    HV_STATUS_e    HvStatus; /* Positive Relay Status */
-    BALANCE_PARA_t Balance;  /* BMU Balance Parameter */
+    HV_STATUS_e    HvStatus;  // Positive Relay Status
+    BALANCE_PARA_t Balance;   // BMU Balance Parameter
 
-    int           BusCurrent;    /* unit:mA RawData */
-    int           BusVolt_mV;    /* unit:mV */
-    int           BusVolt;       /* unit:V */
-    int           MinVcell;      /* Unit:mV */
-    int           MaxVcell;      /* Unit:mV */
-    int           DeltaVolt;     /* Unit:mV */
-    int           MinTcell;      /* unit:0.1 degC */
-    int           MaxTcell;      /* unit:0.1 degC */
-    int           DeltaTemp;     /* unit:0.1 degC */
-    unsigned char MinVcellBmuID; /* BMU ID For Min. Volt */
-    unsigned char MaxVcellBmuID; /* BMU ID For Max. Volt */
-    unsigned char BmuMinVcellID; /* Min.Volt Cell ID In BMU */
-    unsigned char BmuMaxVcellID; /* Max.Volt Cell ID In BMU */
-    unsigned char MinTcellBmuID; /* BMU ID for Min.Temp Cell */
-    unsigned char MaxTcellBmuID; /* BMU ID for Max.Temp Cell */
-    unsigned char BmuMinTcellID; /* Min.Temp Cell ID In BMU */
-    unsigned char BmuMaxTcellID; /* Max.Temp Cell ID In BMU */
+    int           BusCurrent;     // unit:mA RawData
+    int           BusVolt_mV;     // unit:mV
+    int           BusVolt;        // unit:V
+    int           MinVcell;       // Unit:mV
+    int           MaxVcell;       // Unit:mV
+    int           DeltaVolt;      // Unit:mV
+    int           MinTcell;       // unit:0.1 degC
+    int           MaxTcell;       // unit:0.1 degC
+    int           DeltaTemp;      // unit:0.1 degC
+    unsigned char MinVcellBmuID;  // BMU ID For Min. Volt
+    unsigned char MaxVcellBmuID;  // BMU ID For Max. Volt
+    unsigned char BmuMinVcellID;  // Min.Volt Cell ID In BMU
+    unsigned char BmuMaxVcellID;  // Max.Volt Cell ID In BMU
+    unsigned char MinTcellBmuID;  // BMU ID for Min.Temp Cell
+    unsigned char MaxTcellBmuID;  // BMU ID for Max.Temp Cell
+    unsigned char BmuMinTcellID;  // Min.Temp Cell ID In BMU
+    unsigned char BmuMaxTcellID;  // Max.Temp Cell ID In BMU
 
-    unsigned char  SOC;       /* unit: % */
-    unsigned char  SOH;       /* unit: %,According to the Cycle Life Calculation */
-    unsigned int   RemCap;    /* unit: mAh */
-    unsigned int   ChgCap;    /* unit: mAh */
-    unsigned int   DischgCap; /* unit: mAh */
-    unsigned int   FullCap;   /* unit: mAh */
-    unsigned int   DesingCap; /* unit: mAh */
-    unsigned short CycleLife; /* Fixed Eeprom Locations */
+    unsigned char  SOC;        // unit: %
+    unsigned char  SOH;        // unit: %,According to the Cycle Life Calculation
+    unsigned int   RemCap;     // unit: mAh
+    unsigned int   ChgCap;     // unit: mAh
+    unsigned int   DischgCap;  // unit: mAh
+    unsigned int   FullCap;    // unit: mAh
+    unsigned int   DesingCap;  // unit: mAh
+    unsigned short CycleLife;  // Fixed Eeprom Locations
     unsigned short DecayCoefficient;
     /* Protection Flag */
     unsigned char FaultBitArray[(DTC_EVENT_MAX_NUM / 8) + 1];
@@ -208,9 +208,9 @@ typedef struct {
 
 /* Global variables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
-extern volatile const EEPROM_BMS_t       eepBmsDef; /* EEPROM default data */
-extern volatile const EEPROM_SPECIAL_t   eepSpeDef; /* EEPROM default data */
-extern volatile const EEPROM_EMERGENCY_t eepEmgDef; /* EEPROM default data */
+extern volatile const EEPROM_BMS_t       eepBmsDef;  // EEPROM default data
+extern volatile const EEPROM_SPECIAL_t   eepSpeDef;  // EEPROM default data
+extern volatile const EEPROM_EMERGENCY_t eepEmgDef;  // EEPROM default data
 extern BMS_DATA_t                        bmsData;
 extern EEPROM_BMS_t                      eepBms;
 extern EEPROM_EMERGENCY_t                eepEmg;

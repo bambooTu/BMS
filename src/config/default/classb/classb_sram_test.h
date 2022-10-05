@@ -45,7 +45,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -58,8 +58,8 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 /*----------------------------------------------------------------------------
  *     Constants
  *----------------------------------------------------------------------------*/
-#define CLASSB_SRAM_TEST_BUFFER_SIZE        (512U) // Do not modify
-#define CLASSB_SRAM_APP_AREA_START          (0xA0000800U) // Do not modify
+#define CLASSB_SRAM_TEST_BUFFER_SIZE (512U)         // Do not modify
+#define CLASSB_SRAM_APP_AREA_START   (0xA0000800U)  // Do not modify
 
 /*----------------------------------------------------------------------------
  *     Data types
@@ -76,8 +76,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
   Remarks:
     None.
 */
-typedef enum classb_sram_march_algo
-{
+typedef enum classb_sram_march_algo {
     CLASSB_SRAM_MARCH_C       = 0,
     CLASSB_SRAM_MARCH_C_MINUS = 1,
     CLASSB_SRAM_MARCH_B       = 2
@@ -87,23 +86,24 @@ typedef enum classb_sram_march_algo
  *     Functions
  *----------------------------------------------------------------------------*/
 
-CLASSB_TEST_STATUS __attribute__((optimize("-O0"))) CLASSB_SRAM_MarchTestInit(uint32_t * start_addr,
-    uint32_t test_size, CLASSB_SRAM_MARCH_ALGO march_algo, bool running_context);
-CLASSB_TEST_STATUS __attribute__((optimize("-O0"))) CLASSB_SRAM_MarchTest(uint32_t * start_addr,
-    uint32_t test_size, CLASSB_SRAM_MARCH_ALGO march_algo, bool running_context);
+CLASSB_TEST_STATUS __attribute__((optimize("-O0")))
+CLASSB_SRAM_MarchTestInit(uint32_t* start_addr, uint32_t test_size, CLASSB_SRAM_MARCH_ALGO march_algo,
+                          bool running_context);
+CLASSB_TEST_STATUS __attribute__((optimize("-O0")))
+CLASSB_SRAM_MarchTest(uint32_t* start_addr, uint32_t test_size, CLASSB_SRAM_MARCH_ALGO march_algo,
+                      bool running_context);
 
 /* RAM march algorithms
  * Optimization is set to zero, else the compiler optimizes these function away.
  */
-bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchC(uint32_t * start_addr, uint32_t test_size);
-bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchCMinus(uint32_t * start_addr, uint32_t test_size);
-bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchB(uint32_t * start_addr, uint32_t test_size);
+bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchC(uint32_t* start_addr, uint32_t test_size);
+bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchCMinus(uint32_t* start_addr, uint32_t test_size);
+bool __attribute__((optimize("-O0"))) CLASSB_RAMMarchB(uint32_t* start_addr, uint32_t test_size);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-
-    }
+}
 
 #endif
 // DOM-IGNORE-END
-#endif // CLASSB_SRAM_TEST_H
+#endif  // CLASSB_SRAM_TEST_H

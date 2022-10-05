@@ -1,4 +1,5 @@
 #include "indicator.h"
+
 #include "definitions.h"
 #include "dtc.h"
 
@@ -96,8 +97,6 @@ void IND_Initialize(void) {
 
 void IND_1ms_Tasks(void) {
     FaultIndicator.l          = DTC_FaultMapGet();
-    FaultIndicator.b.AFE_COMM = 1;  // TODO:DELETE
-    FaultIndicator.b.ODCP     = 1;  // TODO:DELETE
     FaultIndicator.l          = FaultIndicator.l & FaultIndicatorMask.l;
     if (FaultIndicator.l) {
         if (fCompleteARound) {

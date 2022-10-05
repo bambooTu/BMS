@@ -39,7 +39,7 @@
 
 /**
  * @brief      Ascending power 1D Lookup Table
- * 
+ *
  * @param      input Number of table dimensions
  * @param      bp0   1D-Table breakpoints
  * @param      table 1D-Table data
@@ -88,7 +88,7 @@ double Lookup_Table(double input, volatile const double *bp0, volatile const dou
 
 /**
  * @brief      Average is the sum of array elements
- * 
+ *
  * @param      arr Array input
  * @param      arrSize Array size
  * @return     double
@@ -109,7 +109,7 @@ double Filter_ArrayAverage(double *arr, double arrSize) {
 
 /**
  * @brief      The input data is in positive and negative range ,output is zero
- * 
+ *
  * @param      data Data Input
  * @param      threshold Threshold(Positive and negative range)
  * @return     float

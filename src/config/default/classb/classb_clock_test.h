@@ -45,7 +45,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -66,16 +66,13 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 /*----------------------------------------------------------------------------
  *     Functions
  *----------------------------------------------------------------------------*/
-CLASSB_TEST_STATUS CLASSB_ClockTest(uint32_t cpu_clock_freq,
-    uint8_t error_limit,
-    uint16_t clock_test_rtc_cycles,
-    bool running_context);
+CLASSB_TEST_STATUS CLASSB_ClockTest(uint32_t cpu_clock_freq, uint8_t error_limit, uint16_t clock_test_rtc_cycles,
+                                    bool running_context);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-
-    }
+}
 
 #endif
 // DOM-IGNORE-END
-#endif // CLASSB_CLOCK_TEST_H
+#endif  // CLASSB_CLOCK_TEST_H

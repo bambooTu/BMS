@@ -140,7 +140,7 @@ typedef enum {
     PF_GET_OTHER_GRP_PARAM    = 0x7A,  // Set other types of protection parameters
     PF_GET_CURR_CALIB_PARAM   = 0x8F,  // Get current sensor parameters
     PF_GET_SYS_PARAM_G1       = 0x91,  // Get system parameters(PCS Only)
-    PF_GET_SYS_PARAM_G2       = 0x91,
+    PF_GET_SYS_PARAM_G2       = 0x92,
     PF_GET_SYS_PARAM_G3       = 0x94,
     PF_GET_SYS_PARAM_G4       = 0x95,
     PF_GET_CELL_DATA_G1       = 0xA0,  // Get the BMU temperature reading and the voltage value of each Cell

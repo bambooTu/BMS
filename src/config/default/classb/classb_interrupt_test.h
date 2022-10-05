@@ -45,7 +45,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -70,9 +70,8 @@ CLASSB_TEST_STATUS CLASSB_SST_InterruptTest(void);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-
-    }
+}
 
 #endif
 // DOM-IGNORE-END
-#endif // CLASSB_INTR_TEST_H
+#endif  // CLASSB_INTR_TEST_H

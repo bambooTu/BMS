@@ -16,34 +16,32 @@
 
 *******************************************************************************/
 
-//DOM-IGNORE-BEGIN
+// DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
-*
-* Subject to your compliance with these terms, you may use Microchip software
-* and any derivatives exclusively with Microchip products. It is your
-* responsibility to comply with third party license terms applicable to your
-* use of third party software (including open source software) that may
-* accompany Microchip software.
-*
-* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-* PARTICULAR PURPOSE.
-*
-* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-*******************************************************************************/
-//DOM-IGNORE-END
+ * Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
+ *
+ * Subject to your compliance with these terms, you may use Microchip software
+ * and any derivatives exclusively with Microchip products. It is your
+ * responsibility to comply with third party license terms applicable to your
+ * use of third party software (including open source software) that may
+ * accompany Microchip software.
+ *
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+ * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *******************************************************************************/
+// DOM-IGNORE-END
 
 #include "plib_gpio.h"
-
-
 
 /******************************************************************************
   Function:
@@ -55,16 +53,14 @@
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_Initialize ( void )
-{
-
+void GPIO_Initialize(void) {
     /* PORTA Initialization */
-    LATA = 0x0U; /* Initial Latch Value */
-    TRISACLR = 0x4000U; /* Direction Control */
+    LATA      = 0x0U;    /* Initial Latch Value */
+    TRISACLR  = 0x4000U; /* Direction Control */
     ANSELACLR = 0x4000U; /* Digital Mode Enable */
     /* PORTB Initialization */
-    LATB = 0x0U; /* Initial Latch Value */
-    TRISBCLR = 0xc0U; /* Direction Control */
+    LATB      = 0x0U;  /* Initial Latch Value */
+    TRISBCLR  = 0xc0U; /* Direction Control */
     ANSELBCLR = 0x82U; /* Digital Mode Enable */
     /* PORTC Initialization */
     ANSELCCLR = 0x404U; /* Digital Mode Enable */
@@ -74,9 +70,9 @@ void GPIO_Initialize ( void )
     /* PORTF Initialization */
     ANSELFCLR = 0x3000U; /* Digital Mode Enable */
     /* PORTG Initialization */
-    LATG = 0x0U; /* Initial Latch Value */
-    TRISGCLR = 0x7000U; /* Direction Control */
-    ANSELGCLR = 0x9c0U; /* Digital Mode Enable */
+    LATG      = 0x0U;    /* Initial Latch Value */
+    TRISGCLR  = 0x7000U; /* Direction Control */
+    ANSELGCLR = 0x9c0U;  /* Digital Mode Enable */
 
     /* Unlock system for PPS configuration */
     SYSKEY = 0x00000000U;
@@ -94,17 +90,16 @@ void GPIO_Initialize ( void )
     C4RXR = 6;
 
     /* PPS Output Remapping */
-    RPC9R = 11;
-    RPE0R = 12;
+    RPC9R  = 11;
+    RPE0R  = 12;
     RPE15R = 12;
     RPC15R = 12;
-    RPB1R = 12;
+    RPB1R  = 12;
 
-        /* Lock back the system after PPS configuration */
+    /* Lock back the system after PPS configuration */
     CFGCONbits.IOLOCK = 1U;
 
     SYSKEY = 0x00000000U;
-
 }
 
 // *****************************************************************************
@@ -135,8 +130,7 @@ void GPIO_Initialize ( void )
     low (0).
     Implemented pins are Right aligned in the 32-bit return value.
 */
-uint32_t GPIO_PortRead(GPIO_PORT port)
-{
+uint32_t GPIO_PortRead(GPIO_PORT port) {
     return (*(volatile uint32_t *)(&PORTA + (port * 0x40U)));
 }
 
@@ -150,9 +144,9 @@ uint32_t GPIO_PortRead(GPIO_PORT port)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortWrite(GPIO_PORT port, uint32_t mask, uint32_t value)
-{
-    *(volatile uint32_t *)(&LATA + (port * 0x40U)) = (*(volatile uint32_t *)(&LATA + (port * 0x40U)) & (~mask)) | (mask & value);
+void GPIO_PortWrite(GPIO_PORT port, uint32_t mask, uint32_t value) {
+    *(volatile uint32_t *)(&LATA + (port * 0x40U)) =
+        (*(volatile uint32_t *)(&LATA + (port * 0x40U)) & (~mask)) | (mask & value);
 }
 
 // *****************************************************************************
@@ -165,8 +159,7 @@ void GPIO_PortWrite(GPIO_PORT port, uint32_t mask, uint32_t value)
   Remarks:
     See plib_gpio.h for more details.
 */
-uint32_t GPIO_PortLatchRead(GPIO_PORT port)
-{
+uint32_t GPIO_PortLatchRead(GPIO_PORT port) {
     return (*(volatile uint32_t *)(&LATA + (port * 0x40U)));
 }
 
@@ -180,8 +173,7 @@ uint32_t GPIO_PortLatchRead(GPIO_PORT port)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortSet(GPIO_PORT port, uint32_t mask)
-{
+void GPIO_PortSet(GPIO_PORT port, uint32_t mask) {
     *(volatile uint32_t *)(&LATASET + (port * 0x40U)) = mask;
 }
 
@@ -195,8 +187,7 @@ void GPIO_PortSet(GPIO_PORT port, uint32_t mask)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortClear(GPIO_PORT port, uint32_t mask)
-{
+void GPIO_PortClear(GPIO_PORT port, uint32_t mask) {
     *(volatile uint32_t *)(&LATACLR + (port * 0x40U)) = mask;
 }
 
@@ -210,9 +201,8 @@ void GPIO_PortClear(GPIO_PORT port, uint32_t mask)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortToggle(GPIO_PORT port, uint32_t mask)
-{
-    *(volatile uint32_t *)(&LATAINV + (port * 0x40U))= mask;
+void GPIO_PortToggle(GPIO_PORT port, uint32_t mask) {
+    *(volatile uint32_t *)(&LATAINV + (port * 0x40U)) = mask;
 }
 
 // *****************************************************************************
@@ -225,8 +215,7 @@ void GPIO_PortToggle(GPIO_PORT port, uint32_t mask)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortInputEnable(GPIO_PORT port, uint32_t mask)
-{
+void GPIO_PortInputEnable(GPIO_PORT port, uint32_t mask) {
     *(volatile uint32_t *)(&TRISASET + (port * 0x40U)) = mask;
 }
 
@@ -240,13 +229,9 @@ void GPIO_PortInputEnable(GPIO_PORT port, uint32_t mask)
   Remarks:
     See plib_gpio.h for more details.
 */
-void GPIO_PortOutputEnable(GPIO_PORT port, uint32_t mask)
-{
+void GPIO_PortOutputEnable(GPIO_PORT port, uint32_t mask) {
     *(volatile uint32_t *)(&TRISACLR + (port * 0x40U)) = mask;
 }
-
-
-
 
 /*******************************************************************************
  End of File

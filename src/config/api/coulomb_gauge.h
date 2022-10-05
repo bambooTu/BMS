@@ -35,7 +35,7 @@ extern "C" {
 
 #define DECAY2SOH_TABLE_SIZE    9
 #define SOH2SFULLCAP_TABLE_SIZE 11
-#define OCV_TABLE_SIZE 11
+#define OCV_TABLE_SIZE          11
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Constants                                                         */

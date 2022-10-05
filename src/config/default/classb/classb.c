@@ -42,62 +42,60 @@
  *     include files
  *----------------------------------------------------------------------------*/
 #include "classb.h"
+
 #include "device.h"
 /*----------------------------------------------------------------------------
  *     Constants
  *----------------------------------------------------------------------------*/
 
-
-
 #define FLASH_START_ADDR 0x9d000000
 #define FLASH_SIZE       0x80000
 
-#define SRAM_BASE_ADDRESS                   (0xA0000000)
-#define CLASSB_RESULT_ADDR                  (0xa0000000U)
-#define CLASSB_COMPL_RESULT_ADDR            (0xa0000004U)
-#define CLASSB_ONGOING_TEST_VAR_ADDR        (0xa0000008U)
-#define CLASSB_TEST_IN_PROG_VAR_ADDR        (0xa000000cU)
-#define CLASSB_WDT_TEST_IN_PROG_VAR_ADDR    (0xa0000010U)
-#define CLASSB_FLASH_TEST_VAR_ADDR          (0xa0000014U)
-#define CLASSB_INTERRUPT_TEST_VAR_ADDR      (0xa0000018U)
-#define CLASSB_INTERRUPT_COUNT_VAR_ADDR     (0xa000001cU)
-#define CLASSB_SRAM_STARTUP_TEST_SIZE       (20480U)
-#define CLASSB_CLOCK_ERROR_PERCENT          (5U)
-#define CLASSB_CLOCK_TEST_RTC_CYCLES        (200U)
+#define SRAM_BASE_ADDRESS                (0xA0000000)
+#define CLASSB_RESULT_ADDR               (0xa0000000U)
+#define CLASSB_COMPL_RESULT_ADDR         (0xa0000004U)
+#define CLASSB_ONGOING_TEST_VAR_ADDR     (0xa0000008U)
+#define CLASSB_TEST_IN_PROG_VAR_ADDR     (0xa000000cU)
+#define CLASSB_WDT_TEST_IN_PROG_VAR_ADDR (0xa0000010U)
+#define CLASSB_FLASH_TEST_VAR_ADDR       (0xa0000014U)
+#define CLASSB_INTERRUPT_TEST_VAR_ADDR   (0xa0000018U)
+#define CLASSB_INTERRUPT_COUNT_VAR_ADDR  (0xa000001cU)
+#define CLASSB_SRAM_STARTUP_TEST_SIZE    (20480U)
+#define CLASSB_CLOCK_ERROR_PERCENT       (5U)
+#define CLASSB_CLOCK_TEST_RTC_CYCLES     (200U)
 // RTC is clocked from 32768 Hz Crystal. One RTC cycle is 30517 nano sec
-#define CLASSB_CLOCK_TEST_TMR1_RATIO_NS     (30517U)
-#define CLASSB_CLOCK_TEST_RATIO_NS_MS       (1000000U)
-#define CLASSB_CLOCK_DEFAULT_CLOCK_FREQ     (120000000U)
-#define CLASSB_INVALID_TEST_ID              (0xFFU)
-#define CLASSB_FLASH_CRC32_ADDR             (0xfe000U)
+#define CLASSB_CLOCK_TEST_TMR1_RATIO_NS  (30517U)
+#define CLASSB_CLOCK_TEST_RATIO_NS_MS    (1000000U)
+#define CLASSB_CLOCK_DEFAULT_CLOCK_FREQ  (120000000U)
+#define CLASSB_INVALID_TEST_ID           (0xFFU)
+#define CLASSB_FLASH_CRC32_ADDR          (0xfe000U)
 
 typedef enum {
-    RESET_REASON_NONE = 0x00000000,
-    RESET_REASON_POWERON = 0x00000003,
-    RESET_REASON_BROWNOUT = 0x00000002,
-    RESET_REASON_WDT_TIMEOUT = 0x00000010,
-    RESET_REASON_DMT_TIMEOUT = 0x00000020,
-    RESET_REASON_SOFTWARE = 0x00000040,
-    RESET_REASON_MCLR = 0x00000080,
+    RESET_REASON_NONE            = 0x00000000,
+    RESET_REASON_POWERON         = 0x00000003,
+    RESET_REASON_BROWNOUT        = 0x00000002,
+    RESET_REASON_WDT_TIMEOUT     = 0x00000010,
+    RESET_REASON_DMT_TIMEOUT     = 0x00000020,
+    RESET_REASON_SOFTWARE        = 0x00000040,
+    RESET_REASON_MCLR            = 0x00000080,
     RESET_REASON_CONFIG_MISMATCH = 0x00000200,
-    RESET_REASON_VBAT = 0x00010000,
-    RESET_REASON_VBPOR = 0x00020000,
-    RESET_REASON_PORIO = 0x80000000,
-    RESET_REASON_PORCORE = 0x40000000,
-    RESET_REASON_ALL = 0xC00302F5
+    RESET_REASON_VBAT            = 0x00010000,
+    RESET_REASON_VBPOR           = 0x00020000,
+    RESET_REASON_PORIO           = 0x80000000,
+    RESET_REASON_PORCORE         = 0x40000000,
+    RESET_REASON_ALL             = 0xC00302F5
 
 } RESET_REASON;
 RESET_REASON resetReason;
 
-
 /*----------------------------------------------------------------------------
  *     Global Variables
  *----------------------------------------------------------------------------*/
-volatile uint8_t * ongoing_sst_id;
-volatile uint8_t * classb_test_in_progress;
-volatile uint8_t * wdt_test_in_progress;
-volatile uint8_t * interrupt_tests_status;
-volatile uint32_t * interrupt_count;
+volatile uint8_t  *ongoing_sst_id;
+volatile uint8_t  *classb_test_in_progress;
+volatile uint8_t  *wdt_test_in_progress;
+volatile uint8_t  *interrupt_tests_status;
+volatile uint32_t *interrupt_count;
 
 /*----------------------------------------------------------------------------
  *     Functions
@@ -113,9 +111,9 @@ Notes  : None
 ============================================================================*/
 
 static void Classb_SystemReset(void) {
-    SYSKEY = 0x00000000;
-    SYSKEY = 0xAA996655;
-    SYSKEY = 0x556699AA;
+    SYSKEY    = 0x00000000;
+    SYSKEY    = 0xAA996655;
+    SYSKEY    = 0x556699AA;
     RSWRSTSET = _RSWRST_SWRST_MASK;
 
     RSWRST;
@@ -138,8 +136,8 @@ void CLASSB_WDT_Clear(void) {
     /* Writing specific value to only upper 16 bits of WDTCON register clears WDT counter */
     /* Only write to the upper 16 bits of the register when clearing. */
     /* WDTCLRKEY = 0x5743 */
-    volatile uint16_t * wdtclrkey;
-    wdtclrkey = ((volatile uint16_t *) & WDTCON) + 1;
+    volatile uint16_t *wdtclrkey;
+    wdtclrkey  = ((volatile uint16_t *)&WDTCON) + 1;
     *wdtclrkey = 0x5743;
 }
 
@@ -156,7 +154,7 @@ void CLASSB_WDT_Config(void) {
     SYSKEY = 0xAA996655;
     SYSKEY = 0x556699AA;
 
-    //DEVCFG1bits.WDTPS = 0b01011; //FUSE WDT CAN'T WRITE
+    // DEVCFG1bits.WDTPS = 0b01011; //FUSE WDT CAN'T WRITE
 
     SYSKEY = 0x33333333;
     Nop();
@@ -200,18 +198,17 @@ static void CLASSB_GlobalsInit(void) {
      * These variables point to address' in the reserved SRAM for the
      * Class B library.
      */
-    ongoing_sst_id = (volatile uint8_t *)CLASSB_ONGOING_TEST_VAR_ADDR;
+    ongoing_sst_id          = (volatile uint8_t *)CLASSB_ONGOING_TEST_VAR_ADDR;
     classb_test_in_progress = (volatile uint8_t *)CLASSB_TEST_IN_PROG_VAR_ADDR;
-    wdt_test_in_progress = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
-    interrupt_tests_status = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
-    interrupt_count = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
+    wdt_test_in_progress    = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
+    interrupt_tests_status  = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
+    interrupt_count         = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
 
     // Initialize variables
-    *ongoing_sst_id = CLASSB_INVALID_TEST_ID;
+    *ongoing_sst_id          = CLASSB_INVALID_TEST_ID;
     *classb_test_in_progress = CLASSB_TEST_NOT_STARTED;
-    *wdt_test_in_progress = CLASSB_TEST_NOT_STARTED;
-    *interrupt_tests_status = CLASSB_TEST_NOT_STARTED;
-
+    *wdt_test_in_progress    = CLASSB_TEST_NOT_STARTED;
+    *interrupt_tests_status  = CLASSB_TEST_NOT_STARTED;
 }
 
 /*============================================================================
@@ -222,7 +219,6 @@ Input  : None
 Output : None
 Notes  : The application decides the contents of this function.
 ============================================================================*/
-
 
 static void CLASSB_App_WDT_Recovery(void) {
 #if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
@@ -292,10 +288,9 @@ static void CLASSB_TestWDT(void) {
 }
 
 RESET_REASON SYS_RESET_ReasonGet(void) {
-    return (RESET_REASON) (RCON & (_RCON_CMR_MASK | _RCON_EXTR_MASK |
-            _RCON_SWR_MASK | _RCON_DMTO_MASK | _RCON_WDTO_MASK |
-            _RCON_BOR_MASK | _RCON_POR_MASK | _RCON_VBPOR_MASK |
-            _RCON_VBAT_MASK | _RCON_PORIO_MASK | _RCON_PORCORE_MASK));
+    return (RESET_REASON)(RCON & (_RCON_CMR_MASK | _RCON_EXTR_MASK | _RCON_SWR_MASK | _RCON_DMTO_MASK |
+                                  _RCON_WDTO_MASK | _RCON_BOR_MASK | _RCON_POR_MASK | _RCON_VBPOR_MASK |
+                                  _RCON_VBAT_MASK | _RCON_PORIO_MASK | _RCON_PORCORE_MASK));
 }
 
 void SYS_RESET_ReasonClear(RESET_REASON reason) {
@@ -318,19 +313,18 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
      * These variables point to address' in the reserved SRAM for the
      * Class B library.
      */
-    ongoing_sst_id = (volatile uint8_t *)CLASSB_ONGOING_TEST_VAR_ADDR;
+    ongoing_sst_id          = (volatile uint8_t *)CLASSB_ONGOING_TEST_VAR_ADDR;
     classb_test_in_progress = (volatile uint8_t *)CLASSB_TEST_IN_PROG_VAR_ADDR;
-    wdt_test_in_progress = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
-    interrupt_tests_status = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
-    interrupt_count = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
+    wdt_test_in_progress    = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
+    interrupt_tests_status  = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
+    interrupt_count         = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
 
     CLASSB_INIT_STATUS ret_val = CLASSB_SST_NOT_DONE;
-    resetReason = SYS_RESET_ReasonGet();
+    resetReason                = SYS_RESET_ReasonGet();
     SYS_RESET_ReasonClear(RESET_REASON_ALL);
 
     /*Check if reset was triggered by WDT */
     if ((resetReason & RESET_REASON_WDT_TIMEOUT) == RESET_REASON_WDT_TIMEOUT) {
-
         if (*wdt_test_in_progress == CLASSB_TEST_STARTED) {
             *wdt_test_in_progress = CLASSB_TEST_NOT_STARTED;
         } else if (*classb_test_in_progress == CLASSB_TEST_STARTED) {
@@ -341,23 +335,22 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
     } else {
         /* If it is a software reset and the Class B library has issued it */
         if ((*classb_test_in_progress == CLASSB_TEST_STARTED) &&
-                ((resetReason & RESET_REASON_SOFTWARE) == RESET_REASON_SOFTWARE)) {
+            ((resetReason & RESET_REASON_SOFTWARE) == RESET_REASON_SOFTWARE)) {
             *classb_test_in_progress = CLASSB_TEST_NOT_STARTED;
-            ret_val = CLASSB_SST_DONE;
+            ret_val                  = CLASSB_SST_DONE;
         } else {
-
             /* For all other reset causes,
              * test the reserved SRAM,
              * initialize Class B variables
              * clear the test results and test WDT
              */
             bool result_area_test_ok = false;
-            bool ram_buffer_test_ok = false;
+            bool ram_buffer_test_ok  = false;
             // Test the reserved SRAM
-            result_area_test_ok = CLASSB_RAMMarchC((uint32_t *) SRAM_BASE_ADDRESS, CLASSB_SRAM_TEST_BUFFER_SIZE);
-            ram_buffer_test_ok = CLASSB_RAMMarchC((uint32_t *) SRAM_BASE_ADDRESS + CLASSB_SRAM_TEST_BUFFER_SIZE, CLASSB_SRAM_TEST_BUFFER_SIZE);
+            result_area_test_ok = CLASSB_RAMMarchC((uint32_t *)SRAM_BASE_ADDRESS, CLASSB_SRAM_TEST_BUFFER_SIZE);
+            ram_buffer_test_ok  = CLASSB_RAMMarchC((uint32_t *)SRAM_BASE_ADDRESS + CLASSB_SRAM_TEST_BUFFER_SIZE,
+                                                   CLASSB_SRAM_TEST_BUFFER_SIZE);
             if ((result_area_test_ok == true) && (ram_buffer_test_ok == true)) {
-
                 // Initialize all Class B variables after the March test
                 CLASSB_GlobalsInit();
                 CLASSB_ClearTestResults(CLASSB_TEST_TYPE_SST);
@@ -387,12 +380,11 @@ Notes  : This function calls all the configured self-tests during startup.
          this function enables the WDT and returns CLASSB_STARTUP_TEST_NOT_EXECUTED.
 ============================================================================*/
 
-
 static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
-    CLASSB_STARTUP_STATUS cb_startup_status = CLASSB_STARTUP_TEST_NOT_EXECUTED;
+    CLASSB_STARTUP_STATUS cb_startup_status      = CLASSB_STARTUP_TEST_NOT_EXECUTED;
     CLASSB_STARTUP_STATUS cb_temp_startup_status = CLASSB_STARTUP_TEST_NOT_EXECUTED;
-    CLASSB_TEST_STATUS cb_test_status = CLASSB_TEST_NOT_EXECUTED;
-    
+    CLASSB_TEST_STATUS    cb_test_status         = CLASSB_TEST_NOT_EXECUTED;
+
     // Enable watchdog if it is not enabled
     if (WDTCONbits.ON == 0) {
         // Configure timeout
@@ -400,7 +392,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     }
     // CPU reg test
     *ongoing_sst_id = CLASSB_TEST_CPU;
-    cb_test_status = CLASSB_CPU_RegistersTest(false);
+    cb_test_status  = CLASSB_CPU_RegistersTest(false);
 
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
@@ -411,7 +403,7 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
 
     // Program Counter test
     *ongoing_sst_id = CLASSB_TEST_PC;
-    cb_test_status = CLASSB_CPU_PCTest(false);
+    cb_test_status  = CLASSB_CPU_PCTest(false);
 
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
@@ -422,49 +414,44 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
 
     // SRAM test
     *ongoing_sst_id = CLASSB_TEST_RAM;
-    cb_test_status = CLASSB_SRAM_MarchTestInit((uint32_t *) CLASSB_SRAM_APP_AREA_START,
-            CLASSB_SRAM_STARTUP_TEST_SIZE, CLASSB_SRAM_MARCH_C, false);
+    cb_test_status  = CLASSB_SRAM_MarchTestInit((uint32_t *)CLASSB_SRAM_APP_AREA_START, CLASSB_SRAM_STARTUP_TEST_SIZE,
+                                                CLASSB_SRAM_MARCH_C, false);
     if (cb_test_status == CLASSB_TEST_PASSED) {
-
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
-
-
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
 #ifndef __DEBUG
     // Clock Test
     uint16_t clock_test_tmr1_cycles = ((5 * CLASSB_CLOCK_TEST_RATIO_NS_MS) / CLASSB_CLOCK_TEST_TMR1_RATIO_NS);
-    *ongoing_sst_id = CLASSB_TEST_CLOCK;
-    cb_test_status = CLASSB_ClockTest(CLASSB_CLOCK_DEFAULT_CLOCK_FREQ, CLASSB_CLOCK_ERROR_PERCENT, clock_test_tmr1_cycles, false);
+    *ongoing_sst_id                 = CLASSB_TEST_CLOCK;
+    cb_test_status =
+        CLASSB_ClockTest(CLASSB_CLOCK_DEFAULT_CLOCK_FREQ, CLASSB_CLOCK_ERROR_PERCENT, clock_test_tmr1_cycles, false);
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
-
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
 #endif
     // Flash Test
     *ongoing_sst_id = CLASSB_TEST_FLASH;
-    cb_test_status = CLASSB_FlashCRCTest(FLASH_START_ADDR, FLASH_SIZE, 0xC65B98A0, false);
+    cb_test_status  = CLASSB_FlashCRCTest(FLASH_START_ADDR, FLASH_SIZE, 0xC65B98A0, false);
     if (cb_test_status == CLASSB_TEST_PASSED) {
-
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
-
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
     // Interrupt Test
-     *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
-     cb_test_status = CLASSB_SST_InterruptTest();
-     if (cb_test_status == CLASSB_TEST_PASSED) {
-         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
-     } else if (cb_test_status == CLASSB_TEST_FAILED) {
-         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
-     }
+    *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
+    cb_test_status  = CLASSB_SST_InterruptTest();
+    if (cb_test_status == CLASSB_TEST_PASSED) {
+        cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
+    } else if (cb_test_status == CLASSB_TEST_FAILED) {
+        cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
+    }
     CLASSB_WDT_Clear();
 
     if (cb_temp_startup_status == CLASSB_STARTUP_TEST_PASSED) {
@@ -484,17 +471,14 @@ Output : None
 Notes  : This function is called from Reset_Handler.
 ============================================================================*/
 
-
 void _on_bootstrap(void) {
-
     CLASSB_WDT_Config();
 
     CLASSB_STARTUP_STATUS startup_tests_status = CLASSB_STARTUP_TEST_FAILED;
-    CLASSB_INIT_STATUS init_status = CLASSB_Init();
+    CLASSB_INIT_STATUS    init_status          = CLASSB_Init();
 
     Nop();
     if (init_status == CLASSB_SST_NOT_DONE) {
-        
         *classb_test_in_progress = CLASSB_TEST_STARTED;
         // Run all startup self-tests
         startup_tests_status = CLASSB_Startup_Tests();
@@ -508,9 +492,8 @@ void _on_bootstrap(void) {
 #endif
 
             // Infinite loop
-            
+
             while (1) {
-                
                 ;
             }
 

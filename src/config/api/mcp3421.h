@@ -118,7 +118,7 @@ typedef struct {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void MCP3421_Initialize(void);
+void           MCP3421_Initialize(void);
 unsigned short MCP3421_AdcValueGet(void);
 /* USER CODE END FP */
 /* Private user code ---------------------------------------------------------*/

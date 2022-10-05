@@ -57,10 +57,10 @@ static bool          fProtectionProcess = false;
 static unsigned char gProtectionState   = 0;
 static bool          fEmrgProcess       = false;
 static unsigned char gEmergencyState    = 0;
-// TODO :DELETE
+// TODO :DELETE↓
 static bool          polar = false;
 static unsigned char step  = 0;
-// TODO :DELETE
+// TODO :DELETE↑
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -79,7 +79,7 @@ static unsigned char step  = 0;
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void BMS_SoftWareReset(void) {
+static void BMS_SoftwareReset(void) {
     HV_ModeCommand(MODE_OFF);
     if (HV_StatusGet() == HV_OFF) {
         __builtin_disable_interrupts();
@@ -95,8 +95,8 @@ static void BMS_SoftWareReset(void) {
         (void)RSWRST;
 
         /* Prevent any unwanted code execution until reset occurs */
-        while (1)
-            ;
+        while (1) {
+        };
     }
 }
 
@@ -125,7 +125,7 @@ static void BMS_Protection(void) {
             }
             break;
         case 2:
-            BMS_SoftWareReset();
+            BMS_SoftwareReset();
             gProtectionState = 0;
             break;
         default:
@@ -244,7 +244,7 @@ static void BMS_CommandDetect(void) {
     /*Clear the error code and reset BMS_Emergency() task state
      when the BMS_Emergency() has been executed */
     if (fEmrgProcess == false) {
-        DTC_FaultOccurClear(DIN_4);
+        DTC_FaultOccurClear(DTC_EMERGENCY);
         gEmergencyState = 0;
     }
     if (fProtectionProcess == false) {
@@ -275,10 +275,10 @@ void BMS_ModeCommand(BMS_WORK_MODE_e opMode) {
  */
 void BMS_Crtl_1ms_Tasks(void) {
     BMS_CommandDetect();
-    bmsData.HvStatus = HV_StatusGet();
+
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:
-            BMS_SoftWareReset();
+            BMS_SoftwareReset();
             break;
         case BMS_OCCUR_FAULT:
             BMS_Protection();
@@ -304,7 +304,6 @@ void BMS_Crtl_1ms_Tasks(void) {
     }
 }
 /* USER CODE END 0 */
-
 /*******************************************************************************
  End of File
  */

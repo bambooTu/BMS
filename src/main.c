@@ -25,18 +25,17 @@
 #include <stdbool.h>  // Defines true
 #include <stddef.h>   // Defines NULL
 #include <stdlib.h>   // Defines EXIT_FAILURE
-#include "definitions.h"  // SYS function prototypes
 
-
+#include "bms_ctrl.h"
 #include "can.h"
-#include "mcp3421.h"
-#include "coulomb_gauge.h"
-#include "debounce.h"
-#include "current_sensor.h"
 #include "can_bms_vs_bmu.h"
 #include "can_bms_vs_mbms.h"
+#include "coulomb_gauge.h"
+#include "current_sensor.h"
+#include "debounce.h"
+#include "definitions.h"  // SYS function prototypes
 #include "indicator.h"
-#include "bms_ctrl.h"
+#include "mcp3421.h"
 #include "sys_parameter.h"
 
 #define CALCULTAE_TIME_MS(A) ((A < 1) ? 10 - 1 : 10 * A - 1)
@@ -150,7 +149,7 @@ void CAN_XferTest() {
         canTxMsg.data[i] = 0;
     }
     canTxMsg.data[0] = rc;
-    CAN_PushTxQueue(CAN_4, &canTxMsg);
+    CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
 
 static void CAN_QueueDateRecv(void) {
@@ -214,15 +213,14 @@ int main(void) {
                 }
                 break;
             case APP_STATE_SERVICE_TASKS:
-                CAN_QueueDataXfer(CAN_1);
-                CAN_QueueDataXfer(CAN_4);
+
                 CAN_QueueDateRecv();
                 if (tmrData._1ms.flag) {
                     tmrData._1ms.flag = false;
                     HV_1ms_Tasks();
                     IND_1ms_Tasks();
                     BMU_1ms_Tasks();
-                    //DTC_1ms_Tasks();
+                    // DTC_1ms_Tasks();
                     MBMS_1ms_tasks();
                     BMS_Crtl_1ms_Tasks();
                 }
@@ -244,6 +242,8 @@ int main(void) {
                     tmrData._500ms.flag = false;
                     RLED_Toggle();
                 }
+                CAN_QueueDataXfer(CAN_1);
+                CAN_QueueDataXfer(CAN_4);
                 break;
             case APP_STATE_PWROFF_TASKS:
                 /* code */

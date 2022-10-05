@@ -27,8 +27,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys_parameter.h"
 #include "can_bms_vs_bmu.h"
+
+#include "sys_parameter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

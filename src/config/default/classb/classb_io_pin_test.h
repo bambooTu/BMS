@@ -45,7 +45,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -74,8 +74,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
   Remarks:
     None.
 */
-typedef enum classb_port_index
-{
+typedef enum classb_port_index {
     CLASSB_GPIO_PORT_A = 0,
     CLASSB_GPIO_PORT_B = 1,
     CLASSB_GPIO_PORT_C = 2,
@@ -94,18 +93,17 @@ typedef enum classb_port_index
   Remarks:
     None.
 */
-typedef enum classb_port_pin
-{
-    PIN0 = 0,
-    PIN1 = 1,
-    PIN2 = 2,
-    PIN3 = 3,
-    PIN4 = 4,
-    PIN5 = 5,
-    PIN6 = 6,
-    PIN7 = 7,
-    PIN8 = 8,
-    PIN9 = 9,
+typedef enum classb_port_pin {
+    PIN0  = 0,
+    PIN1  = 1,
+    PIN2  = 2,
+    PIN3  = 3,
+    PIN4  = 4,
+    PIN5  = 5,
+    PIN6  = 6,
+    PIN7  = 7,
+    PIN8  = 8,
+    PIN9  = 9,
     PIN10 = 10,
     PIN11 = 11,
     PIN12 = 12,
@@ -142,25 +140,22 @@ typedef enum classb_port_pin
   Remarks:
     None.
 */
-typedef enum classb_port_pin_state
-{
-    PORT_PIN_LOW  = 0,
-    PORT_PIN_HIGH = 1,
+typedef enum classb_port_pin_state {
+    PORT_PIN_LOW     = 0,
+    PORT_PIN_HIGH    = 1,
     PORT_PIN_INVALID = 2
 } CLASSB_PORT_PIN_STATE;
 
 /*----------------------------------------------------------------------------
  *     Functions
  *----------------------------------------------------------------------------*/
-CLASSB_TEST_STATUS CLASSB_RST_IOTest(CLASSB_PORT_INDEX port, CLASSB_PORT_PIN pin,
-    CLASSB_PORT_PIN_STATE state);
-void CLASSB_IO_InputSamplingEnable(CLASSB_PORT_INDEX port, CLASSB_PORT_PIN pin);
+CLASSB_TEST_STATUS CLASSB_RST_IOTest(CLASSB_PORT_INDEX port, CLASSB_PORT_PIN pin, CLASSB_PORT_PIN_STATE state);
+void               CLASSB_IO_InputSamplingEnable(CLASSB_PORT_INDEX port, CLASSB_PORT_PIN pin);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-
-    }
+}
 
 #endif
 // DOM-IGNORE-END
-#endif // CLASSB_IO_PIN_TEST_H
+#endif  // CLASSB_IO_PIN_TEST_H

@@ -22,9 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "commonly_used.h"
 #include "definitions.h"
 #include "sys_parameter.h"
-#include "commonly_used.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,8 +45,6 @@ typedef enum {
     HV_SETUP_FINISH,
     HV_SETUP_FAULT,
 } HV_SETUP_STATUS_e;
-
-
 
 typedef struct {
     HV_SETUP_STATUS_e   setupStatus;
@@ -266,7 +264,7 @@ static HV_OFF_STATUS_e HV_OffStatusGet(void) {
 }
 
 HV_STATUS_e HV_StatusGet(void) {
-    HV_STATUS_e ret = HV_OFF;
+    static HV_STATUS_e ret;
     if ((HV_OffStatusGet() == HV_OFF_FINISH) || (HV_OffStatusGet() == HV_OFF_FORCE)) {
         ret = HV_OFF;
     } else if (HV_SetupStatusGet() == HV_SETUP_FINISH) {
@@ -315,6 +313,7 @@ void HV_Initialize(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void HV_1ms_Tasks(void) {
+    bmsData.HvStatus = HV_StatusGet();
     if ((HV.opMode == MODE_ON) || (HV.opMode == MODE_PRECHG)) {
         HV_SeqTurnOn();
     } else {

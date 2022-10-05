@@ -22,27 +22,27 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2018-2019 Microchip Technology Inc. and its subsidiaries.
-*
-* Subject to your compliance with these terms, you may use Microchip software
-* and any derivatives exclusively with Microchip products. It is your
-* responsibility to comply with third party license terms applicable to your
-* use of third party software (including open source software) that may
-* accompany Microchip software.
-*
-* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-* PARTICULAR PURPOSE.
-*
-* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-*******************************************************************************/
+ * Copyright (C) 2018-2019 Microchip Technology Inc. and its subsidiaries.
+ *
+ * Subject to your compliance with these terms, you may use Microchip software
+ * and any derivatives exclusively with Microchip products. It is your
+ * responsibility to comply with third party license terms applicable to your
+ * use of third party software (including open source software) that may
+ * accompany Microchip software.
+ *
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+ * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *******************************************************************************/
 // DOM-IGNORE-END
 
 #ifndef PLIB_I2C_MASTER_COMMON_H
@@ -54,14 +54,14 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -85,8 +85,7 @@
     None.
 */
 
-typedef enum
-{
+typedef enum {
     /* No Error */
     I2C_ERROR_NONE,
 
@@ -110,13 +109,12 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum
-{
+typedef enum {
     I2C_TRANSFER_TYPE_WRITE = 0,
 
     I2C_TRANSFER_TYPE_READ
 
-}I2C_TRANSFER_TYPE;
+} I2C_TRANSFER_TYPE;
 
 // *****************************************************************************
 /* I2C State.
@@ -132,8 +130,7 @@ typedef enum
 
 */
 
-typedef enum
-{
+typedef enum {
     I2C_STATE_START_CONDITION,
 
     I2C_STATE_ADDR_BYTE_1_SEND,
@@ -171,7 +168,7 @@ typedef enum
     None.
 */
 
-typedef void (*I2C_CALLBACK) (uintptr_t contextHandle);
+typedef void (*I2C_CALLBACK)(uintptr_t contextHandle);
 
 // *****************************************************************************
 /* I2C PLib Instance Object
@@ -186,21 +183,20 @@ typedef void (*I2C_CALLBACK) (uintptr_t contextHandle);
     None.
 */
 
-typedef struct
-{
-    uint16_t                address;
-    uint8_t*                writeBuffer;
-    uint8_t*                readBuffer;
-    size_t                  writeSize;
-    size_t                  readSize;
-    size_t                  writeCount;
-    size_t                  readCount;
-    bool                    forcedWrite;
-    I2C_TRANSFER_TYPE       transferType;
-    I2C_STATE               state;
-    I2C_ERROR               error;
-    I2C_CALLBACK            callback;
-    uintptr_t               context;
+typedef struct {
+    uint16_t          address;
+    uint8_t*          writeBuffer;
+    uint8_t*          readBuffer;
+    size_t            writeSize;
+    size_t            readSize;
+    size_t            writeCount;
+    size_t            readCount;
+    bool              forcedWrite;
+    I2C_TRANSFER_TYPE transferType;
+    I2C_STATE         state;
+    I2C_ERROR         error;
+    I2C_CALLBACK      callback;
+    uintptr_t         context;
 
 } I2C_OBJ;
 
@@ -217,8 +213,7 @@ typedef struct
     None.
 */
 
-typedef struct
-{
+typedef struct {
     /* I2C Clock Speed */
     uint32_t clkSpeed;
 
@@ -226,23 +221,8 @@ typedef struct
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-    }
+}
 #endif
 // DOM-IGNORE-END
 
 #endif /* PLIB_I2C_MASTER_COMMON_H */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

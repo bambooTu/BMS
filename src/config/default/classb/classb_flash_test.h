@@ -45,7 +45,7 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
-    extern "C" {
+extern "C" {
 
 #endif
 // DOM-IGNORE-END
@@ -66,15 +66,13 @@ SUBSTITUTE  GOODS,  TECHNOLOGY,  SERVICES,  OR  ANY  CLAIMS  BY  THIRD   PARTIES
 /*----------------------------------------------------------------------------
  *     Functions
  *----------------------------------------------------------------------------*/
-uint32_t CLASSB_FlashCRCGenerate(uint32_t start_addr, uint32_t test_size);
-CLASSB_TEST_STATUS CLASSB_FlashCRCTest(uint32_t start_addr,
-    uint32_t test_size, uint32_t crc_val, bool running_context);
+uint32_t           CLASSB_FlashCRCGenerate(uint32_t start_addr, uint32_t test_size);
+CLASSB_TEST_STATUS CLASSB_FlashCRCTest(uint32_t start_addr, uint32_t test_size, uint32_t crc_val, bool running_context);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
-
-    }
+}
 
 #endif
 // DOM-IGNORE-END
-#endif // CLASSB_FLASH_TEST_H
+#endif  // CLASSB_FLASH_TEST_H

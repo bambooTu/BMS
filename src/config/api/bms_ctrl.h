@@ -1,13 +1,13 @@
 /**
  * @file       bms_ctrl.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _BMS_CTRL_H
@@ -31,7 +31,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-    
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 typedef enum {
@@ -86,8 +86,8 @@ typedef enum {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void        BMS_ModeCommand(BMS_WORK_MODE_e opMode);
-void        BMS_Crtl_1ms_Tasks(void);
+void BMS_ModeCommand(BMS_WORK_MODE_e opMode);
+void BMS_Crtl_1ms_Tasks(void);
 /* USER CODE END FP */
 
 /* Private user code ---------------------------------------------------------*/

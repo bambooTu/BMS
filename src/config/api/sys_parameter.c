@@ -1,13 +1,13 @@
 /**
  * @file       sys_parameter.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-04
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 /* Global define -------------------------------------------------------------*/
@@ -98,7 +98,6 @@ volatile const EEPROM_BMS_t eepBmsDef = {
 volatile const EEPROM_EMERGENCY_t eepEmgDef = {
     .ChgCap = CELL_DESIGN_CAP, .CycleLife = 0, .DisChgCap = 0, .ErrorCode = {0}};
 volatile const EEPROM_SPECIAL_t eepSpeDef = {.BmsAddr = BMS_COMM_ADDR, .AdcGainOffset = 0, .AdcZeroOffset = 0};
-
 
 EEPROM_BMS_t       eepBms  = {};
 EEPROM_EMERGENCY_t eepEmg  = {};
