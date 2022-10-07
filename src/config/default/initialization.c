@@ -46,6 +46,8 @@
 #include "definitions.h"
 #include "device.h"
 
+
+
 // ****************************************************************************
 // ****************************************************************************
 // Section: Configuration Bits
@@ -107,11 +109,16 @@
 #pragma config TSEQ = 0x0
 #pragma config CSEQ = 0xffff
 
+
+
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Driver Initialization Data
 // *****************************************************************************
 // *****************************************************************************
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -147,37 +154,48 @@
   Remarks:
  */
 
-void SYS_Initialize(void* data) {
+void SYS_Initialize ( void* data )
+{
     /* MISRAC 2012 deviation block start */
     /* MISRA C-2012 Rule 2.2 deviated in this file.  Deviation record ID -  H3_MISRAC_2012_R_2_2_DR_1 */
 
     /* Start out with interrupts disabled before configuring any modules */
     __builtin_disable_interrupts();
 
+  
     CLK_Initialize();
 
     /* Configure CP0.K0 for optimal performance (cached instruction pre-fetch) */
-    __builtin_mtc0(16, 0, (__builtin_mfc0(16, 0) | 0x3));
+    __builtin_mtc0(16, 0,(__builtin_mfc0(16, 0) | 0x3));
 
     /* Configure Wait States and Prefetch */
-    CHECONbits.PFMWS  = 2;
+    CHECONbits.PFMWS = 2;
     CHECONbits.PREFEN = 1;
+
+
 
     GPIO_Initialize();
 
-    TMR4_Initialize();
-    I2C1_Initialize();
-    // CAN3_Initialize();
+    CAN3_Initialize();
 
     CAN4_Initialize();
 
     CAN1_Initialize();
 
+    CAN2_Initialize();
+
+	UART5_Initialize();
+
+    NVM_Initialize();
+
+    I2C1_Initialize();
+
+    TMR4_Initialize();
+
     EEPROM_Initialize();
 
-    // CAN2_Initialize();
 
-    UART5_Initialize();
+
 
     X2CScope_Init();
 
@@ -186,8 +204,10 @@ void SYS_Initialize(void* data) {
     /* Enable global interrupts */
     __builtin_enable_interrupts();
 
+
     /* MISRAC 2012 deviation block end */
 }
+
 
 /*******************************************************************************
  End of File
