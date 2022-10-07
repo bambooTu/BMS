@@ -464,16 +464,17 @@ static void BMU_CtrlSM(void) {
                 if (BMU_rxMessageFlag == BMU_RECV_MSG_FLAG) {
                     BMU_ResponseComplete(BMU_ID);
                     if (BMU_XtrmVcellSearch(BMU_ID)) {
-                        /*TODO:clear_fault_occur(DTC_AFE_COMM);*/
+                        /*TODO:DTC_FaultOccurClear(DTC_AFE_COMM);*/
                     } else {
-                        /*TODO:set_fault_occur(DTC_AFE_COMM);*/
+                        /*TODO:DTC_FaultOccurSet(DTC_AFE_COMM);*/
                     }
                     BMU_XtrmTcellSearch(BMU_ID);
                     BMU_ID++;
                     BMU_taskState = BMS_BMU_REQ_CMD;
                 } else if (BMU_responseTimeoutCount == 0) {
-                    BMU_ResponseTimeout(BMU_ID);
+                    
                     if (++BMU_retryCount > 2) {
+                        BMU_ResponseTimeout(BMU_ID);
                         BMU_retryCount = 0;
                         BMU_ID++;
                     }
