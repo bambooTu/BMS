@@ -58,8 +58,8 @@ static unsigned char gProtectionState   = 0;
 static bool          fEmrgProcess       = false;
 static unsigned char gEmergencyState    = 0;
 // TODO :DELETE↓
-static bool          polar = false;
-static unsigned char step  = 0;
+//static bool          polar = false;
+//static unsigned char step  = 0;
 // TODO :DELETE↑
 /* USER CODE END PV */
 
@@ -182,7 +182,7 @@ static void BMS_CommandDetect(void) {
     // TODO: Engineer mode
 
     if (MBMS_EngrModeStatusGet() == true) {
-        BMS_ModeCommand(MBMS_RelayCommandGet());                
+        BMS_ModeCommand(MBMS_RelayCommandGet());
     }                                                           /*-----------------------------------------------*/
     else if (((DIN_StateGet(DIN_4) == true) &&                  // When the EMS is pressed
               (fProtectionProcess == false)) ||                 // and the BMS_Protection() is not executing
@@ -264,25 +264,37 @@ void BMS_Crtl_1ms_Tasks(void) {
 
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:
+            bmsData.Status = SYS_GOTO_RESET;
             BMS_SoftwareReset();
             break;
         case BMS_OCCUR_FAULT:
+            bmsData.Status = SYS_FAULT;
             BMS_Protection();
             break;
         case BMS_OCCUR_EMRG:
+            bmsData.Status = SYS_EMERGENCY;
             BMS_Emergency();
             break;
         case BMS_OFF:
+            bmsData.Status = SYS_TURN_OFF;
             HV_ModeCommand(MODE_OFF);
             break;
         case BMS_CHG_ON:
             // Jump to next case
         case BMS_DISCHG_ON:
+            if (bmsData.BusCurrent == 0) {
+                bmsData.Status = SYS_TURN_ON;
+            } else if (bmsData.BusCurrent > 0) {
+                bmsData.Status = SYS_CHARGING;
+            } else if (bmsData.BusCurrent < 0) {
+                bmsData.Status = SYS_DISCHARGING;
+            }
             HV_ModeCommand(MODE_ON);
             break;
         case BMS_CHG_PRE_ON:
             // Jump to next case
         case BMS_DISCHG_PRE_ON:
+            bmsData.Status = SYS_PRE_ON;
             HV_ModeCommand(MODE_PRECHG);
             break;
         default:
