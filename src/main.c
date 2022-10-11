@@ -30,6 +30,7 @@
 #include "can.h"
 #include "can_bms_vs_bmu.h"
 #include "can_bms_vs_mbms.h"
+#include "classb.h"
 #include "coulomb_gauge.h"
 #include "current_sensor.h"
 #include "debounce.h"
@@ -40,6 +41,18 @@
 
 #define CALCULTAE_TIME_MS(A) ((A < 1) ? 10 - 1 : 10 * A - 1)
 
+// Classb
+#define APP_FLASH_ADDRESS               (NVM_FLASH_START_ADDRESS + (NVM_FLASH_SIZE / 2))
+#define FLASH_START_ADDR                (0x9d000000)  // Program Flash 0x9D000000 ~ 0x9D07FFFF(Virtual Memory Map)
+#define FLASH_SIZE                      (0x80000)     // Prpgram Flash Size
+#define CLASSB_FLASH_TEST_BUFFER_SIZE   (4096U)       // Prpgram Flash Test Size
+#define FLASH_CRC32_ADDR                (APP_FLASH_ADDRESS)  // Program Flash Panel 2
+#define SRAM_RST_SIZE                   (32768U)
+#define CLASSB_CLOCK_TEST_TMR1_RATIO_NS (30517U)
+#define CLASSB_CLOCK_TEST_RATIO_NS_MS   (1000000U)
+#define CLASSB_CLOCK_DEFAULT_CLOCK_FREQ (200000000U)
+
+// CAN Device address
 #define CSNVC500_CAN_ID 0x3C2
 #define TEST_GUI_CAN_ID 0x18FF4510
 // *****************************************************************************
@@ -50,7 +63,7 @@
 
 typedef struct {
     unsigned int cnt;
-    bool flag;
+    bool         flag;
 } TMR_DATA_t;
 
 struct {
@@ -70,46 +83,49 @@ typedef enum {
 } APP_STATUS_e;
 
 struct {
-    APP_STATUS_e state;
-    unsigned mainPWR : 1;
+    APP_STATUS_e   state;
+    unsigned       mainPWR : 1;
     unsigned short bootTimeCount;
 } appData;
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
 /* ************************************************************************** */
-
 /* ************************************************************************** */
 struct {
     unsigned int duty;
     unsigned int period;
 } ledPWM;
 
+unsigned int  crc_val[1]   = {0};
+
+bool runtimeClassBChecks(void);
 // *****************************************************************************
 // *****************************************************************************
 // Section: Interrupt Handler
 // *****************************************************************************
 // *****************************************************************************
 
-void TMR4_EvnetHandler(uint32_t status, uintptr_t context) { // 0.1ms
+void TMR4_EvnetHandler(uint32_t status, uintptr_t context) {  // 0.1ms
     if (tmrData._1ms.cnt++ >= CALCULTAE_TIME_MS(1)) {
-        tmrData._1ms.cnt = 0;
+        tmrData._1ms.cnt  = 0;
         tmrData._1ms.flag = true;
     }
     if (tmrData._5ms.cnt++ >= CALCULTAE_TIME_MS(5)) {
-        tmrData._5ms.cnt = 0;
+        tmrData._5ms.cnt  = 0;
         tmrData._5ms.flag = true;
     }
     if (tmrData._10ms.cnt++ >= CALCULTAE_TIME_MS(10)) {
-        tmrData._10ms.cnt = 0;
+        tmrData._10ms.cnt  = 0;
         tmrData._10ms.flag = true;
     }
     if (tmrData._20ms.cnt++ >= CALCULTAE_TIME_MS(20)) {
-        tmrData._20ms.cnt = 0;
+        tmrData._20ms.cnt  = 0;
         tmrData._20ms.flag = true;
     }
     if (tmrData._500ms.cnt++ >= CALCULTAE_TIME_MS(500)) {
-        tmrData._500ms.cnt = 0;
+        tmrData._500ms.cnt  = 0;
         tmrData._500ms.flag = true;
     }
     if (ledPWM.period++ >= 100) {
@@ -136,11 +152,10 @@ void LVD_EvnetHandler(EXTERNAL_INT_PIN pin, uintptr_t context) {
 // *****************************************************************************
 // *****************************************************************************
 // TODO : Delete ↓
-
 void CAN_XferTest() {
     CAN_MSG_t canTxMsg;
-    canTxMsg.id = 0x18FF4520;
-    canTxMsg.dlc = 8;
+    canTxMsg.id             = 0x18FF4520;
+    canTxMsg.dlc            = 8;
     static unsigned char rc = 0;
     if (++rc > 0xff) {
         rc = 0;
@@ -151,7 +166,7 @@ void CAN_XferTest() {
     canTxMsg.data[0] = rc;
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+// TODO : Delete ↑
 static void CAN_QueueDateRecv(void) {
     CAN_MSG_t canRxMsg;
     if (CAN_GetRxQueueCount(CAN_1)) {
@@ -175,31 +190,38 @@ static void CAN_QueueDateRecv(void) {
         }
     }
 }
-// TODO : Delete ↑
-
 int main(void) {
     /* Initialize all modules */
     WDT_Clear();
     SYS_Initialize(NULL);
+    crc_val[0] = CLASSB_FlashCRCGenerate(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE);
+    // Use NVMCTRL to write the calculated CRC into a Flash location
+    while (NVM_IsBusy() == true) {
+        ;
+    }
+    NVM_RowWrite(crc_val, FLASH_CRC32_ADDR);
+
     while (true) {
         SYS_Tasks();
         X2CScope_Communicate();
         WDT_Clear();
-        switch ((APP_STATUS_e) appData.state) {
+        switch ((APP_STATUS_e)appData.state) {
             case APP_EEPROM_READ:
-                eepBms = eepBmsDef;
-                eepSpe = eepSpeDef;
+                eepBms                = eepBmsDef;
+                eepSpe                = eepSpeDef;
                 appData.bootTimeCount = CALCULTAE_TIME_MS(100);
-                appData.state = APP_STATE_INIT;
+                appData.state         = APP_STATE_INIT;
                 break;
             case APP_STATE_INIT:
-                /* APP low voltage detect start */
-                EVIC_ExternalInterruptCallbackRegister(EXTERNAL_INT_2, LVD_EvnetHandler, (uintptr_t) NULL);
+                // APP low voltage detect start
+                EVIC_ExternalInterruptCallbackRegister(EXTERNAL_INT_2, LVD_EvnetHandler, (uintptr_t)NULL);
                 EVIC_ExternalInterruptEnable(EXTERNAL_INT_2);
-                /* APP Timer Start */
-                TMR4_CallbackRegister(TMR4_EvnetHandler, (uintptr_t) NULL);
+
+                // APP Timer Start
+                TMR4_CallbackRegister(TMR4_EvnetHandler, (uintptr_t)NULL);
                 TMR4_Start();
-                /* APP Initialize */
+
+                // APP Initialize
                 HV_Initialize();
                 BMU_Initialize();
                 CAN_Initialize();
@@ -208,42 +230,44 @@ int main(void) {
                 CURRSNSR_Intialize();
                 CG_Initialize(&bmsData);
                 DIN_ParameterInitialize();
+
+                // Delay to APP_STATE_SERVICE_TASKS
                 if (!appData.bootTimeCount) {
                     appData.state = APP_STATE_SERVICE_TASKS;
                 }
                 break;
             case APP_STATE_SERVICE_TASKS:
-
+                CAN_QueueDataXfer(CAN_1);
+                CAN_QueueDataXfer(CAN_4);
                 CAN_QueueDateRecv();
                 if (tmrData._1ms.flag) {
                     tmrData._1ms.flag = false;
-                    HV_1ms_Tasks();
-                    IND_1ms_Tasks();
-                    BMU_1ms_Tasks();
-                    // DTC_1ms_Tasks();
-                    MBMS_1ms_tasks();
-                    BMS_Crtl_1ms_Tasks();
+                    HV_1ms_Tasks();   // HV relay control
+                    IND_1ms_Tasks();  // Indicator control
+                    BMU_1ms_Tasks();  // Bmu communcation and data processing
+                    // DTC_1ms_Tasks(); // Error code process
+                    MBMS_1ms_tasks();      // MBMS communication
+                    BMS_Crtl_1ms_Tasks();  // Bms system flow control
                 }
                 if (tmrData._5ms.flag) {
                     tmrData._5ms.flag = false;
-                    DIN_5ms_Tasks();
+                    DIN_5ms_Tasks();  // Digital input process
                 }
                 if (tmrData._10ms.flag) {
                     tmrData._10ms.flag = false;
-                    CURRSNSR_10ms_Tasks();
+                    CURRSNSR_10ms_Tasks();  // Current sensor communication and data processing
                     // TODO : Delete ↓
                     CAN_XferTest();
                 }
                 if (tmrData._20ms.flag) {
                     tmrData._20ms.flag = false;
-                    CG_20ms_Tasks(&bmsData);
+                    CG_20ms_Tasks(&bmsData);  // Coulomb gauge data process
                 }
                 if (tmrData._500ms.flag) {
                     tmrData._500ms.flag = false;
+                    runtimeClassBChecks();
                     RLED_Toggle();
                 }
-                CAN_QueueDataXfer(CAN_1);
-                CAN_QueueDataXfer(CAN_4);
                 break;
             case APP_STATE_PWROFF_TASKS:
                 /* code */
@@ -259,6 +283,24 @@ int main(void) {
     /* Execution should not come here during normal operation */
 
     return (EXIT_FAILURE);
+}
+
+bool runtimeClassBChecks(void) {
+    bool               ret_val            = false;
+    CLASSB_TEST_STATUS classb_rst1_status = CLASSB_TEST_NOT_EXECUTED;
+    CLASSB_TEST_STATUS classb_rst2_status = CLASSB_TEST_NOT_EXECUTED;
+    
+    __builtin_disable_interrupts();
+    classb_rst1_status = CLASSB_CPU_RegistersTest(true);
+    __builtin_enable_interrupts();
+    classb_rst2_status =
+        CLASSB_FlashCRCTest(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE, *(uint32_t *)FLASH_CRC32_ADDR, true);
+
+    if ((classb_rst1_status == CLASSB_TEST_PASSED) && (classb_rst2_status == CLASSB_TEST_PASSED)) {
+        ret_val = true;
+    }
+
+    return ret_val;
 }
 /*******************************************************************************
  End of File
