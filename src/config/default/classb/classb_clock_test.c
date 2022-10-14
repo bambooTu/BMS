@@ -144,7 +144,7 @@ static void _CLASSB_Clock_TMR1_Init(void) {
     PR1 = 162;
 
     /* Setup TMR1 Interrupt */
-    // TMR1_InterruptEnable();  /* Enable interrupt on the way out */
+    //TMR1_InterruptEnable();  /* Enable interrupt on the way out */
 }
 
 /*============================================================================
@@ -214,7 +214,7 @@ static void _CLASSB_Clock_CLK_Initialize(bool running_context) {
             PMD1 = 0x25818981;
             PMD2 = 0x7e0f0f;
             PMD3 = 0x19031316;
-
+            PMD4bits.T1MD = 0;
             break;
         }
         case true: {
