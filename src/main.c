@@ -46,7 +46,7 @@
 #define FLASH_START_ADDR                (0x9d000000)  // Program Flash 0x9D000000 ~ 0x9D07FFFF(Virtual Memory Map)
 #define FLASH_SIZE                      (0x80000)     // Prpgram Flash Size
 #define CLASSB_FLASH_TEST_BUFFER_SIZE   (4096U)       // Prpgram Flash Test Size
-#define FLASH_CRC32_ADDR                (APP_FLASH_ADDRESS)  // Program Flash Panel 2
+#define FLASH_CRC32_ADDR                (0x9d0fffef)  // Program Flash Panel 2
 #define SRAM_RST_SIZE                   (32768U)
 #define CLASSB_CLOCK_TEST_TMR1_RATIO_NS (30517U)
 #define CLASSB_CLOCK_TEST_RATIO_NS_MS   (1000000U)
@@ -194,13 +194,12 @@ int main(void) {
     /* Initialize all modules */
     WDT_Clear();
     SYS_Initialize(NULL);
-    crc_val[0] = CLASSB_FlashCRCGenerate(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE);
-    // Use NVMCTRL to write the calculated CRC into a Flash location
-    while (NVM_IsBusy() == true) {
-        ;
-    }
-    NVM_RowWrite(crc_val, FLASH_CRC32_ADDR);
-
+   crc_val[0] = CLASSB_FlashCRCGenerate(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE);
+   // Use NVMCTRL to write the calculated CRC into a Flash location
+//   while (NVM_IsBusy() == true) {
+//       ;
+//   }
+//   NVM_RowWrite(crc_val, FLASH_CRC32_ADDR);
     while (true) {
         SYS_Tasks();
         X2CScope_Communicate();
@@ -294,7 +293,7 @@ bool runtimeClassBChecks(void) {
     classb_rst1_status = CLASSB_CPU_RegistersTest(true);
     __builtin_enable_interrupts();
     classb_rst2_status =
-        CLASSB_FlashCRCTest(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE, *(uint32_t *)FLASH_CRC32_ADDR, true);
+       CLASSB_FlashCRCTest(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE,crc_val[0], true);
 
     if ((classb_rst1_status == CLASSB_TEST_PASSED) && (classb_rst2_status == CLASSB_TEST_PASSED)) {
         ret_val = true;
