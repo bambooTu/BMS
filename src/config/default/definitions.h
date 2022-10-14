@@ -12,30 +12,30 @@
 
  *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+//DOM-IGNORE-BEGIN
 /*******************************************************************************
- * Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
- *
- * Subject to your compliance with these terms, you may use Microchip software
- * and any derivatives exclusively with Microchip products. It is your
- * responsibility to comply with third party license terms applicable to your
- * use of third party software (including open source software) that may
- * accompany Microchip software.
- *
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
- * PARTICULAR PURPOSE.
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
- * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
- * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *******************************************************************************/
-// DOM-IGNORE-END
+//DOM-IGNORE-END
 
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
@@ -45,23 +45,23 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
-
+#include <stddef.h>
+#include <stdbool.h>
 #include "X2CCode/X2CScope/inc/X2CScope.h"
-#include "peripheral/canfd/plib_canfd1.h"
-#include "peripheral/canfd/plib_canfd2.h"
 #include "peripheral/canfd/plib_canfd3.h"
 #include "peripheral/canfd/plib_canfd4.h"
+#include "peripheral/canfd/plib_canfd1.h"
+#include "peripheral/canfd/plib_canfd2.h"
 #include "peripheral/clk/plib_clk.h"
-#include "peripheral/eeprom/plib_eeprom.h"
-#include "peripheral/evic/plib_evic.h"
 #include "peripheral/gpio/plib_gpio.h"
+#include "peripheral/evic/plib_evic.h"
+#include "peripheral/wdt/plib_wdt.h"
+#include "peripheral/uart/plib_uart5.h"
+#include "peripheral/nvm/plib_nvm.h"
 #include "peripheral/i2c/master/plib_i2c1_master.h"
 #include "peripheral/tmr/plib_tmr4.h"
-#include "peripheral/uart/plib_uart5.h"
-#include "peripheral/wdt/plib_wdt.h"
+#include "peripheral/eeprom/plib_eeprom.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -119,10 +119,10 @@ extern "C" {
     This function will only be called once, after system reset.
 */
 
-void SYS_Initialize(void *data);
+void SYS_Initialize( void *data );
 
 /* Nullify SYS_Tasks() if only PLIBs are used. */
-#define SYS_Tasks()
+#define     SYS_Tasks()
 
 // *****************************************************************************
 // *****************************************************************************
@@ -130,13 +130,17 @@ void SYS_Initialize(void *data);
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
+
+
+
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-// DOM-IGNORE-END
+//DOM-IGNORE-END
 
 #endif /* DEFINITIONS_H */
 /*******************************************************************************
  End of File
 */
+
