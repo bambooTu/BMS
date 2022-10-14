@@ -159,8 +159,7 @@ CLASSB_TEST_STATUS CLASSB_FlashCRCTest(uint32_t start_addr, uint32_t test_size, 
         }
 
         calculated_crc = CLASSB_FlashCRCGenerate(start_addr, test_size);
-        crc_val = CLASSB_FlashCRCGenerate(start_addr, test_size);
-
+        
         if (calculated_crc == crc_val) {
             crc_test_status = CLASSB_TEST_PASSED;
         } else {
