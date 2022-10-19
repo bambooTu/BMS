@@ -24,8 +24,7 @@ extern "C" {
 
 /* USER CODE BEGIN GD */
 //#define NVM_MODE
-#define APP_FLASH_ADDRESS 0
-#define EEPROM_START_ADDR APP_FLASH_ADDRESS
+#define EEPROM_START_ADDR 0x000
 
 /****** EERPOM Address 0x040 ~ 0x7FF Storage BMS Parameter ******/
 /* section 1 */
