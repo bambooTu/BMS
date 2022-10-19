@@ -101,7 +101,7 @@ void GPIO_Initialize ( void )
     RPB1R = 12;
 
         /* Lock back the system after PPS configuration */
-    CFGCONbits.IOLOCK = 1U;
+    //CFGCONbits.IOLOCK = 1U;
 
     SYSKEY = 0x00000000U;
 
