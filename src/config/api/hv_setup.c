@@ -161,13 +161,15 @@ static void HV_SeqTurnOn(void) {
             break;
         case HV_SETUP_FINISH:
             HV.delayTimeCount = 0;
-            RELAY_PRECHG_OPEN;
             if (HV.opMode == MODE_PRECHG) {
                 RELAY_PRECHG_CLOSE;
                 if (HV.delayTimeCount++ >= TURN_ON_PRECHG_DELAY_MS) {
                     HV.delayTimeCount = 0;
                     HV.opMode         = HV_PRECHG_START;
                 }
+            }
+            else{
+                RELAY_PRECHG_OPEN;
             }
             YLED_Set();  // TODO:Delete
             break;
