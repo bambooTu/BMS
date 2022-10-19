@@ -72,12 +72,12 @@
 /*** DEVCFG1 ***/
 #pragma config FNOSC     = SPLL
 #pragma config DMTINTV   = WIN_127_128
-#pragma config FSOSCEN   = OFF
+#pragma config FSOSCEN   = ON
 #pragma config IESO      = ON
 #pragma config POSCMOD   = OFF
 #pragma config OSCIOFNC  = OFF
 #pragma config FCKSM     = CSECME
-#pragma config WDTPS     = PS4096
+#pragma config WDTPS     = PS2048
 #pragma config WDTSPGM   = STOP
 #pragma config FWDTEN    = ON
 #pragma config WINDIS    = NORMAL
