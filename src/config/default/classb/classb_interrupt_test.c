@@ -281,7 +281,9 @@ void _CLASSB_TMR1_Initialize(void) {
     TSYNC = 0
     TCS = 0
      */
-
+    T1CONbits.TECS = 2;
+    T1CONbits.TCS = 0;
+    T1CONbits.TCKPS = 3; 
     /* Clear counter */
     T1CONbits.TCS = 0;
     T1CONSET      = 0x60;  // 0x00
