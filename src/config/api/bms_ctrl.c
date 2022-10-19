@@ -264,37 +264,37 @@ void BMS_Crtl_1ms_Tasks(void) {
 
     switch (bmsData.WorkModeCmd) {
         case BMS_RESET:
-            bmsData.Status = SYS_GOTO_RESET;
+            bmsData.SysStatus = SYS_GOTO_RESET;
             BMS_SoftwareReset();
             break;
         case BMS_OCCUR_FAULT:
-            bmsData.Status = SYS_FAULT;
+            bmsData.SysStatus = SYS_FAULT;
             BMS_Protection();
             break;
         case BMS_OCCUR_EMRG:
-            bmsData.Status = SYS_EMERGENCY;
+            bmsData.SysStatus = SYS_EMERGENCY;
             BMS_Emergency();
             break;
         case BMS_OFF:
-            bmsData.Status = SYS_TURN_OFF;
+            bmsData.SysStatus = SYS_TURN_OFF;
             HV_ModeCommand(MODE_OFF);
             break;
         case BMS_CHG_ON:
             // Jump to next case
         case BMS_DISCHG_ON:
             if (bmsData.BusCurrent == 0) {
-                bmsData.Status = SYS_TURN_ON;
+                bmsData.SysStatus = SYS_TURN_ON;
             } else if (bmsData.BusCurrent > 0) {
-                bmsData.Status = SYS_CHARGING;
+                bmsData.SysStatus = SYS_CHARGING;
             } else if (bmsData.BusCurrent < 0) {
-                bmsData.Status = SYS_DISCHARGING;
+                bmsData.SysStatus = SYS_DISCHARGING;
             }
             HV_ModeCommand(MODE_ON);
             break;
         case BMS_CHG_PRE_ON:
             // Jump to next case
         case BMS_DISCHG_PRE_ON:
-            bmsData.Status = SYS_PRE_ON;
+            bmsData.SysStatus = SYS_PRE_ON;
             HV_ModeCommand(MODE_PRECHG);
             break;
         default:

@@ -156,7 +156,7 @@ typedef struct {
 
 typedef struct {
     BMS_WORK_MODE_e WorkModeCmd;  // BMS Receive Command
-    SYS_STATUS_e    Status;       // BMS Status
+    SYS_STATUS_e    SysStatus;    // BMS System Status
 
     HV_STATUS_e    HvStatus;  // Positive Relay Status
     BALANCE_PARA_t Balance;   // BMU Balance Parameter
