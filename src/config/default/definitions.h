@@ -60,6 +60,7 @@
 #include "peripheral/uart/plib_uart5.h"
 #include "peripheral/nvm/plib_nvm.h"
 #include "peripheral/i2c/master/plib_i2c1_master.h"
+#include "peripheral/coretimer/plib_coretimer.h"
 #include "peripheral/tmr/plib_tmr4.h"
 #include "peripheral/eeprom/plib_eeprom.h"
 
