@@ -49,7 +49,7 @@
  *     Constants
  *----------------------------------------------------------------------------*/
 
-#define CLASSB_INTR_MAX_INT_COUNT (10U)
+#define CLASSB_INTR_MAX_INT_COUNT (15U)
 
 /*----------------------------------------------------------------------------
  *     Global Variables
@@ -85,7 +85,9 @@ Notes  : None.
 void __attribute__((interrupt(IPL1SRS))) _CLASSB_TMR2_Handler(void) {
     IFS0CLR = _IFS0_T2IF_MASK;
     (*interrupt_count)++;
-    //__builtin_software_breakpoint();
+#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
+    __builtin_software_breakpoint();
+#endif
 }
 
 /*============================================================================
@@ -216,26 +218,28 @@ static void _CLASSB_INT_CLK_Initialize(void) {
 
     OSCCONbits.FRCDIV = 0;
 
-    /* SPLLBSWSEL   = 5   */
-    /* SPLLPWDN     = PLL_ON     */
+    /* SPLLBSWSEL   = 5 */
+    /* SPLLPWDN     = PLL_ON */
     /* SPLLPOSTDIV1 = 4 */
-    /* SPLLFLOCK    = NO_ASSERT    */
-    /* SPLLRST      = NO_ASSERT      */
-    /* SPLLFBDIV    = 20  */
-    /* SPLLREFDIV   = 1   */
-    /* SPLLICLK     = POSC     */
-    /* SPLL_BYP     = NO_BYPASS     */
+    /* SPLLFLOCK    = NO_ASSERT */
+    /* SPLLRST      = NO_ASSERT */
+    /* SPLLFBDIV    = 20 */
+    /* SPLLREFDIV   = 1 */
+    /* SPLLICLK     = POSC  */
+    /* SPLL_BYP     = NO_BYPASS */
 
-    /* OSWEN    = SWITCH_COMPLETE    */
-    /* SOSCEN   = OFF   */
-    /* UFRCEN   = USBCLK   */
-    /* CF       = NO_FAILDET       */
-    /* SLPEN    = IDLE    */
-    /* CLKLOCK  = UNLOCKED  */
-    /* NOSC     = SPLL     */
+    /* SPLLCON      = 0x23D0081; */
+
+    /* OSWEN    = SWITCH_COMPLETE */
+    /* SOSCEN   = OFF */
+    /* UFRCEN   = USBCLK */
+    /* CF       = NO_FAILDET */
+    /* SLPEN    = IDLE */
+    /* CLKLOCK  = UNLOCKED */
+    /* NOSC     = SPLL */
     /* WAKE2SPD = SELECTED_CLK */
-    /* DRMEN    = NO_EFFECT    */
-    /* FRCDIV   = OSC_FRC_DIV_1   */
+    /* DRMEN    = NO_EFFECT */
+    /* FRCDIV   = OSC_FRC_DIV_1 */
     OSCCON = 0x100;
 
     OSCCONSET = _OSCCON_OSWEN_MASK; /* request oscillator switch to occur */
@@ -266,7 +270,6 @@ Notes  : The TMR1 is reset after successfully performing the test.
 void _CLASSB_TMR1_Initialize(void) {
     /* Disable Timer */
     T1CONCLR = _T1CON_ON_MASK;
-
     /*
     SIDL = 0
     TWDIS = 0
@@ -280,10 +283,10 @@ void _CLASSB_TMR1_Initialize(void) {
     T1CONbits.TCS = 0;
     T1CONbits.TCKPS = 3; 
     /* Clear counter */
-    T1CONbits.TCS = 0;
-    T1CONSET      = 0x60;  // 0x00
+    TMR1 = 0x0;
     /*Set period */
-    PR1     = 46875;  // 23437
+    PR1     = 23437;  // 23437
+    /* Enable TMR Interrupt */
     IFS0CLR = _IFS0_T1IF_MASK;
     IEC0SET = _IEC0_T1IE_MASK;
 }
@@ -298,10 +301,8 @@ Notes  : None.
 ============================================================================*/
 void Classb_EVIC_Initialize(void) {
     INTCONSET = _INTCON_MVEC_MASK;
-
     /* Set up priority and subpriority of enabled interrupts */
     IPC2SET = 0x400 | 0x0; /* TIMER_2:  Priority 1 / Subpriority 0 */
-
     /* Configure Shadow Register Set */
     PRISS = 0x76543210;
 }
@@ -318,21 +319,17 @@ Notes  : The TMR2 is reset after successfully performing the test.
 void _CLASSB_TMR2_Initialize(void) {
     /* Disable Timer */
     T2CONCLR = _T2CON_ON_MASK;
-
     /*
     SIDL = 0
-    TCKPS =7
+    TCKPS = 6
     T32   = 0
     TCS = 0
      */
     T2CONSET = 0x60;
-
     /* Clear counter */
     TMR2 = 0x0;
-
     /*Set period */
     PR2 = 9375U;  // 9375
-
     /* Enable TMR Interrupt */
     IFS0CLR = _IFS0_T2IF_MASK;
     IEC0SET = _IEC0_T2IE_MASK;
@@ -348,7 +345,7 @@ Notes  : The clocks required for TMR1 are configured in a separate function.
 ============================================================================*/
 static void _CLASSB_INT_TMR1_Period_Set(uint32_t period) {
     PR1 = period;
-    EVIC_SourceEnable(INT_SOURCE_TIMER_1);
+    // EVIC_SourceEnable(INT_SOURCE_TIMER_1);
 }
 
 /*============================================================================
@@ -361,7 +358,7 @@ Notes  : None.
 ============================================================================*/
 static void _CLASSB_INT_TMR1_Start(void) {
     T1CONSET = _T1CON_ON_MASK;
-    // EVIC_SourceEnable(INT_SOURCE_TIMER_1);
+    EVIC_SourceEnable(INT_SOURCE_TIMER_1);
 }
 
 /*============================================================================
@@ -405,34 +402,36 @@ CLASSB_TEST_STATUS CLASSB_SST_InterruptTest(void) {
     *interrupt_count = 0;
     _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_INPROGRESS);
 
-    _CLASSB_BuildVectorTable();
     __builtin_disable_interrupts();
+    _CLASSB_BuildVectorTable();
     _CLASSB_INT_CLK_Initialize();
     _CLASSB_TMR2_Initialize();
     _CLASSB_TMR1_Initialize();
     Classb_EVIC_Initialize();
     _CLASSB_INT_TMR1_Period_Set(23437);
+
     /* Enable global interrupts */
     __builtin_enable_interrupts();
-
     _CLASSB_INT_TMR1_Start();
     _CLASSB_INT_TMR2_Start();
     //__builtin_software_breakpoint();
 
-    while (!EVIC_SourceStatusGet(INT_SOURCE_TIMER_1)) {
-    };
-
+    while (!EVIC_SourceStatusGet(INT_SOURCE_TIMER_1))
+        ;
+    LATGCLR = (1U << 13);
     //__builtin_software_breakpoint();
     EVIC_SourceStatusClear(INT_SOURCE_TIMER_1);
     //__builtin_software_breakpoint();
     _CLASSB_INT_TMR2_Stop();
     //__builtin_software_breakpoint();
     if ((*interrupt_count < CLASSB_INTR_MAX_INT_COUNT) && (*interrupt_count > 0)) {
+        LATGCLR          = (1U << 12);
         T1CONCLR         = _T1CON_ON_MASK;  // stop timer1
         intr_test_status = CLASSB_TEST_PASSED;
         _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_PASSED);
         set_ebase_org(((uint32_t)ebase_org));
     } else {
+        LATGSET          = (1U << 14);
         intr_test_status = CLASSB_TEST_FAILED;
         _CLASSB_UpdateTestResult(CLASSB_TEST_TYPE_SST, CLASSB_TEST_INTERRUPT, CLASSB_TEST_FAILED);
         set_ebase_org(((uint32_t)ebase_org));

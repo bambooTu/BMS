@@ -96,7 +96,7 @@ volatile uint8_t  *classb_test_in_progress;
 volatile uint8_t  *wdt_test_in_progress;
 volatile uint8_t  *interrupt_tests_status;
 volatile uint32_t *interrupt_count;
-volatile uint32_t *appResetReason;
+//volatile uint32_t *appResetReason;
 /*----------------------------------------------------------------------------
  *     Functions
  *----------------------------------------------------------------------------*/
@@ -203,13 +203,13 @@ static void CLASSB_GlobalsInit(void) {
     wdt_test_in_progress    = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
     interrupt_tests_status  = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
     interrupt_count         = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
-    appResetReason          = (volatile uint32_t *)CLASSB_RESET_REASON_VAR_ADDR;
+    //appResetReason          = (volatile uint32_t *)CLASSB_RESET_REASON_VAR_ADDR;
     // Initialize variables
     *ongoing_sst_id          = CLASSB_INVALID_TEST_ID;
     *classb_test_in_progress = CLASSB_TEST_NOT_STARTED;
     *wdt_test_in_progress    = CLASSB_TEST_NOT_STARTED;
     *interrupt_tests_status  = CLASSB_TEST_NOT_STARTED;
-    *appResetReason          = 0;
+    //*appResetReason          = 0;
 }
 
 /*============================================================================
@@ -225,6 +225,8 @@ static void CLASSB_App_WDT_Recovery(void) {
 #if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
     __builtin_software_breakpoint();
 #endif
+    TRISGbits.TRISG14 = 0;
+    
     // Infinite loop
     while (1) {
         ;
@@ -243,6 +245,7 @@ void CLASSB_SST_WDT_Recovery(void) {
 #if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
     __builtin_software_breakpoint();
 #endif
+   
     // Infinite loop
     while (1) {
         ;
@@ -314,21 +317,22 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
      * These variables point to address' in the reserved SRAM for the
      * Class B library.
      */
+    CLASSB_WDT_Clear();
     ongoing_sst_id          = (volatile uint8_t *)CLASSB_ONGOING_TEST_VAR_ADDR;
     classb_test_in_progress = (volatile uint8_t *)CLASSB_TEST_IN_PROG_VAR_ADDR;
     wdt_test_in_progress    = (volatile uint8_t *)CLASSB_WDT_TEST_IN_PROG_VAR_ADDR;
     interrupt_tests_status  = (volatile uint8_t *)CLASSB_INTERRUPT_TEST_VAR_ADDR;
     interrupt_count         = (volatile uint32_t *)CLASSB_INTERRUPT_COUNT_VAR_ADDR;
-    appResetReason          = (volatile uint32_t *)CLASSB_RESET_REASON_VAR_ADDR;
-
+    //appResetReason          = (volatile uint32_t *)CLASSB_RESET_REASON_VAR_ADDR;
+   
     CLASSB_INIT_STATUS ret_val = CLASSB_SST_NOT_DONE;
     resetReason                = SYS_RESET_ReasonGet();
-    *appResetReason            = resetReason;
+    //*appResetReason            = resetReason;
     SYS_RESET_ReasonClear(RESET_REASON_ALL);
 
     /*Check if reset was triggered by WDT */
     if ((resetReason & RESET_REASON_WDT_TIMEOUT) == RESET_REASON_WDT_TIMEOUT) {
-        *appResetReason ^= RESET_REASON_WDT_TIMEOUT;
+        //*appResetReason ^= RESET_REASON_WDT_TIMEOUT;
         if (*wdt_test_in_progress == CLASSB_TEST_STARTED) {
             *wdt_test_in_progress = CLASSB_TEST_NOT_STARTED;
         } else if (*classb_test_in_progress == CLASSB_TEST_STARTED) {
@@ -340,11 +344,11 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
         /* If it is a software reset and the Class B library has issued it */
         if ((*classb_test_in_progress == CLASSB_TEST_STARTED) &&
             ((resetReason & RESET_REASON_SOFTWARE) == RESET_REASON_SOFTWARE)) {
-            *appResetReason ^= RESET_REASON_WDT_TIMEOUT;
+            //*appResetReason ^= RESET_REASON_WDT_TIMEOUT;
             *classb_test_in_progress = CLASSB_TEST_NOT_STARTED;
             ret_val                  = CLASSB_SST_DONE;
         } else {
-            
+
             /* For all other reset causes,
              * test the reserved SRAM,
              * initialize Class B variables
@@ -356,9 +360,7 @@ static CLASSB_INIT_STATUS CLASSB_Init(void) {
             result_area_test_ok = CLASSB_RAMMarchC((uint32_t *)SRAM_BASE_ADDRESS, CLASSB_SRAM_TEST_BUFFER_SIZE);
             ram_buffer_test_ok  = CLASSB_RAMMarchC((uint32_t *)SRAM_BASE_ADDRESS + CLASSB_SRAM_TEST_BUFFER_SIZE,
                                                    CLASSB_SRAM_TEST_BUFFER_SIZE);
-            if ((result_area_test_ok == true) && (ram_buffer_test_ok == true)) {
-                TRISGbits.TRISG13 = 0;
-                LATGSET = (1U << 13);
+            if ((result_area_test_ok == true) && (ram_buffer_test_ok == true)) {         
                 // Initialize all Class B variables after the March test
                 CLASSB_GlobalsInit();
                 CLASSB_ClearTestResults(CLASSB_TEST_TYPE_SST);
@@ -392,8 +394,8 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     CLASSB_STARTUP_STATUS cb_startup_status      = CLASSB_STARTUP_TEST_NOT_EXECUTED;
     CLASSB_STARTUP_STATUS cb_temp_startup_status = CLASSB_STARTUP_TEST_NOT_EXECUTED;
     CLASSB_TEST_STATUS    cb_test_status         = CLASSB_TEST_NOT_EXECUTED;
-      TRISGbits.TRISG12 = 0;
-      LATGSET = (1U << 12);
+    LATGCLR = (1U << 12);
+      
     // Enable watchdog if it is not enabled
     if (WDTCONbits.ON == 0) {
         // Configure timeout
@@ -405,27 +407,30 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
 
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
+        
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
-
+   
     // Program Counter test
     *ongoing_sst_id = CLASSB_TEST_PC;
     cb_test_status  = CLASSB_CPU_PCTest(false);
 
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
+        
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
     }
     CLASSB_WDT_Clear();
-
+    
     // SRAM test
     *ongoing_sst_id = CLASSB_TEST_RAM;
     cb_test_status  = CLASSB_SRAM_MarchTestInit((uint32_t *)CLASSB_SRAM_APP_AREA_START, CLASSB_SRAM_STARTUP_TEST_SIZE,
                                                 CLASSB_SRAM_MARCH_C, false);
     if (cb_test_status == CLASSB_TEST_PASSED) {
+        
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_FAILED;
@@ -444,10 +449,10 @@ static CLASSB_STARTUP_STATUS CLASSB_Startup_Tests(void) {
     }
     CLASSB_WDT_Clear();
 #endif
-    CLASSB_WDT_Clear();
     // Interrupt Test
     *ongoing_sst_id = CLASSB_TEST_INTERRUPT;
     cb_test_status  = CLASSB_SST_InterruptTest();
+  
     if (cb_test_status == CLASSB_TEST_PASSED) {
         cb_temp_startup_status = CLASSB_STARTUP_TEST_PASSED;
     } else if (cb_test_status == CLASSB_TEST_FAILED) {
@@ -473,19 +478,21 @@ Notes  : This function is called from Reset_Handler.
 ============================================================================*/
 
 void _on_bootstrap(void) {
-    CLASSB_WDT_Config();
-   
-    CLASSB_STARTUP_STATUS startup_tests_status = CLASSB_STARTUP_TEST_FAILED;
     TRISGbits.TRISG12 = 0;
+    TRISGbits.TRISG13 = 0;
+    TRISGbits.TRISG14 = 0;
+    CLASSB_WDT_Config();
+    CLASSB_WDT_Clear();
     LATGSET = (1U << 12);
+    CLASSB_STARTUP_STATUS startup_tests_status = CLASSB_STARTUP_TEST_FAILED;
     CLASSB_INIT_STATUS    init_status          = CLASSB_Init();
-   
-    Nop();
+    LATGSET = (1U << 13);
+    
     if (init_status == CLASSB_SST_NOT_DONE) {
         *classb_test_in_progress = CLASSB_TEST_STARTED;
         // Run all startup self-tests
         startup_tests_status = CLASSB_Startup_Tests();
-
+        
         if (startup_tests_status == CLASSB_STARTUP_TEST_PASSED) {
             // Reset the device if all tests are passed.
             Classb_SystemReset();
@@ -493,9 +500,7 @@ void _on_bootstrap(void) {
 #if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
             __builtin_software_breakpoint();
 #endif
-
             // Infinite loop
-
             while (1) {
                 ;
             }

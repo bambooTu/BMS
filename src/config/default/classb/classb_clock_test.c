@@ -210,10 +210,6 @@ static void _CLASSB_Clock_CLK_Initialize(bool running_context) {
                 ; /* wait for indication of successful clock change before proceeding */
 
             /* Peripheral Module Disable Configuration */
-
-            PMD1 = 0x25818981;
-            PMD2 = 0x7e0f0f;
-            PMD3 = 0x19031316;
             PMD4bits.T1MD = 0;
             break;
         }
@@ -265,7 +261,7 @@ CLASSB_TEST_STATUS CLASSB_ClockTest(uint32_t cpu_clock_freq, uint8_t error_limit
     _CLASSB_Clock_CLK_Initialize(running_context);
     _CLASSB_EVIC_Initialize();
     __builtin_enable_interrupts();
-
+   
     if ((expected_ticks > CLASSB_CLOCK_MAX_SYSTICK_VAL) || (cpu_clock_freq > CLASSB_CLOCK_MAX_CLOCK_FREQ) ||
         (error_limit < CLASSB_CLOCK_MAX_TEST_ACCURACY)) {
         ;
@@ -289,7 +285,7 @@ CLASSB_TEST_STATUS CLASSB_ClockTest(uint32_t cpu_clock_freq, uint8_t error_limit
         while (!EVIC_SourceStatusGet(INT_SOURCE_TIMER_1)) {
             ;
         }
-
+        
         systick_count_b = _CLASSB_Clock_SysTickGetVal();
 
         expected_ticks = expected_ticks * CLASSB_CLOCK_MUL_FACTOR;
@@ -309,7 +305,7 @@ CLASSB_TEST_STATUS CLASSB_ClockTest(uint32_t cpu_clock_freq, uint8_t error_limit
                 ((((ticks_passed - expected_ticks) * CLASSB_CLOCK_MUL_FACTOR) / (expected_ticks)) * 100) /
                 CLASSB_CLOCK_MUL_FACTOR;
         }
-
+        
         if (error_limit > calculated_error_limit) {
             clock_test_status = CLASSB_TEST_PASSED;
             if (running_context == true) {
