@@ -1,8 +1,8 @@
 /*--------------------------------------------------------------------------
- * MPLAB XC Compiler -  PIC32MK1024MCM100 linker script
- * Build date : Feb 17 2022
+ * MPLAB XC Compiler -  PIC32MK MCM linker script
+ * Build date : Jan 26 2021
  * 
- * Copyright (c) 2022, Microchip Technology Inc. and its subsidiaries ("Microchip")
+ * Copyright (c) 2021, Microchip Technology Inc. and its subsidiaries ("Microchip")
  * All rights reserved.
  * 
  * This software is developed by Microchip Technology Inc. and its
@@ -36,7 +36,7 @@
  * 
  */
 
-/* Default linker script, for normal executables */
+/* Custom linker script, for applications programmed through a bootloader */
 
 /*  NOTE: This single-file linker script replaces the two-file system used
  *  for older PIC32 devices. 
@@ -82,6 +82,9 @@ OPTIONAL("vector_offset_init.o")
 PROVIDE(_vector_spacing = 0x0001);
 PROVIDE(_ebase_address = 0x9D000000);
 
+/* Place the vector table and other exceptions after the device reset code. */
+PROVIDE(_ebase_vector_offsets = 0x1000);
+
 /*************************************************************************
  * Memory Address Equates
  * _RESET_ADDR                    -- Reset Vector or entry point
@@ -90,11 +93,9 @@ PROVIDE(_ebase_address = 0x9D000000);
  * _SIMPLE_TLB_REFILL_EXCPT_ADDR  -- Simple TLB-Refill Exception Vector
  * _GEN_EXCPT_ADDR                -- General Exception Vector
  *************************************************************************/
-_RESET_ADDR                    = 0xBFC00000;
-_BEV_EXCPT_ADDR                = 0xBFC00380;
-_DBG_EXCPT_ADDR                = 0xBFC00480;
-_SIMPLE_TLB_REFILL_EXCPT_ADDR  = _ebase_address + 0;
-_GEN_EXCPT_ADDR                = _ebase_address + 0x180;
+_RESET_ADDR                    = 0xBD000000;
+_SIMPLE_TLB_REFILL_EXCPT_ADDR  = _ebase_address + _ebase_vector_offsets + 0;
+_GEN_EXCPT_ADDR                = _ebase_address + _ebase_vector_offsets + 0x180;
 
 /*************************************************************************
  * Memory Regions
@@ -103,112 +104,25 @@ _GEN_EXCPT_ADDR                = _ebase_address + 0x180;
  * Only sections specifically assigned to these regions can be allocated
  * into these regions.
  *
- * The Debug exception vector is located at 0x9FC00480.
- *
  * The config_<address> sections are used to locate the config words at
  * their absolute addresses.
  *************************************************************************/
 
-
 MEMORY
 {
-  kseg0_program_mem     (rx)  : ORIGIN = 0x9D000000, LENGTH = 0x100000
-  kseg0_boot_mem              : ORIGIN = 0x9FC004B0, LENGTH = 0x0
-  debug_exec_mem              : ORIGIN = 0x9FC20490, LENGTH = 0x3AA0
-  kseg0_boot_mem              : ORIGIN = 0x9FC20490, LENGTH = 0x0
-  kseg1_boot_mem              : ORIGIN = 0xBFC00000, LENGTH = 0x480
-  kseg1_boot_mem_4B0          : ORIGIN = 0xBFC004B0, LENGTH = 0x3A80
-  config_BFC03F40             : ORIGIN = 0xBFC03F40, LENGTH = 0x4
-  config_BFC03F44             : ORIGIN = 0xBFC03F44, LENGTH = 0x4
-  config_BFC03F48             : ORIGIN = 0xBFC03F48, LENGTH = 0x4
-  config_BFC03F4C             : ORIGIN = 0xBFC03F4C, LENGTH = 0x4
-  config_BFC03F5C             : ORIGIN = 0xBFC03F5C, LENGTH = 0x4
-  config_BFC03F6C             : ORIGIN = 0xBFC03F6C, LENGTH = 0x4
-  config_BFC03F70             : ORIGIN = 0xBFC03F70, LENGTH = 0x4
-  config_BFC03FC0             : ORIGIN = 0xBFC03FC0, LENGTH = 0x4
-  config_BFC03FC4             : ORIGIN = 0xBFC03FC4, LENGTH = 0x4
-  config_BFC03FC8             : ORIGIN = 0xBFC03FC8, LENGTH = 0x4
-  config_BFC03FCC             : ORIGIN = 0xBFC03FCC, LENGTH = 0x4
-  config_BFC03FDC             : ORIGIN = 0xBFC03FDC, LENGTH = 0x4
-  config_BFC03FEC             : ORIGIN = 0xBFC03FEC, LENGTH = 0x4
-  config_BFC03FF0             : ORIGIN = 0xBFC03FF0, LENGTH = 0x4
-  lowerbootaliaslastpage      : ORIGIN = 0xBFC04000, LENGTH = 0x1000
-  upperbootalias              : ORIGIN = 0xBFC20000, LENGTH = 0x3F30
-  config_BFC23F40             : ORIGIN = 0xBFC23F40, LENGTH = 0x4
-  config_BFC23F44             : ORIGIN = 0xBFC23F44, LENGTH = 0x4
-  config_BFC23F48             : ORIGIN = 0xBFC23F48, LENGTH = 0x4
-  config_BFC23F4C             : ORIGIN = 0xBFC23F4C, LENGTH = 0x4
-  config_BFC23F5C             : ORIGIN = 0xBFC23F5C, LENGTH = 0x4
-  config_BFC23F6C             : ORIGIN = 0xBFC23F6C, LENGTH = 0x4
-  config_BFC23F70             : ORIGIN = 0xBFC23F70, LENGTH = 0x4
-  config_BFC23FC0             : ORIGIN = 0xBFC23FC0, LENGTH = 0x4
-  config_BFC23FC4             : ORIGIN = 0xBFC23FC4, LENGTH = 0x4
-  config_BFC23FC8             : ORIGIN = 0xBFC23FC8, LENGTH = 0x4
-  config_BFC23FCC             : ORIGIN = 0xBFC23FCC, LENGTH = 0x4
-  config_BFC23FDC             : ORIGIN = 0xBFC23FDC, LENGTH = 0x4
-  config_BFC23FEC             : ORIGIN = 0xBFC23FEC, LENGTH = 0x4
-  config_BFC23FF0             : ORIGIN = 0xBFC23FF0, LENGTH = 0x4
-  upperbootaliaslastpage      : ORIGIN = 0xBFC24000, LENGTH = 0x1000
-  boot1                       : ORIGIN = 0xBFC40000, LENGTH = 0x3F30
-  config_BFC43F40             : ORIGIN = 0xBFC43F40, LENGTH = 0x4
-  config_BFC43F44             : ORIGIN = 0xBFC43F44, LENGTH = 0x4
-  config_BFC43F48             : ORIGIN = 0xBFC43F48, LENGTH = 0x4
-  config_BFC43F4C             : ORIGIN = 0xBFC43F4C, LENGTH = 0x4
-  config_BFC43F5C             : ORIGIN = 0xBFC43F5C, LENGTH = 0x4
-  config_BFC43F6C             : ORIGIN = 0xBFC43F6C, LENGTH = 0x4
-  config_BFC43F70             : ORIGIN = 0xBFC43F70, LENGTH = 0x4
-  config_BFC43FC0             : ORIGIN = 0xBFC43FC0, LENGTH = 0x4
-  config_BFC43FC4             : ORIGIN = 0xBFC43FC4, LENGTH = 0x4
-  config_BFC43FC8             : ORIGIN = 0xBFC43FC8, LENGTH = 0x4
-  config_BFC43FCC             : ORIGIN = 0xBFC43FCC, LENGTH = 0x4
-  config_BFC43FDC             : ORIGIN = 0xBFC43FDC, LENGTH = 0x4
-  config_BFC43FEC             : ORIGIN = 0xBFC43FEC, LENGTH = 0x4
-  config_BFC43FF0             : ORIGIN = 0xBFC43FF0, LENGTH = 0x4
-  boot1lastpage               : ORIGIN = 0xBFC44000, LENGTH = 0x1000
-  config_BFC45000             : ORIGIN = 0xBFC45000, LENGTH = 0x4
-  config_BFC45004             : ORIGIN = 0xBFC45004, LENGTH = 0x4
-  config_BFC45008             : ORIGIN = 0xBFC45008, LENGTH = 0x4
-  config_BFC4500C             : ORIGIN = 0xBFC4500C, LENGTH = 0x4
-  config_BFC45010             : ORIGIN = 0xBFC45010, LENGTH = 0x4
-  config_BFC45014             : ORIGIN = 0xBFC45014, LENGTH = 0x4
-  config_BFC45018             : ORIGIN = 0xBFC45018, LENGTH = 0x4
-  config_BFC45020             : ORIGIN = 0xBFC45020, LENGTH = 0x4
-  config_BFC45024             : ORIGIN = 0xBFC45024, LENGTH = 0x4
-  config_BFC45028             : ORIGIN = 0xBFC45028, LENGTH = 0x4
-  config_BFC4502C             : ORIGIN = 0xBFC4502C, LENGTH = 0x4
-  config_BFC45030             : ORIGIN = 0xBFC45030, LENGTH = 0x4
-  config_BFC45034             : ORIGIN = 0xBFC45034, LENGTH = 0x4
-  config_BFC45038             : ORIGIN = 0xBFC45038, LENGTH = 0x4
-  config_BFC4503C             : ORIGIN = 0xBFC4503C, LENGTH = 0x4
-  boot2                       : ORIGIN = 0xBFC60000, LENGTH = 0x3F30
-  config_BFC63F40             : ORIGIN = 0xBFC63F40, LENGTH = 0x4
-  config_BFC63F44             : ORIGIN = 0xBFC63F44, LENGTH = 0x4
-  config_BFC63F48             : ORIGIN = 0xBFC63F48, LENGTH = 0x4
-  config_BFC63F4C             : ORIGIN = 0xBFC63F4C, LENGTH = 0x4
-  config_BFC63F5C             : ORIGIN = 0xBFC63F5C, LENGTH = 0x4
-  config_BFC63F6C             : ORIGIN = 0xBFC63F6C, LENGTH = 0x4
-  config_BFC63F70             : ORIGIN = 0xBFC63F70, LENGTH = 0x4
-  config_BFC63FC0             : ORIGIN = 0xBFC63FC0, LENGTH = 0x4
-  config_BFC63FC4             : ORIGIN = 0xBFC63FC4, LENGTH = 0x4
-  config_BFC63FC8             : ORIGIN = 0xBFC63FC8, LENGTH = 0x4
-  config_BFC63FCC             : ORIGIN = 0xBFC63FCC, LENGTH = 0x4
-  config_BFC63FDC             : ORIGIN = 0xBFC63FDC, LENGTH = 0x4
-  config_BFC63FEC             : ORIGIN = 0xBFC63FEC, LENGTH = 0x4
-  config_BFC63FF0             : ORIGIN = 0xBFC63FF0, LENGTH = 0x4
-  boot2lastpage               : ORIGIN = 0xBFC64000, LENGTH = 0x1000
-  kseg0_data_mem       (w!x)  : ORIGIN = 0x80000000, LENGTH = 0x40000
-  sfrs                        : ORIGIN = 0xBF800000, LENGTH = 0x100000
-  configsfrs_BFC03F30         : ORIGIN = 0xBFC03F30, LENGTH = 0x1C
-  configsfrs_BFC03FB0         : ORIGIN = 0xBFC03FB0, LENGTH = 0x1C
-  configsfrs_BFC23F30         : ORIGIN = 0xBFC23F30, LENGTH = 0x1C
-  configsfrs_BFC23FB0         : ORIGIN = 0xBFC23FB0, LENGTH = 0x1C
-  configsfrs_BFC43F30         : ORIGIN = 0xBFC43F30, LENGTH = 0x1C
-  configsfrs_BFC43FB0         : ORIGIN = 0xBFC43FB0, LENGTH = 0x1C
-  configsfrs_BFC45000         : ORIGIN = 0xBFC45000, LENGTH = 0x1C
-  configsfrs_BFC45020         : ORIGIN = 0xBFC45020, LENGTH = 0x10
-  configsfrs_BFC45030         : ORIGIN = 0xBFC45030, LENGTH = 0x10
-  configsfrs_BFC63F30         : ORIGIN = 0xBFC63F30, LENGTH = 0x1C
-  configsfrs_BFC63FB0         : ORIGIN = 0xBFC63FB0, LENGTH = 0x1C
+    /* All C files will be located here. Program Flash size of this device is 1MB
+     * Program Flash Memory is reduced by Half(512KB) to support Dual Bank update.
+     * Reserve 512 Bytes(ROW Size) of memory at the end of bank to store
+     * serial number used by bootloader to decide which program flash bank to
+     * update and run.
+     */
+    kseg0_program_mem  (rx) : ORIGIN = 0x9D001000, LENGTH = 0x80000 - 0x1000 - 512
+    kseg1_boot_mem          : ORIGIN = 0xBD000000, LENGTH = 0x480
+
+    /* Reserve 16 Bytes to Store Bootloader Trigger Pattern */
+    kseg0_data_mem     (w!x): ORIGIN = 0x80000000, LENGTH = 0x40000
+
+    sfrs                    : ORIGIN = 0xBF800000, LENGTH = 0x100000
 }
 
 /*************************************************************************
@@ -217,231 +131,11 @@ MEMORY
  *************************************************************************/
 SECTIONS
 {
-  .config_BFC03F40 : {
-    KEEP(*(.config_BFC03F40))
-  } > config_BFC03F40
-  .config_BFC03F44 : {
-    KEEP(*(.config_BFC03F44))
-  } > config_BFC03F44
-  .config_BFC03F48 : {
-    KEEP(*(.config_BFC03F48))
-  } > config_BFC03F48
-  .config_BFC03F4C : {
-    KEEP(*(.config_BFC03F4C))
-  } > config_BFC03F4C
-  .config_BFC03F5C : {
-    KEEP(*(.config_BFC03F5C))
-  } > config_BFC03F5C
-  .config_BFC03F6C : {
-    KEEP(*(.config_BFC03F6C))
-  } > config_BFC03F6C
-  .config_BFC03F70 : {
-    KEEP(*(.config_BFC03F70))
-  } > config_BFC03F70
-  .config_BFC03FC0 : {
-    KEEP(*(.config_BFC03FC0))
-  } > config_BFC03FC0
-  .config_BFC03FC4 : {
-    KEEP(*(.config_BFC03FC4))
-  } > config_BFC03FC4
-  .config_BFC03FC8 : {
-    KEEP(*(.config_BFC03FC8))
-  } > config_BFC03FC8
-  .config_BFC03FCC : {
-    KEEP(*(.config_BFC03FCC))
-  } > config_BFC03FCC
-  .config_BFC03FDC : {
-    KEEP(*(.config_BFC03FDC))
-  } > config_BFC03FDC
-  .config_BFC03FEC : {
-    KEEP(*(.config_BFC03FEC))
-  } > config_BFC03FEC
-  .config_BFC03FF0 : {
-    KEEP(*(.config_BFC03FF0))
-  } > config_BFC03FF0
-  .config_BFC23F40 : {
-    KEEP(*(.config_BFC23F40))
-  } > config_BFC23F40
-  .config_BFC23F44 : {
-    KEEP(*(.config_BFC23F44))
-  } > config_BFC23F44
-  .config_BFC23F48 : {
-    KEEP(*(.config_BFC23F48))
-  } > config_BFC23F48
-  .config_BFC23F4C : {
-    KEEP(*(.config_BFC23F4C))
-  } > config_BFC23F4C
-  .config_BFC23F5C : {
-    KEEP(*(.config_BFC23F5C))
-  } > config_BFC23F5C
-  .config_BFC23F6C : {
-    KEEP(*(.config_BFC23F6C))
-  } > config_BFC23F6C
-  .config_BFC23F70 : {
-    KEEP(*(.config_BFC23F70))
-  } > config_BFC23F70
-  .config_BFC23FC0 : {
-    KEEP(*(.config_BFC23FC0))
-  } > config_BFC23FC0
-  .config_BFC23FC4 : {
-    KEEP(*(.config_BFC23FC4))
-  } > config_BFC23FC4
-  .config_BFC23FC8 : {
-    KEEP(*(.config_BFC23FC8))
-  } > config_BFC23FC8
-  .config_BFC23FCC : {
-    KEEP(*(.config_BFC23FCC))
-  } > config_BFC23FCC
-  .config_BFC23FDC : {
-    KEEP(*(.config_BFC23FDC))
-  } > config_BFC23FDC
-  .config_BFC23FEC : {
-    KEEP(*(.config_BFC23FEC))
-  } > config_BFC23FEC
-  .config_BFC23FF0 : {
-    KEEP(*(.config_BFC23FF0))
-  } > config_BFC23FF0
-  .config_BFC43F40 : {
-    KEEP(*(.config_BFC43F40))
-  } > config_BFC43F40
-  .config_BFC43F44 : {
-    KEEP(*(.config_BFC43F44))
-  } > config_BFC43F44
-  .config_BFC43F48 : {
-    KEEP(*(.config_BFC43F48))
-  } > config_BFC43F48
-  .config_BFC43F4C : {
-    KEEP(*(.config_BFC43F4C))
-  } > config_BFC43F4C
-  .config_BFC43F5C : {
-    KEEP(*(.config_BFC43F5C))
-  } > config_BFC43F5C
-  .config_BFC43F6C : {
-    KEEP(*(.config_BFC43F6C))
-  } > config_BFC43F6C
-  .config_BFC43F70 : {
-    KEEP(*(.config_BFC43F70))
-  } > config_BFC43F70
-  .config_BFC43FC0 : {
-    KEEP(*(.config_BFC43FC0))
-  } > config_BFC43FC0
-  .config_BFC43FC4 : {
-    KEEP(*(.config_BFC43FC4))
-  } > config_BFC43FC4
-  .config_BFC43FC8 : {
-    KEEP(*(.config_BFC43FC8))
-  } > config_BFC43FC8
-  .config_BFC43FCC : {
-    KEEP(*(.config_BFC43FCC))
-  } > config_BFC43FCC
-  .config_BFC43FDC : {
-    KEEP(*(.config_BFC43FDC))
-  } > config_BFC43FDC
-  .config_BFC43FEC : {
-    KEEP(*(.config_BFC43FEC))
-  } > config_BFC43FEC
-  .config_BFC43FF0 : {
-    KEEP(*(.config_BFC43FF0))
-  } > config_BFC43FF0
-  .config_BFC45000 : {
-    KEEP(*(.config_BFC45000))
-  } > config_BFC45000
-  .config_BFC45004 : {
-    KEEP(*(.config_BFC45004))
-  } > config_BFC45004
-  .config_BFC45008 : {
-    KEEP(*(.config_BFC45008))
-  } > config_BFC45008
-  .config_BFC4500C : {
-    KEEP(*(.config_BFC4500C))
-  } > config_BFC4500C
-  .config_BFC45010 : {
-    KEEP(*(.config_BFC45010))
-  } > config_BFC45010
-  .config_BFC45014 : {
-    KEEP(*(.config_BFC45014))
-  } > config_BFC45014
-  .config_BFC45018 : {
-    KEEP(*(.config_BFC45018))
-  } > config_BFC45018
-  .config_BFC45020 : {
-    KEEP(*(.config_BFC45020))
-  } > config_BFC45020
-  .config_BFC45024 : {
-    KEEP(*(.config_BFC45024))
-  } > config_BFC45024
-  .config_BFC45028 : {
-    KEEP(*(.config_BFC45028))
-  } > config_BFC45028
-  .config_BFC4502C : {
-    KEEP(*(.config_BFC4502C))
-  } > config_BFC4502C
-  .config_BFC45030 : {
-    KEEP(*(.config_BFC45030))
-  } > config_BFC45030
-  .config_BFC45034 : {
-    KEEP(*(.config_BFC45034))
-  } > config_BFC45034
-  .config_BFC45038 : {
-    KEEP(*(.config_BFC45038))
-  } > config_BFC45038
-  .config_BFC4503C : {
-    KEEP(*(.config_BFC4503C))
-  } > config_BFC4503C
-  .config_BFC63F40 : {
-    KEEP(*(.config_BFC63F40))
-  } > config_BFC63F40
-  .config_BFC63F44 : {
-    KEEP(*(.config_BFC63F44))
-  } > config_BFC63F44
-  .config_BFC63F48 : {
-    KEEP(*(.config_BFC63F48))
-  } > config_BFC63F48
-  .config_BFC63F4C : {
-    KEEP(*(.config_BFC63F4C))
-  } > config_BFC63F4C
-  .config_BFC63F5C : {
-    KEEP(*(.config_BFC63F5C))
-  } > config_BFC63F5C
-  .config_BFC63F6C : {
-    KEEP(*(.config_BFC63F6C))
-  } > config_BFC63F6C
-  .config_BFC63F70 : {
-    KEEP(*(.config_BFC63F70))
-  } > config_BFC63F70
-  .config_BFC63FC0 : {
-    KEEP(*(.config_BFC63FC0))
-  } > config_BFC63FC0
-  .config_BFC63FC4 : {
-    KEEP(*(.config_BFC63FC4))
-  } > config_BFC63FC4
-  .config_BFC63FC8 : {
-    KEEP(*(.config_BFC63FC8))
-  } > config_BFC63FC8
-  .config_BFC63FCC : {
-    KEEP(*(.config_BFC63FCC))
-  } > config_BFC63FCC
-  .config_BFC63FDC : {
-    KEEP(*(.config_BFC63FDC))
-  } > config_BFC63FDC
-  .config_BFC63FEC : {
-    KEEP(*(.config_BFC63FEC))
-  } > config_BFC63FEC
-  .config_BFC63FF0 : {
-    KEEP(*(.config_BFC63FF0))
-  } > config_BFC63FF0
-}
-SECTIONS
-{
   /* Boot Sections */
   .reset _RESET_ADDR :
   {
     KEEP(*(.reset))
     KEEP(*(.reset.startup))
-  } > kseg1_boot_mem
-  .bev_excpt _BEV_EXCPT_ADDR :
-  {
-    KEEP(*(.bev_handler))
   } > kseg1_boot_mem
 
   .app_excpt _GEN_EXCPT_ADDR :
@@ -450,7 +144,7 @@ SECTIONS
   } > kseg0_program_mem
 
   /* Interrupt vector table with vector offsets */
-  .vectors _ebase_address + 0x200 :
+  .vectors _ebase_address + _ebase_vector_offsets + 0x200 :
   {
     /*  Symbol __vector_offset_n points to .vector_n if it exists, 
      *  otherwise points to the default handler. The
@@ -1232,15 +926,6 @@ SECTIONS
     KEEP(*(.vector_default))
   } > kseg0_program_mem
 
-  /*  The startup code is in the .reset.startup section.
-   *  Keep this here for backwards compatibility with older
-   *  C32 v1.xx releases.
-   */
-  .startup ORIGIN(kseg0_boot_mem) :
-  {
-    KEEP(*(.startup))
-  } > kseg0_boot_mem
-
   /* Code Sections - Note that input sections *(.text) and *(.text.*)
    * are not mapped here. The best-fit allocator locates them,
    * so that .text may flow around absolute sections as needed.
@@ -1540,5 +1225,7 @@ SECTIONS
   .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
   /DISCARD/ : { *(.note.GNU-stack) }
   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) *(.discard) }
+  /DISCARD/ : { *(._debug_exception) }
+  /DISCARD/ : { *(.config_*) }
 }
 
