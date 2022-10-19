@@ -247,15 +247,10 @@ static void _CLASSB_INT_CLK_Initialize(void) {
         ; /* wait for indication of successful clock change before proceeding */
 
     /* Peripheral Module Disable Configuration */
-    CFGCONbits.PMDLOCK = 0;
-    PMD2               = 0x17001f;
-    PMD3               = 0xffffffff;
-    PMD4               = 0xfc;  // fc
-    PMD5               = 0x30f3f3c;
-    PMD6               = 0x10000;
-    PMD7               = 0x0;
-
-    CFGCONbits.PMDLOCK = 1;
+    // CFGCONbits.PMDLOCK = 0;
+    PMD4bits.T1MD = 0;
+    PMD4bits.T2MD = 0;
+    // CFGCONbits.PMDLOCK = 1;
     /* Lock system since done with clock configuration */
     SYSKEY = 0x33333333;
 }
