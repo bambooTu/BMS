@@ -58,8 +58,8 @@ static unsigned char gProtectionState   = 0;
 static bool          fEmrgProcess       = false;
 static unsigned char gEmergencyState    = 0;
 // TODO :DELETE↓
-//static bool          polar = false;
-//static unsigned char step  = 0;
+// static bool          polar = false;
+// static unsigned char step  = 0;
 // TODO :DELETE↑
 /* USER CODE END PV */
 
@@ -182,7 +182,27 @@ static void BMS_CommandDetect(void) {
     // TODO: Engineer mode
 
     if (MBMS_EngrModeStatusGet() == true) {
-        BMS_ModeCommand(MBMS_RelayCommandGet());
+        switch (MBMS_RelayCommandGet()) {
+            case BMS_CHG_ON:
+                BMS_ModeCommand(BMS_CHG_ON);
+                break;
+            case BMS_DISCHG_ON:
+                BMS_ModeCommand(BMS_DISCHG_ON);
+                break;
+            case BMS_CHG_PRE_ON:
+                BMS_ModeCommand(BMS_CHG_PRE_ON);
+                break;
+            case BMS_DISCHG_PRE_ON:
+                BMS_ModeCommand(BMS_DISCHG_PRE_ON);
+                break;
+            case BMS_RESET:
+                BMS_ModeCommand(BMS_RESET);
+                break;
+            case BMS_OFF:
+            default:
+                BMS_ModeCommand(BMS_OFF);
+                break;
+        }
     }                                                           /*-----------------------------------------------*/
     else if (((DIN_StateGet(DIN_4) == true) &&                  // When the EMS is pressed
               (fProtectionProcess == false)) ||                 // and the BMS_Protection() is not executing
@@ -199,7 +219,27 @@ static void BMS_CommandDetect(void) {
         BMS_ModeCommand(BMS_OFF);                               // ,it execute BMS_OFF command.
     }                                                           /*-----------------------------------------------*/
     else {                                                      // User part
-        BMS_ModeCommand(MBMS_RelayCommandGet());
+        switch (MBMS_RelayCommandGet()) {
+            case BMS_CHG_ON:
+                BMS_ModeCommand(BMS_CHG_ON);
+                break;
+            case BMS_DISCHG_ON:
+                BMS_ModeCommand(BMS_DISCHG_ON);
+                break;
+            case BMS_CHG_PRE_ON:
+                BMS_ModeCommand(BMS_CHG_PRE_ON);
+                break;
+            case BMS_DISCHG_PRE_ON:
+                BMS_ModeCommand(BMS_DISCHG_PRE_ON);
+                break;
+            case BMS_RESET:
+                BMS_ModeCommand(BMS_RESET);
+                break;
+            case BMS_OFF:
+            default:
+                BMS_ModeCommand(BMS_OFF);
+                break;
+        }
         // TODO :DELETE Test Function ↓
         // switch (step) {
         //     case 0:

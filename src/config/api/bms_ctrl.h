@@ -45,7 +45,7 @@ typedef enum {
     SYS_EMERGENCY,  /*Emergency Relay Off*/
     SYS_PRE_ON,     /*PreChg Relay Close*/
     SYS_BMS_MAX
-} SYS_STATUS_e; /*BMS Status*/
+} SYS_STATUS_e; /*BMS System Status*/
 
 typedef enum {
     /* Remote Control */

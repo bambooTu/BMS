@@ -239,7 +239,7 @@ static void BMU_BalanceParamMsg(unsigned int BMU_ID) {
     canTxMsg.data[3] = (unsigned char)((eepBms.BalanceDef.Volt & 0xFF00) >> 8);
     canTxMsg.data[4] = (unsigned char)(bmsData.MinVcell & 0xFF);
     canTxMsg.data[5] = (unsigned char)((bmsData.MinVcell & 0xFF00) >> 8);
-    canTxMsg.data[6] = (unsigned char)(bmsData.Status);
+    canTxMsg.data[6] = (unsigned char)(bmsData.SysStatus);
     canTxMsg.data[7] = BR.BmuFaultLed[(BMU_ID)];
     CAN_PushTxQueue(CAN_4, &canTxMsg);
 }
