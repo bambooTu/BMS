@@ -72,16 +72,16 @@ extern "C" {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-
-/* USER CODE END FP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 unsigned short BMU_CellTempGet(unsigned char BMU_ID, unsigned char Cell_ID);
 unsigned short BMU_CellVoltGet(unsigned char BMU_ID, unsigned char Cell_ID);
 void           BMU_CheckQueueTasks(CAN_MSG_t canRxMsg);
 void           BMU_Initialize(void);
 void           BMU_1ms_Tasks(void);
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
 /* USER CODE END 0 */
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus
