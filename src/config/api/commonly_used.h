@@ -1,30 +1,27 @@
 /**
  * @file       commonly_used.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief
+ * @brief      
  * @version    0.1
- * @date       2022-08-19
- *
+ * @date       2022-10-24
+ * 
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- *
- * Abbreviation:
+ * 
+ * Abbreviation: 
  * None
  */
-
 #ifndef _COMMONLY_USED_H /* Guard against multiple inclusion */
-#define _COMMONLY_USED_NAME_H
+#define _COMMONLY_USED_H
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Included Files
-// *****************************************************************************
-// *****************************************************************************
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
 extern "C" {
-#endif
 
+#endif
+// DOM-IGNORE-END
+
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 #define MOD(A, M)              (A % M)
 #define DIVIDE(A, M)           (A / M)
 #define MAX(A, B)              ((A < B) ? B : A)
@@ -54,29 +51,57 @@ extern "C" {
         } while (0);                \
         __ret;                      \
     })
+/* USER CODE END GD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* Includes ------------------------------------------------------------------*/
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
 double Lookup_Table(double input, volatile const double *bp0, volatile const double *table, unsigned int tableSize);
 double Filter_Deadzone(double data, double threshold);
 double Filter_ArrayAverage(double *arr, double arrSize);
+/* USER CODE END FP */
 
-/* Provide C++ Compatibility */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _EXAMPLE_FILE_NAME_H */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+#endif /* _COMMONLY_USED_H */
+/*******************************************************************************
  End of File
  */

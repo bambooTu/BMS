@@ -1,34 +1,46 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       Untitled-1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "coulomb_gauge.h"
-
 #include "commonly_used.h"
 #include "sys_parameter.h"
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
 volatile const double Decay2SOH_BP[DECAY2SOH_TABLE_SIZE]    = {0, 1000, 3000, 4200, 4400, 4500, 4600, 4800, 5000};
 volatile const double Decay2SOH_Table[DECAY2SOH_TABLE_SIZE] = {100, 90, 80, 70, 60, 50, 40, 30, 0};
 
@@ -58,15 +70,22 @@ volatile const double OCV_Table[SOH2SFULLCAP_TABLE_SIZE] = {0,
                                                             (CELL_DESIGN_CAP * 0.8),
                                                             (CELL_DESIGN_CAP * 0.9),
                                                             CELL_DESIGN_CAP};
+/* USER CODE END GV */
 
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
 static bool          fDischgCapFull  = false;
-static unsigned char gCgTaskState    = 0;
-static unsigned char gSelfDischgCurr = 0;
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
+static unsigned char cgTaskState    = 0;
+static unsigned char selfDischgCurr = 0;
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 /**
  * @brief      Calculate state of health
  *
@@ -158,8 +177,8 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
         self->DischgCap = self->DischgCap + ((-1) * self->BusCurrent / period_ms / 3600.0f);
     }
 
-    if (++gSelfDischgCurr > (3600 / 10 * period_ms)) {  // Self-Discharge
-        gSelfDischgCurr = 0;
+    if (++selfDischgCurr > (3600 / 10 * period_ms)) {  // Self-Discharge
+        selfDischgCurr = 0;
         self->DischgCap++;
     }
 }
@@ -279,28 +298,33 @@ void CG_Initialize(BMS_DATA_t *self) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 void CG_20ms_Tasks(BMS_DATA_t *self) {
-    switch (gCgTaskState) {
+    switch (cgTaskState) {
         case 0:
             CG_CoulombCounter(self, 100);
-            gCgTaskState++;
+            cgTaskState++;
             break;
         case 1:
             Calibration_OcvPoint(self);
-            gCgTaskState++;
+            cgTaskState++;
             break;
         case 2:
             Calculate_CycleLife(self);
             Calculate_BattRemCap(self);
-            gCgTaskState++;
+            cgTaskState++;
             break;
         case 3:
             Calculate_SOH(self);
             Calibration_SOH2FullCap(self);
-            gCgTaskState++;
+            cgTaskState++;
             break;
         default:
             Calculate_SOC(self);
-            gCgTaskState = 0;
+            cgTaskState = 0;
             break;
     }
 }
+/* USER CODE END 0 */
+
+/*******************************************************************************
+ End of File
+ */

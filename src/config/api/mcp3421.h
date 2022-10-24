@@ -1,3 +1,15 @@
+/**
+ * @file       mcp3421.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
+ */
 #ifndef _MCP3421_H
 #define _MCP3421_H
 // DOM-IGNORE-BEGIN
@@ -19,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "definitions.h"  // SYS function prototypes
+#include "definitions.h" 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -123,6 +135,7 @@ unsigned short MCP3421_AdcValueGet(void);
 /* USER CODE END FP */
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 /* USER CODE END 0 */
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus

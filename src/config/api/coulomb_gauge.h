@@ -1,69 +1,79 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       coulomb_gauge.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
+#ifndef _COULOMB_GAUGE_H /* Guard against multiple inclusion */
+#define _COULOMB_GAUGE_H
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-#ifndef _CURRENT_GAUGE_H /* Guard against multiple inclusion */
-#define _CURRENT_GAUGE_H
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/* This section lists the other files that are included in this file.*/
-#include "sys_parameter.h"
-/* TODO:  Include other files here if needed. */
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
 extern "C" {
-#endif
 
+#endif
+// DOM-IGNORE-END
+
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
+
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "sys_parameter.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 #define DECAY2SOH_TABLE_SIZE    9
 #define SOH2SFULLCAP_TABLE_SIZE 11
 #define OCV_TABLE_SIZE          11
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Constants                                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END PD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* USER CODE END PM */
 
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
 void CG_Initialize(BMS_DATA_t *self);
 void CG_20ms_Tasks(BMS_DATA_t *self);
+/* USER CODE END FP */
 
-/* Provide C++ Compatibility */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _EXAMPLE_FILE_NAME_H */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+#endif /* _COULOMB_GAUGE_H */
+/*******************************************************************************
  End of File
  */

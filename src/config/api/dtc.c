@@ -1,44 +1,48 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       dtc.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END GD */
 
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "dtc.h"
-
 #include "sys_parameter.h"
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* USER CODE END Includes */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
 DTC_FAULT_t dtc     = {.l = 0};
 DTC_FAULT_t dtcMask = {.l = 0};
 
-static unsigned short   gDtcTimeCount[(DTC_TCELL_UNBALANCE_W + 1)];
 DTC_FAULT_CHECK_TABLE_t FaultCheckTaskTable[] = {
     {        DTC_VCELL_OVP,   &bmsData.MaxVcell, &eepBms.CellOVP},
     {        DTC_VCELL_UVP,   &bmsData.MinVcell, &eepBms.CellUVP},
@@ -93,17 +97,29 @@ volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM] = {
     {0x0851,    ERR_LEVEL_MESSAGE, 0, 0}, /* Current Direction Error */
     {0x0953,      ERR_LEVEL_FAULT, 5, 9}  /* PCS Command Error(OVP or UVP) */
 };
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
+/* USER CODE END GV */
 
-/* ************************************************************************** */
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+static unsigned short   gDtcTimeCount[(DTC_TCELL_UNBALANCE_W + 1)];
+/* USER CODE END PV */
 
-void DTC_FaultOccurClear(DTC_EVENT_e event) {
-    dtc.l &= ~(1 << event);
-}
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
 
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void DTC_Store2Eeprom(DTC_EVENT_e event) {
     static DTC_EVENT_e LatestDTC = DTC_EVENT_MAX_NUM;
 
@@ -129,24 +145,96 @@ static void DTC_Store2Eeprom(DTC_EVENT_e event) {
         /*TODO: APP_EepromEmergencyWrite();*/
     }
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+void DTC_FaultOccurClear(DTC_EVENT_e event) {
+    dtc.l &= ~(1 << event);
+}
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void DTC_FaultOccurSet(DTC_EVENT_e event) {
     dtc.l |= 1 << event;
     DTC_Store2Eeprom(event);
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+void DTC_FaultMaskClear(DTC_EVENT_e event) {
+    dtcMask.l &= ~(1 << event);
+}
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+void DTC_FaultMaskSet(DTC_EVENT_e event) {
+    dtcMask.l |= 1 << event;
+}
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @return     true 
+ * @return     false 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 bool DTC_FaultEventGet(DTC_EVENT_e event) {
     bool ret = true;
     ret      = (dtc.l >> event) & 0x01;
     return ret;
 }
-
+/**
+ * @brief      
+ * 
+ * @return     unsigned long long 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 unsigned long long DTC_FaultMapGet(void) {
     unsigned long long ret = 0;
     ret                    = dtc.l;
     return ret;
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @param      source 
+ * @param      ptrObj 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source < ptrObj->Limit) {
@@ -168,7 +256,17 @@ static void DTC_LowerLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* pt
         }
     }
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @param      source 
+ * @param      ptrObj 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void DTC_HigherLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* ptrObj) {
     if (DTC_FaultEventGet(event) == false) {
         if (source > ptrObj->Limit) {
@@ -190,7 +288,15 @@ static void DTC_HigherLimitCheck(DTC_EVENT_e event, int source, FAULT_PARAM_t* p
         }
     }
 }
-
+/**
+ * @brief      
+ * 
+ * @param      table 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void DTC_FaultOccureCheck(DTC_FAULT_CHECK_TABLE_t* table) {
     if (table->ptrObject->Limit > table->ptrObject->Release) {
         DTC_HigherLimitCheck(table->event, (int)*table->source, table->ptrObject);
@@ -198,15 +304,41 @@ static void DTC_FaultOccureCheck(DTC_FAULT_CHECK_TABLE_t* table) {
         DTC_LowerLimitCheck(table->event, (int)*table->source, table->ptrObject);
     }
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @return     ERROR_LEVEL_e 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 ERROR_LEVEL_e DTC_ErrorLevelGet(DTC_EVENT_e event) {
     return (DTC_BMS_Message_Table[event].errorLevel);
 }
-
+/**
+ * @brief      
+ * 
+ * @param      event 
+ * @return     unsigned short 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 unsigned short DTC_ErrorCodeGet(DTC_EVENT_e event) {
     return (DTC_BMS_Message_Table[event].errorCode);
 }
-
+/**
+ * @brief      
+ * 
+ * @return     ERROR_LEVEL_e 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 ERROR_LEVEL_e DTC_WorstLevelGet(void) {
     ERROR_LEVEL_e ret            = ERR_LEVEL_NONE;
     ERROR_LEVEL_e currErrorLevel = ERR_LEVEL_NONE;
@@ -221,15 +353,29 @@ ERROR_LEVEL_e DTC_WorstLevelGet(void) {
     }
     return ret;
 }
-
+/**
+ * @brief      
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void DTC_Initialize(void) {
     dtc.l                  = 0;
     dtcMask.l              = 0x1FFFFFFFF;
-    dtcMask.b.SHUT_DOWN    = 0;
-    dtcMask.b.EMERGENCY    = 0;
-    dtcMask.b.CURR_DIR_ERR = 0;
+    DTC_FaultMaskSet(DTC_SHUT_DOWN);
+    DTC_FaultMaskSet(DTC_EMERGENCY);
+    DTC_FaultMaskSet(DTC_CURR_DIR_ERR);
 }
-
+/**
+ * @brief      
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void DTC_1ms_Tasks(void) {
     bmsData.DeltaVolt = bmsData.MaxVcell - bmsData.MinVcell;
     bmsData.DeltaTemp = bmsData.MaxTcell - bmsData.MinTcell;
@@ -237,3 +383,8 @@ void DTC_1ms_Tasks(void) {
         DTC_FaultOccureCheck(&FaultCheckTaskTable[event]);
     }
 }
+/* USER CODE END 0 */
+
+/*******************************************************************************
+ End of File
+ */

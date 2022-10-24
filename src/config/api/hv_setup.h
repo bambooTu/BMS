@@ -1,3 +1,15 @@
+/**
+ * @file       hv_setup.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
+ */
 #ifndef _HV_SETUP_H
 #define _HV_SETUP_H
 // DOM-IGNORE-BEGIN

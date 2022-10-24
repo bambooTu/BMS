@@ -1,36 +1,46 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       debounce.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "debounce.h"
+#include "definitions.h" 
+/* USER CODE END Includes */
 
-#include "definitions.h"  // SYS function prototypes
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 #define RISING  0
 #define FALLING 1
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
 unsigned int     gDebounceTimeCount[2][DIN_MAPPING_MAX];
 DIN_PARAM_t      gDinParamTable[DIN_MAPPING_MAX];
 DIN_TASK_TABLE_t gDinTaskTable[] = {
@@ -40,13 +50,20 @@ DIN_TASK_TABLE_t gDinTaskTable[] = {
     {          DIN_4,           &gDinParamTable[DIN_4]}, // EMS cutoff
     {DIN_MAPPING_MAX, &gDinParamTable[DIN_MAPPING_MAX]}, // max
 };
+/* USER CODE END GV */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Local Functions                                                   */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
 
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 static void DIN_SetState(DIN_MAPPING_e dinNum) {
     gDinParamTable[dinNum].status = true;
 }
@@ -113,12 +130,6 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
         gDebounceTimeCount[RISING][ptrObj->dinNum] = ptrObj->dinParam->debounceTime[RISING];
     }
 }
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
 /**
  * @brief      Initialize digital input parameter
  *
@@ -160,6 +171,8 @@ void DIN_5ms_Tasks(void) {
 bool DIN_StateGet(DIN_MAPPING_e dinNum) {
     return gDinParamTable[dinNum].status;
 }
-/* *****************************************************************************
+/* USER CODE END 0 */
+
+/*******************************************************************************
  End of File
  */

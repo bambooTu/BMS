@@ -16,7 +16,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "can.h"
-
 #include "sys_parameter.h"
 /* USER CODE END Includes */
 
@@ -533,6 +532,17 @@ uint32_t CAN_GetRxQueueCount(CAN_MODULE_e Instance) {
     return (Object[Instance].rxQueue.Count);
 }
 
+/**
+ * @brief      transfer queue data
+ * 
+ * @param      Instance CAN Module number
+ * @return     true 
+ * @return     false 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 bool CAN_QueueDataXfer(CAN_MODULE_e Instance) {
     bool      ret = false;
     CAN_MSG_t canTxMsg;

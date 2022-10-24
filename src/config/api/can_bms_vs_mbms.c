@@ -35,8 +35,8 @@
 /* USER CODE BEGIN PTD */
 typedef struct {
     unsigned short subCmd;
-    unsigned char length;
-    void *ptrVariable;
+    unsigned char  length;
+    void          *ptrVariable;
 } PARAM_POINT_t;
 /* USER CODE END PTD */
 
@@ -53,10 +53,10 @@ typedef struct {
 
 /* Global variables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
-unsigned short gMbmsTimeoutCount = 0;
-unsigned short gEngrTimeoutCount = 0;
-unsigned char gEngrMode = 0;
-BMS_WORK_MODE_e gMbmsRelayCmd = 0;
+unsigned short  gMbmsTimeoutCount = 0;
+unsigned short  gEngrTimeoutCount = 0;
+unsigned char   gEngrMode         = 0;
+BMS_WORK_MODE_e gMbmsRelayCmd     = 0;
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
@@ -65,91 +65,91 @@ static unsigned short seedRandom;
 static unsigned short seed = 0;
 
 static const PARAM_POINT_t VoltParamGroup[] = {
-    {0x0101, sizeof (eepBms.BusOVP.Limit), &eepBms.BusOVP.Limit},
-    {0x0102, sizeof (eepBms.BusOVP.LimitTime), &eepBms.BusOVP.LimitTime},
-    {0x0103, sizeof (eepBms.BusOVP.Release), &eepBms.BusOVP.Release},
-    {0x0104, sizeof (eepBms.BusOVP.ReleaseTime), &eepBms.BusOVP.ReleaseTime},
-    {0x0201, sizeof (eepBms.BusOVW.Limit), &eepBms.BusOVW.Limit},
-    {0x0202, sizeof (eepBms.BusOVW.LimitTime), &eepBms.BusOVW.LimitTime},
-    {0x0203, sizeof (eepBms.BusOVW.Release), &eepBms.BusOVW.Release},
-    {0x0204, sizeof (eepBms.BusOVW.ReleaseTime), &eepBms.BusOVW.ReleaseTime},
-    {0x0301, sizeof (eepBms.BusUVP.Limit), &eepBms.BusUVP.Limit},
-    {0x0302, sizeof (eepBms.BusUVP.LimitTime), &eepBms.BusUVP.LimitTime},
-    {0x0303, sizeof (eepBms.BusUVP.Release), &eepBms.BusUVP.Release},
-    {0x0304, sizeof (eepBms.BusUVP.ReleaseTime), &eepBms.BusUVP.ReleaseTime},
-    {0x0401, sizeof (eepBms.BusUVW.Limit), &eepBms.BusUVW.Limit},
-    {0x0402, sizeof (eepBms.BusUVW.LimitTime), &eepBms.BusUVW.LimitTime},
-    {0x0403, sizeof (eepBms.BusUVW.Release), &eepBms.BusUVW.Release},
-    {0x0404, sizeof (eepBms.BusUVW.ReleaseTime), &eepBms.BusUVW.ReleaseTime},
-    {0x1101, sizeof (eepBms.CellUBP.Limit), &eepBms.CellUBP.Limit},
-    {0x1102, sizeof (eepBms.CellUBP.LimitTime), &eepBms.CellUBP.LimitTime},
-    {0x1103, sizeof (eepBms.CellUBP.Release), &eepBms.CellUBP.Release},
-    {0x1104, sizeof (eepBms.CellUBP.ReleaseTime), &eepBms.CellUBP.ReleaseTime},
-    {0x1201, sizeof (eepBms.CellUBW.Limit), &eepBms.CellUBW.Limit},
-    {0x1202, sizeof (eepBms.CellUBW.LimitTime), &eepBms.CellUBW.LimitTime},
-    {0x1203, sizeof (eepBms.CellUBW.Release), &eepBms.CellUBW.Release},
-    {0x1204, sizeof (eepBms.CellUBW.ReleaseTime), &eepBms.CellUBW.ReleaseTime},
-    {0x1301, sizeof (eepBms.CellOVP.Limit), &eepBms.CellOVP.Limit},
-    {0x1302, sizeof (eepBms.CellOVP.LimitTime), &eepBms.CellOVP.LimitTime},
-    {0x1303, sizeof (eepBms.CellOVP.Release), &eepBms.CellOVP.Release},
-    {0x1304, sizeof (eepBms.CellOVP.ReleaseTime), &eepBms.CellOVP.ReleaseTime},
-    {0x1401, sizeof (eepBms.CellUVP.Limit), &eepBms.CellUVP.Limit},
-    {0x1402, sizeof (eepBms.CellUVP.LimitTime), &eepBms.CellUVP.LimitTime},
-    {0x1403, sizeof (eepBms.CellUVP.Release), &eepBms.CellUVP.Release},
-    {0x1404, sizeof (eepBms.CellUVP.ReleaseTime), &eepBms.CellUVP.ReleaseTime}
+    {0x0101,        sizeof(eepBms.BusOVP.Limit),        &eepBms.BusOVP.Limit},
+    {0x0102,    sizeof(eepBms.BusOVP.LimitTime),    &eepBms.BusOVP.LimitTime},
+    {0x0103,      sizeof(eepBms.BusOVP.Release),      &eepBms.BusOVP.Release},
+    {0x0104,  sizeof(eepBms.BusOVP.ReleaseTime),  &eepBms.BusOVP.ReleaseTime},
+    {0x0201,        sizeof(eepBms.BusOVW.Limit),        &eepBms.BusOVW.Limit},
+    {0x0202,    sizeof(eepBms.BusOVW.LimitTime),    &eepBms.BusOVW.LimitTime},
+    {0x0203,      sizeof(eepBms.BusOVW.Release),      &eepBms.BusOVW.Release},
+    {0x0204,  sizeof(eepBms.BusOVW.ReleaseTime),  &eepBms.BusOVW.ReleaseTime},
+    {0x0301,        sizeof(eepBms.BusUVP.Limit),        &eepBms.BusUVP.Limit},
+    {0x0302,    sizeof(eepBms.BusUVP.LimitTime),    &eepBms.BusUVP.LimitTime},
+    {0x0303,      sizeof(eepBms.BusUVP.Release),      &eepBms.BusUVP.Release},
+    {0x0304,  sizeof(eepBms.BusUVP.ReleaseTime),  &eepBms.BusUVP.ReleaseTime},
+    {0x0401,        sizeof(eepBms.BusUVW.Limit),        &eepBms.BusUVW.Limit},
+    {0x0402,    sizeof(eepBms.BusUVW.LimitTime),    &eepBms.BusUVW.LimitTime},
+    {0x0403,      sizeof(eepBms.BusUVW.Release),      &eepBms.BusUVW.Release},
+    {0x0404,  sizeof(eepBms.BusUVW.ReleaseTime),  &eepBms.BusUVW.ReleaseTime},
+    {0x1101,       sizeof(eepBms.CellUBP.Limit),       &eepBms.CellUBP.Limit},
+    {0x1102,   sizeof(eepBms.CellUBP.LimitTime),   &eepBms.CellUBP.LimitTime},
+    {0x1103,     sizeof(eepBms.CellUBP.Release),     &eepBms.CellUBP.Release},
+    {0x1104, sizeof(eepBms.CellUBP.ReleaseTime), &eepBms.CellUBP.ReleaseTime},
+    {0x1201,       sizeof(eepBms.CellUBW.Limit),       &eepBms.CellUBW.Limit},
+    {0x1202,   sizeof(eepBms.CellUBW.LimitTime),   &eepBms.CellUBW.LimitTime},
+    {0x1203,     sizeof(eepBms.CellUBW.Release),     &eepBms.CellUBW.Release},
+    {0x1204, sizeof(eepBms.CellUBW.ReleaseTime), &eepBms.CellUBW.ReleaseTime},
+    {0x1301,       sizeof(eepBms.CellOVP.Limit),       &eepBms.CellOVP.Limit},
+    {0x1302,   sizeof(eepBms.CellOVP.LimitTime),   &eepBms.CellOVP.LimitTime},
+    {0x1303,     sizeof(eepBms.CellOVP.Release),     &eepBms.CellOVP.Release},
+    {0x1304, sizeof(eepBms.CellOVP.ReleaseTime), &eepBms.CellOVP.ReleaseTime},
+    {0x1401,       sizeof(eepBms.CellUVP.Limit),       &eepBms.CellUVP.Limit},
+    {0x1402,   sizeof(eepBms.CellUVP.LimitTime),   &eepBms.CellUVP.LimitTime},
+    {0x1403,     sizeof(eepBms.CellUVP.Release),     &eepBms.CellUVP.Release},
+    {0x1404, sizeof(eepBms.CellUVP.ReleaseTime), &eepBms.CellUVP.ReleaseTime}
 };
 
 static const PARAM_POINT_t CurrParamGroup[] = {
-    {0x0101, sizeof (eepBms.OCCP.Limit), &eepBms.OCCP.Limit},
-    {0x0102, sizeof (eepBms.OCCP.LimitTime), &eepBms.OCCP.LimitTime},
-    {0x0103, sizeof (eepBms.OCCP.Release), &eepBms.OCCP.Release},
-    {0x0104, sizeof (eepBms.OCCP.ReleaseTime), &eepBms.OCCP.ReleaseTime},
-    {0x0201, sizeof (eepBms.OCCW.Limit), &eepBms.OCCW.Limit},
-    {0x0202, sizeof (eepBms.OCCW.LimitTime), &eepBms.OCCW.LimitTime},
-    {0x0203, sizeof (eepBms.OCCW.Release), &eepBms.OCCW.Release},
-    {0x0204, sizeof (eepBms.OCCW.ReleaseTime), &eepBms.OCCW.ReleaseTime},
-    {0x0301, sizeof (eepBms.ODCP.Limit), &eepBms.ODCP.Limit},
-    {0x0302, sizeof (eepBms.ODCP.LimitTime), &eepBms.ODCP.LimitTime},
-    {0x0303, sizeof (eepBms.ODCP.Release), &eepBms.ODCP.Release},
-    {0x0304, sizeof (eepBms.ODCP.ReleaseTime), &eepBms.ODCP.ReleaseTime},
-    {0x0401, sizeof (eepBms.ODCW.Limit), &eepBms.ODCW.Limit},
-    {0x0402, sizeof (eepBms.ODCW.LimitTime), &eepBms.ODCW.LimitTime},
-    {0x0403, sizeof (eepBms.ODCW.Release), &eepBms.ODCW.Release},
-    {0x0404, sizeof (eepBms.ODCW.ReleaseTime), &eepBms.ODCW.ReleaseTime}
+    {0x0101,       sizeof(eepBms.OCCP.Limit),       &eepBms.OCCP.Limit},
+    {0x0102,   sizeof(eepBms.OCCP.LimitTime),   &eepBms.OCCP.LimitTime},
+    {0x0103,     sizeof(eepBms.OCCP.Release),     &eepBms.OCCP.Release},
+    {0x0104, sizeof(eepBms.OCCP.ReleaseTime), &eepBms.OCCP.ReleaseTime},
+    {0x0201,       sizeof(eepBms.OCCW.Limit),       &eepBms.OCCW.Limit},
+    {0x0202,   sizeof(eepBms.OCCW.LimitTime),   &eepBms.OCCW.LimitTime},
+    {0x0203,     sizeof(eepBms.OCCW.Release),     &eepBms.OCCW.Release},
+    {0x0204, sizeof(eepBms.OCCW.ReleaseTime), &eepBms.OCCW.ReleaseTime},
+    {0x0301,       sizeof(eepBms.ODCP.Limit),       &eepBms.ODCP.Limit},
+    {0x0302,   sizeof(eepBms.ODCP.LimitTime),   &eepBms.ODCP.LimitTime},
+    {0x0303,     sizeof(eepBms.ODCP.Release),     &eepBms.ODCP.Release},
+    {0x0304, sizeof(eepBms.ODCP.ReleaseTime), &eepBms.ODCP.ReleaseTime},
+    {0x0401,       sizeof(eepBms.ODCW.Limit),       &eepBms.ODCW.Limit},
+    {0x0402,   sizeof(eepBms.ODCW.LimitTime),   &eepBms.ODCW.LimitTime},
+    {0x0403,     sizeof(eepBms.ODCW.Release),     &eepBms.ODCW.Release},
+    {0x0404, sizeof(eepBms.ODCW.ReleaseTime), &eepBms.ODCW.ReleaseTime}
 };
 
 static const PARAM_POINT_t TempParamGroup[] = {
-    {0x0101, sizeof (eepBms.OTP.Limit), &eepBms.OTP.Limit},
-    {0x0102, sizeof (eepBms.OTP.LimitTime), &eepBms.OTP.LimitTime},
-    {0x0103, sizeof (eepBms.OTP.Release), &eepBms.OTP.Release},
-    {0x0104, sizeof (eepBms.OTP.ReleaseTime), &eepBms.OTP.ReleaseTime},
-    {0x0201, sizeof (eepBms.OTW.Limit), &eepBms.OTW.Limit},
-    {0x0202, sizeof (eepBms.OTW.LimitTime), &eepBms.OTW.LimitTime},
-    {0x0203, sizeof (eepBms.OTW.Release), &eepBms.OTW.Release},
-    {0x0204, sizeof (eepBms.OTW.ReleaseTime), &eepBms.OTW.ReleaseTime},
-    {0x0301, sizeof (eepBms.UTP.Limit), &eepBms.UTP.Limit},
-    {0x0302, sizeof (eepBms.UTP.LimitTime), &eepBms.UTP.LimitTime},
-    {0x0303, sizeof (eepBms.UTP.Release), &eepBms.UTP.Release},
-    {0x0304, sizeof (eepBms.UTP.ReleaseTime), &eepBms.UTP.ReleaseTime},
-    {0x0401, sizeof (eepBms.UTW.Limit), &eepBms.UTW.Limit},
-    {0x0402, sizeof (eepBms.UTW.LimitTime), &eepBms.UTW.LimitTime},
-    {0x0403, sizeof (eepBms.UTW.Release), &eepBms.UTW.Release},
-    {0x0404, sizeof (eepBms.UTW.ReleaseTime), &eepBms.UTW.ReleaseTime},
-    {0x0501, sizeof (eepBms.UBTW.Limit), &eepBms.UBTW.Limit},
-    {0x0502, sizeof (eepBms.UBTW.LimitTime), &eepBms.UBTW.LimitTime},
-    {0x0503, sizeof (eepBms.UBTW.Release), &eepBms.UBTW.Release},
-    {0x0504, sizeof (eepBms.UBTW.ReleaseTime), &eepBms.UBTW.ReleaseTime}
+    {0x0101,        sizeof(eepBms.OTP.Limit),        &eepBms.OTP.Limit},
+    {0x0102,    sizeof(eepBms.OTP.LimitTime),    &eepBms.OTP.LimitTime},
+    {0x0103,      sizeof(eepBms.OTP.Release),      &eepBms.OTP.Release},
+    {0x0104,  sizeof(eepBms.OTP.ReleaseTime),  &eepBms.OTP.ReleaseTime},
+    {0x0201,        sizeof(eepBms.OTW.Limit),        &eepBms.OTW.Limit},
+    {0x0202,    sizeof(eepBms.OTW.LimitTime),    &eepBms.OTW.LimitTime},
+    {0x0203,      sizeof(eepBms.OTW.Release),      &eepBms.OTW.Release},
+    {0x0204,  sizeof(eepBms.OTW.ReleaseTime),  &eepBms.OTW.ReleaseTime},
+    {0x0301,        sizeof(eepBms.UTP.Limit),        &eepBms.UTP.Limit},
+    {0x0302,    sizeof(eepBms.UTP.LimitTime),    &eepBms.UTP.LimitTime},
+    {0x0303,      sizeof(eepBms.UTP.Release),      &eepBms.UTP.Release},
+    {0x0304,  sizeof(eepBms.UTP.ReleaseTime),  &eepBms.UTP.ReleaseTime},
+    {0x0401,        sizeof(eepBms.UTW.Limit),        &eepBms.UTW.Limit},
+    {0x0402,    sizeof(eepBms.UTW.LimitTime),    &eepBms.UTW.LimitTime},
+    {0x0403,      sizeof(eepBms.UTW.Release),      &eepBms.UTW.Release},
+    {0x0404,  sizeof(eepBms.UTW.ReleaseTime),  &eepBms.UTW.ReleaseTime},
+    {0x0501,       sizeof(eepBms.UBTW.Limit),       &eepBms.UBTW.Limit},
+    {0x0502,   sizeof(eepBms.UBTW.LimitTime),   &eepBms.UBTW.LimitTime},
+    {0x0503,     sizeof(eepBms.UBTW.Release),     &eepBms.UBTW.Release},
+    {0x0504, sizeof(eepBms.UBTW.ReleaseTime), &eepBms.UBTW.ReleaseTime}
 };
 
 static const PARAM_POINT_t OtherParamGroup[] = {
-    {0xA001, sizeof (eepBms.FullCap), &eepBms.FullCap},
-    {0xA002, sizeof (bmsData.DesingCap), &bmsData.DesingCap},
-    {0xA003, sizeof (bmsData.RemCap), &bmsData.RemCap},
-    {0xA004, sizeof (eepEmg.CycleLife), &eepEmg.CycleLife}
+    {0xA001,    sizeof(eepBms.FullCap),    &eepBms.FullCap},
+    {0xA002, sizeof(bmsData.DesingCap), &bmsData.DesingCap},
+    {0xA003,    sizeof(bmsData.RemCap),    &bmsData.RemCap},
+    {0xA004,  sizeof(eepEmg.CycleLife),  &eepEmg.CycleLife}
 };
 
 const unsigned short Security_uint16_Table[] = {0x6C27u, 0xB93Fu, 0x9813u, 0x8A21u, 0x4F5Du, 0x0C12u, 0xF230u, 0x64E5u,
-    0x3F0Cu, 0xB071u, 0xDA51u, 0x406Cu, 0xB542u, 0x905Au, 0x3CF3u, 0xA789u};
+                                                0x3F0Cu, 0xB071u, 0xDA51u, 0x406Cu, 0xB542u, 0x905Au, 0x3CF3u, 0xA789u};
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -168,21 +168,21 @@ struct {
 } MBMS;
 
 typedef enum {
-    SUB_CMD_HV_CTRL = 0x500,
+    SUB_CMD_HV_CTRL   = 0x500,
     SUB_CMD_SYS_RESET = 0x510,
-    SUB_CMD_CLR_DTC = 0x515,
+    SUB_CMD_CLR_DTC   = 0x515,
 } MBMS_SUB_CMD_e;
 
 unsigned int MBMS_GetSecurityKey(unsigned short seed) {
-    unsigned int ret;
-    unsigned char key[4];
+    unsigned int   ret;
+    unsigned char  key[4];
     unsigned short table;
 
     key[0] = 0;
     key[1] = 0;
     key[2] = 0;
     key[3] = 0;
-    table = Security_uint16_Table[seed & 0x0F];
+    table  = Security_uint16_Table[seed & 0x0F];
 
     key[0] = ((~table) >> 3) ^ seed;
     key[1] = (key[0] + (~seed)) ^ (table >> 8);
@@ -201,13 +201,13 @@ unsigned int MBMS_GetSecurityKey(unsigned short seed) {
 }
 
 static void MBMS_XferMsgInit(CAN_MSG_t *canTxMsg) {
-    canTxMsg->J1939.priority = 5;
-    canTxMsg->J1939.reserved = 1;
-    canTxMsg->J1939.dataPage = 0;
-    canTxMsg->J1939.pduFormat = 0x00;
-    canTxMsg->J1939.pduSpecific = 0x00; /* Destination Address */
+    canTxMsg->J1939.priority      = 5;
+    canTxMsg->J1939.reserved      = 1;
+    canTxMsg->J1939.dataPage      = 0;
+    canTxMsg->J1939.pduFormat     = 0x00;
+    canTxMsg->J1939.pduSpecific   = 0x00; /* Destination Address */
     canTxMsg->J1939.sourceAddress = eepSpe.BmsAddr;
-    canTxMsg->dlc = 8;
+    canTxMsg->dlc                 = 8;
 
     for (unsigned i = 0; i < 8; i++) {
         *(canTxMsg->data + i) = 0xAA;
@@ -219,7 +219,7 @@ static void MBMS_Ack(CAN_MSG_t *canRxMsg) {
 
     MBMS_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = 0xE8; /*  */
+    canTxMsg.J1939.pduFormat   = 0xE8; /*  */
 
     canTxMsg.data[0] = 0; /* ACK */
     canTxMsg.data[5] = canRxMsg->data[0];
@@ -233,7 +233,7 @@ static void MBMS_Nack(CAN_MSG_t *canRxMsg) {
 
     MBMS_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = 0xE8; /*  */
+    canTxMsg.J1939.pduFormat   = 0xE8; /*  */
 
     canTxMsg.data[0] = 1; /* NACK */
     canTxMsg.data[5] = canRxMsg->data[0];
@@ -243,30 +243,30 @@ static void MBMS_Nack(CAN_MSG_t *canRxMsg) {
 }
 
 static void MBMS_GetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tableMax, unsigned short subCmd,
-        CAN_MSG_t *canTxMsg) {
-    unsigned char i = 0;
+                               CAN_MSG_t *canTxMsg) {
+    unsigned char  i     = 0;
     unsigned short Var16 = 0;
-    unsigned int Var32 = 0;
+    unsigned int   Var32 = 0;
 
     for (i = 0; i < tableMax; i++) {
         if (subCmd == (ptrTable + i)->subCmd) {
             switch ((ptrTable + i)->length) {
                 case 1:
-                    canTxMsg->data[2] = *((unsigned char *) ((ptrTable + i)->ptrVariable));
+                    canTxMsg->data[2] = *((unsigned char *)((ptrTable + i)->ptrVariable));
                     break;
 
                 case 2:
-                    Var16 = *((unsigned short *) ((ptrTable + i)->ptrVariable));
-                    canTxMsg->data[2] = (unsigned char) (Var16 & 0xFF);
-                    canTxMsg->data[3] = (unsigned char) ((Var16 & 0xFF00) >> 8);
+                    Var16             = *((unsigned short *)((ptrTable + i)->ptrVariable));
+                    canTxMsg->data[2] = (unsigned char)(Var16 & 0xFF);
+                    canTxMsg->data[3] = (unsigned char)((Var16 & 0xFF00) >> 8);
                     break;
 
                 case 4:
-                    Var32 = *((unsigned int *) ((ptrTable + i)->ptrVariable));
-                    canTxMsg->data[2] = (unsigned char) (Var32 & 0xFF); /* LSB */
-                    canTxMsg->data[3] = (unsigned char) ((Var32 & 0xFF00) >> 8);
-                    canTxMsg->data[4] = (unsigned char) ((Var32 & 0xFF0000) >> 16);
-                    canTxMsg->data[5] = (unsigned char) ((Var32 & 0xFF000000) >> 24); /* MSB */
+                    Var32             = *((unsigned int *)((ptrTable + i)->ptrVariable));
+                    canTxMsg->data[2] = (unsigned char)(Var32 & 0xFF); /* LSB */
+                    canTxMsg->data[3] = (unsigned char)((Var32 & 0xFF00) >> 8);
+                    canTxMsg->data[4] = (unsigned char)((Var32 & 0xFF0000) >> 16);
+                    canTxMsg->data[5] = (unsigned char)((Var32 & 0xFF000000) >> 24); /* MSB */
                     break;
 
                 default:
@@ -284,32 +284,32 @@ static void MBMS_GetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tabl
 }
 
 static void MBMS_SetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tableMax, CAN_MSG_t *canRxMsg) {
-    unsigned char i = 0;
+    unsigned char  i      = 0;
     unsigned short subCmd = 0;
-    unsigned short Var16 = 0;
-    unsigned int Var32 = 0;
+    unsigned short Var16  = 0;
+    unsigned int   Var32  = 0;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[0];
-    LOW_BYTE(subCmd) = canRxMsg->data[1];
+    LOW_BYTE(subCmd)  = canRxMsg->data[1];
     for (i = 0; i < tableMax; i++) {
         if (subCmd == (ptrTable + i)->subCmd) {
             switch ((ptrTable + i)->length) {
                 case 1:
-                    canRxMsg->data[2] = *((unsigned char *) ((ptrTable + i)->ptrVariable));
+                    canRxMsg->data[2] = *((unsigned char *)((ptrTable + i)->ptrVariable));
                     break;
 
                 case 2:
-                    Var16 = *((unsigned short *) ((ptrTable + i)->ptrVariable));
-                    canRxMsg->data[2] = (unsigned char) (Var16 & 0xFF);
-                    canRxMsg->data[3] = (unsigned char) ((Var16 & 0xFF00) >> 8);
+                    Var16             = *((unsigned short *)((ptrTable + i)->ptrVariable));
+                    canRxMsg->data[2] = (unsigned char)(Var16 & 0xFF);
+                    canRxMsg->data[3] = (unsigned char)((Var16 & 0xFF00) >> 8);
                     break;
 
                 case 4:
-                    Var32 = *((unsigned int *) ((ptrTable + i)->ptrVariable));
-                    canRxMsg->data[2] = (unsigned char) (Var32 & 0xFF); /* LSB */
-                    canRxMsg->data[3] = (unsigned char) ((Var32 & 0xFF00) >> 8);
-                    canRxMsg->data[4] = (unsigned char) ((Var32 & 0xFF0000) >> 16);
-                    canRxMsg->data[5] = (unsigned char) ((Var32 & 0xFF000000) >> 24); /* MSB */
+                    Var32             = *((unsigned int *)((ptrTable + i)->ptrVariable));
+                    canRxMsg->data[2] = (unsigned char)(Var32 & 0xFF); /* LSB */
+                    canRxMsg->data[3] = (unsigned char)((Var32 & 0xFF00) >> 8);
+                    canRxMsg->data[4] = (unsigned char)((Var32 & 0xFF0000) >> 16);
+                    canRxMsg->data[5] = (unsigned char)((Var32 & 0xFF000000) >> 24); /* MSB */
                     break;
 
                 default:
@@ -330,7 +330,7 @@ static void PF_GetCommVer(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_COMM_VER; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_COMM_VER; /*  */
 
     canTxMsg.data[0] = COMM_VER_MAJOR_0;
     canTxMsg.data[1] = COMM_VER_MAJOR_1;
@@ -345,9 +345,9 @@ static void PF_GetSeed(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_SEED; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_SEED; /*  */
 
-    seed = seedRandom;
+    seed             = seedRandom;
     canTxMsg.data[0] = LOW_BYTE(seed);
     canTxMsg.data[1] = HIGH_BYTE(seed);
     CAN_PushTxQueue(CAN_1, &canTxMsg);
@@ -357,7 +357,7 @@ static void PF_GetMfgDate(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_MFG_DATE; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_MFG_DATE; /*  */
 
     canTxMsg.data[0] = eepBms.FactoryDay;
     canTxMsg.data[1] = eepBms.FactoryMonth;
@@ -371,7 +371,7 @@ static void PF_GetProdSN(CAN_MSG_t *canRxMsg) {
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_PROD_SN;
+    canTxMsg.J1939.pduFormat   = PF_GET_PROD_SN;
 
     for (unsigned char i = 0; i < 8; i++) {
         canTxMsg.data[i] = eepBms.SerialNum[i];
@@ -392,7 +392,7 @@ static void PF_GetSwHwVer(CAN_MSG_t *canRxMsg) {
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_SW_HW_VER; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_SW_HW_VER; /*  */
 
     canTxMsg.data[0] = HARDWARE_VER_0;
     canTxMsg.data[1] = HARDWARE_VER_1;
@@ -407,102 +407,110 @@ static void PF_GetSwHwVer(CAN_MSG_t *canRxMsg) {
 
 static void PF_GetCurrGrpParam(CAN_MSG_t *canRxMsg) {
     unsigned short subCmd;
-    CAN_MSG_t canTxMsg;
+    CAN_MSG_t      canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_CURR_GRP_PARAM;
+    canTxMsg.J1939.pduFormat   = PF_GET_CURR_GRP_PARAM;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[3];
-    LOW_BYTE(subCmd) = canRxMsg->data[4];
+    LOW_BYTE(subCmd)  = canRxMsg->data[4];
 
-    MBMS_GetGroupParam(CurrParamGroup, sizeof (CurrParamGroup) / sizeof (CurrParamGroup[0]), subCmd, &canTxMsg);
+    MBMS_GetGroupParam(CurrParamGroup, sizeof(CurrParamGroup) / sizeof(CurrParamGroup[0]), subCmd, &canTxMsg);
 
     if (canTxMsg.J1939.pduFormat != PF_GET_CURR_GRP_PARAM) {
         MBMS_Nack(canRxMsg);
     } else {
         canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-        canTxMsg.data[0] = canRxMsg->data[3];
-        canTxMsg.data[1] = canRxMsg->data[4];
+        canTxMsg.data[0]           = canRxMsg->data[3];
+        canTxMsg.data[1]           = canRxMsg->data[4];
         CAN_PushTxQueue(CAN_1, &canTxMsg);
     }
 }
 
 static void PF_GetVoltGrpParam(CAN_MSG_t *canRxMsg) {
     unsigned short subCmd;
-    CAN_MSG_t canTxMsg;
+    CAN_MSG_t      canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_VOLT_GRP_PARAM;
+    canTxMsg.J1939.pduFormat   = PF_GET_VOLT_GRP_PARAM;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[3];
-    LOW_BYTE(subCmd) = canRxMsg->data[4];
+    LOW_BYTE(subCmd)  = canRxMsg->data[4];
 
-    MBMS_GetGroupParam(VoltParamGroup, sizeof (VoltParamGroup) / sizeof (VoltParamGroup[0]), subCmd, &canTxMsg);
+    MBMS_GetGroupParam(VoltParamGroup, sizeof(VoltParamGroup) / sizeof(VoltParamGroup[0]), subCmd, &canTxMsg);
 
     if (canTxMsg.J1939.pduFormat != PF_GET_VOLT_GRP_PARAM) {
         MBMS_Nack(canRxMsg);
     } else {
         canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-        canTxMsg.data[0] = canRxMsg->data[3];
-        canTxMsg.data[1] = canRxMsg->data[4];
+        canTxMsg.data[0]           = canRxMsg->data[3];
+        canTxMsg.data[1]           = canRxMsg->data[4];
         CAN_PushTxQueue(CAN_1, &canTxMsg);
     }
 }
 
 static void PF_GetTempGrpParam(CAN_MSG_t *canRxMsg) {
     unsigned short subCmd;
-    CAN_MSG_t canTxMsg;
+    CAN_MSG_t      canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_TEMP_GRP_PARAM;
+    canTxMsg.J1939.pduFormat   = PF_GET_TEMP_GRP_PARAM;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[3];
-    LOW_BYTE(subCmd) = canRxMsg->data[4];
+    LOW_BYTE(subCmd)  = canRxMsg->data[4];
 
-    MBMS_GetGroupParam(TempParamGroup, sizeof (TempParamGroup) / sizeof (TempParamGroup[0]), subCmd, &canTxMsg);
+    MBMS_GetGroupParam(TempParamGroup, sizeof(TempParamGroup) / sizeof(TempParamGroup[0]), subCmd, &canTxMsg);
 
     if (canTxMsg.J1939.pduFormat != PF_GET_VOLT_GRP_PARAM) {
         MBMS_Nack(canRxMsg);
     } else {
         canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-        canTxMsg.data[0] = canRxMsg->data[3];
-        canTxMsg.data[1] = canRxMsg->data[4];
+        canTxMsg.data[0]           = canRxMsg->data[3];
+        canTxMsg.data[1]           = canRxMsg->data[4];
         CAN_PushTxQueue(CAN_1, &canTxMsg);
     }
 }
 
 static void PF_GetOtherGrpParam(CAN_MSG_t *canRxMsg) {
     unsigned short subCmd;
-    CAN_MSG_t canTxMsg;
+    CAN_MSG_t      canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_OTHER_GRP_PARAM;
+    canTxMsg.J1939.pduFormat   = PF_GET_OTHER_GRP_PARAM;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[3];
-    LOW_BYTE(subCmd) = canRxMsg->data[4];
+    LOW_BYTE(subCmd)  = canRxMsg->data[4];
 
-    MBMS_GetGroupParam(OtherParamGroup, sizeof (OtherParamGroup) / sizeof (TempParamGroup[0]), subCmd, &canTxMsg);
+    MBMS_GetGroupParam(OtherParamGroup, sizeof(OtherParamGroup) / sizeof(TempParamGroup[0]), subCmd, &canTxMsg);
 
     if (canTxMsg.J1939.pduFormat != PF_GET_VOLT_GRP_PARAM) {
         MBMS_Nack(canRxMsg);
     } else {
         canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-        canTxMsg.data[0] = canRxMsg->data[3];
-        canTxMsg.data[1] = canRxMsg->data[4];
+        canTxMsg.data[0]           = canRxMsg->data[3];
+        canTxMsg.data[1]           = canRxMsg->data[4];
         CAN_PushTxQueue(CAN_1, &canTxMsg);
     }
 }
-
+/**
+ * @brief      Get current sensor calibration parameter data handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetCurrCalibParam(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_CURR_CALIB_PARAM; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_CURR_CALIB_PARAM; /*  */
 
     canTxMsg.data[0] = 0x30; /* Command */
     canTxMsg.data[1] = 0x00; /* Command */
@@ -518,13 +526,21 @@ static void PF_GetCurrCalibParam(CAN_MSG_t *canRxMsg) {
 
     canTxMsg.data[0] = 0x30; /* Command */
     canTxMsg.data[1] = 0x20; /* Command */
-    canTxMsg.data[2] = *(((unsigned char *) (&bmsData.BusCurrent)));
-    canTxMsg.data[3] = *(((unsigned char *) (&bmsData.BusCurrent)) + 1);
-    canTxMsg.data[4] = *(((unsigned char *) (&bmsData.BusCurrent)) + 2);
-    canTxMsg.data[5] = *(((unsigned char *) (&bmsData.BusCurrent)) + 3);
+    canTxMsg.data[2] = *(((unsigned char *)(&bmsData.BusCurrent)));
+    canTxMsg.data[3] = *(((unsigned char *)(&bmsData.BusCurrent)) + 1);
+    canTxMsg.data[4] = *(((unsigned char *)(&bmsData.BusCurrent)) + 2);
+    canTxMsg.data[5] = *(((unsigned char *)(&bmsData.BusCurrent)) + 3);
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Get system data handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetSystemParam(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
@@ -534,16 +550,16 @@ static void PF_GetSystemParam(CAN_MSG_t *canRxMsg) {
     Current = Current / 1000;
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_SYS_PARAM_G1; /*  */
+    canTxMsg.J1939.pduFormat   = PF_GET_SYS_PARAM_G1; /*  */
 
     canTxMsg.data[0] = LOW_BYTE(bmsData.BusVolt);
     canTxMsg.data[1] = HIGH_BYTE(bmsData.BusVolt);
-    canTxMsg.data[2] = LOW_BYTE(Current); // bus current(unit:A) low byte
-    canTxMsg.data[3] = HIGH_BYTE(Current); // bus current(unit:A) high byte
+    canTxMsg.data[2] = LOW_BYTE(Current);   // bus current(unit:A) low byte
+    canTxMsg.data[3] = HIGH_BYTE(Current);  // bus current(unit:A) high byte
     canTxMsg.data[4] = bmsData.SOC;
-    canTxMsg.data[5] = (unsigned char) bmsData.HvStatus;
+    canTxMsg.data[5] = (unsigned char)bmsData.HvStatus;
     canTxMsg.data[6] = bmsData.SOH;
-    canTxMsg.data[7] = bmsData.Status;
+    canTxMsg.data[7] = bmsData.SysStatus;
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 
     canTxMsg.J1939.pduFormat = PF_GET_SYS_PARAM_G2; /*  */
@@ -560,15 +576,15 @@ static void PF_GetSystemParam(CAN_MSG_t *canRxMsg) {
 
     canTxMsg.J1939.pduFormat = PF_GET_SYS_PARAM_G3; /*  */
 
-    Current = bmsData.BusCurrent;
-    canTxMsg.data[0] = (unsigned char) (bmsData.BusVolt_mV & 0xFF);
-    canTxMsg.data[1] = (unsigned char) ((bmsData.BusVolt_mV & 0xFF00) >> 8);
-    canTxMsg.data[2] = (unsigned char) ((bmsData.BusVolt_mV & 0xFF0000) >> 16);
-    canTxMsg.data[3] = (unsigned char) ((bmsData.BusVolt_mV & 0xFF000000) >> 24);
-    canTxMsg.data[4] = (unsigned char) (Current & 0xFF);
-    canTxMsg.data[5] = (unsigned char) ((Current & 0xFF00) >> 8);
-    canTxMsg.data[6] = (unsigned char) ((Current & 0xFF0000) >> 16);
-    canTxMsg.data[7] = (unsigned char) ((Current & 0xFF000000) >> 24);
+    Current          = bmsData.BusCurrent;
+    canTxMsg.data[0] = (unsigned char)(bmsData.BusVolt_mV & 0xFF);
+    canTxMsg.data[1] = (unsigned char)((bmsData.BusVolt_mV & 0xFF00) >> 8);
+    canTxMsg.data[2] = (unsigned char)((bmsData.BusVolt_mV & 0xFF0000) >> 16);
+    canTxMsg.data[3] = (unsigned char)((bmsData.BusVolt_mV & 0xFF000000) >> 24);
+    canTxMsg.data[4] = (unsigned char)(Current & 0xFF);
+    canTxMsg.data[5] = (unsigned char)((Current & 0xFF00) >> 8);
+    canTxMsg.data[6] = (unsigned char)((Current & 0xFF0000) >> 16);
+    canTxMsg.data[7] = (unsigned char)((Current & 0xFF000000) >> 24);
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 
     canTxMsg.J1939.pduFormat = PF_GET_SYS_PARAM_G4; /*  */
@@ -587,124 +603,172 @@ static void PF_GetSystemParam(CAN_MSG_t *canRxMsg) {
     DTC_FaultOccurClear(DTC_MBMS_COMM);
     gMbmsTimeoutCount = MBMS_COMM_TIMEOUT;
 }
-
+/**
+ * @brief      Get battery cell date handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetCellData(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
-    short Temperature;
+    short          Temperature;
     unsigned short Voltage;
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_CELL_DATA_G1; /*	*/
+    canTxMsg.J1939.pduFormat   = PF_GET_CELL_DATA_G1; /*	*/
 
     canTxMsg.data[0] = canRxMsg->data[3];
     canTxMsg.data[1] = BMU_VCELL_MAX_NUM;
-    Temperature = BMU_CellTempGet(canRxMsg->data[3], 0);
+    Temperature      = BMU_CellTempGet(canRxMsg->data[3], 0);
     canTxMsg.data[2] = LOW_BYTE(Temperature);
     canTxMsg.data[3] = HIGH_BYTE(Temperature);
-    Temperature = BMU_CellTempGet(canRxMsg->data[3], 1);
+    Temperature      = BMU_CellTempGet(canRxMsg->data[3], 1);
     canTxMsg.data[4] = LOW_BYTE(Temperature);
     canTxMsg.data[5] = HIGH_BYTE(Temperature);
-    canTxMsg.data[6] = 0x00; // Status flag
-    canTxMsg.data[7] = 0x00; // Error flag
+    canTxMsg.data[6] = 0x00;  // Status flag
+    canTxMsg.data[7] = 0x00;  // Error flag
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 
     canTxMsg.J1939.pduFormat = PF_GET_CELL_DATA_G2; /*	*/
 
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 0);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 0);
     canTxMsg.data[0] = LOW_BYTE(Voltage);
     canTxMsg.data[1] = HIGH_BYTE(Voltage);
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 1);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 1);
     canTxMsg.data[2] = LOW_BYTE(Voltage);
     canTxMsg.data[3] = HIGH_BYTE(Voltage);
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 2);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 2);
     canTxMsg.data[4] = LOW_BYTE(Voltage);
     canTxMsg.data[5] = HIGH_BYTE(Voltage);
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 3);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 3);
     canTxMsg.data[6] = LOW_BYTE(Voltage);
     canTxMsg.data[7] = HIGH_BYTE(Voltage);
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 
     canTxMsg.J1939.pduFormat = PF_GET_CELL_DATA_G3; /*	*/
 
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 4);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 4);
     canTxMsg.data[0] = LOW_BYTE(Voltage);
     canTxMsg.data[1] = HIGH_BYTE(Voltage);
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 5);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 5);
     canTxMsg.data[2] = LOW_BYTE(Voltage);
     canTxMsg.data[3] = HIGH_BYTE(Voltage);
-    Voltage = BMU_CellVoltGet(canRxMsg->data[3], 6);
+    Voltage          = BMU_CellVoltGet(canRxMsg->data[3], 6);
     canTxMsg.data[4] = LOW_BYTE(Voltage);
     canTxMsg.data[5] = HIGH_BYTE(Voltage);
     canTxMsg.data[6] = 0xAA;
     canTxMsg.data[7] = 0xAA;
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Get battery cell balance date handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetBalanceData(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_BALANCE_DATA; /*	*/
+    canTxMsg.J1939.pduFormat   = PF_GET_BALANCE_DATA; /*	*/
 
-    canTxMsg.data[0] = (unsigned char) bmsData.Balance.Mode;
+    canTxMsg.data[0] = (unsigned char)bmsData.Balance.Mode;
     canTxMsg.data[1] = bmsData.Balance.VoltDiff;
     canTxMsg.data[2] = LOW_BYTE(bmsData.Balance.Volt);
     canTxMsg.data[3] = HIGH_BYTE(bmsData.Balance.Volt);
     canTxMsg.data[4] = LOW_BYTE(bmsData.MinVcell);
     canTxMsg.data[5] = HIGH_BYTE(bmsData.MinVcell);
-    canTxMsg.data[6] = (unsigned char) bmsData.Status;
+    canTxMsg.data[6] = (unsigned char)bmsData.SysStatus;
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Get coulomb gauge data handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetCoulombGaugeData(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_BALANCE_DATA; /*	*/
+    canTxMsg.J1939.pduFormat   = PF_GET_BALANCE_DATA; /*	*/
 
     canTxMsg.data[0] = bmsData.SOH;
     canTxMsg.data[1] = bmsData.SOC;
     canTxMsg.data[2] = LOW_BYTE(eepEmg.CycleLife);
     canTxMsg.data[3] = HIGH_BYTE(eepEmg.CycleLife);
-    canTxMsg.data[4] = (unsigned char) (bmsData.RemCap);
-    canTxMsg.data[5] = (unsigned char) (bmsData.RemCap >> 8);
-    canTxMsg.data[6] = (unsigned char) (bmsData.RemCap >> 16);
-    canTxMsg.data[7] = (unsigned char) (bmsData.RemCap >> 24);
+    canTxMsg.data[4] = (unsigned char)(bmsData.RemCap);
+    canTxMsg.data[5] = (unsigned char)(bmsData.RemCap >> 8);
+    canTxMsg.data[6] = (unsigned char)(bmsData.RemCap >> 16);
+    canTxMsg.data[7] = (unsigned char)(bmsData.RemCap >> 24);
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Get DTC log data handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetLogData(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_BALANCE_DATA; /*	*/
+    canTxMsg.J1939.pduFormat   = PF_GET_BALANCE_DATA; /*	*/
 
     for (unsigned char i = 0; i < DTC_LOG_LENGTH; i++) {
-        canTxMsg.data[i] = LOW_BYTE(eepEmg.ErrorCode[i]);
+        canTxMsg.data[i]     = LOW_BYTE(eepEmg.ErrorCode[i]);
         canTxMsg.data[i + 1] = HIGH_BYTE(eepEmg.ErrorCode[i]);
     }
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Get DTC flag handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void PF_GetDtcFlag(CAN_MSG_t *canRxMsg) {
     CAN_MSG_t canTxMsg;
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat = PF_GET_BALANCE_DATA; /*	*/
+    canTxMsg.J1939.pduFormat   = PF_GET_BALANCE_DATA; /*	*/
     // TODO:
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
-
+/**
+ * @brief      Set communication address handler 
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetCommAddr(CAN_MSG_t *canRxMsg) {
-    bool sendNack = true;
+    bool          sendNack      = true;
     unsigned char NewBmsAddress = 0;
 
     if (gEngrMode == true) {
@@ -738,21 +802,37 @@ static void CMD_SetCommAddr(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set manufactured date handler 
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetMfgDate(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
 
-        eepBms.FactoryDay = canRxMsg->data[0];
-        eepBms.FactoryMonth = canRxMsg->data[1];
-        LOW_BYTE(eepBms.FactoryYear) = canRxMsg->data[2];
+        eepBms.FactoryDay             = canRxMsg->data[0];
+        eepBms.FactoryMonth           = canRxMsg->data[1];
+        LOW_BYTE(eepBms.FactoryYear)  = canRxMsg->data[2];
         HIGH_BYTE(eepBms.FactoryYear) = canRxMsg->data[3];
     }
 }
-
+/**
+ * @brief      Set first group of serial nember handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetSN1(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
-        gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
+        gEngrTimeoutCount   = CAN_ENGR_MODE_TIMEOUT;
         eepBms.SerialNum[0] = canRxMsg->data[0];
         eepBms.SerialNum[1] = canRxMsg->data[1];
         eepBms.SerialNum[2] = canRxMsg->data[2];
@@ -763,18 +843,34 @@ static void CMD_SetSN1(CAN_MSG_t *canRxMsg) {
         eepBms.SerialNum[7] = canRxMsg->data[7];
     }
 }
-
+/**
+ * @brief      Set second group of serial nember handler 
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetSN2(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
-        gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
-        eepBms.SerialNum[8] = canRxMsg->data[0];
-        eepBms.SerialNum[9] = canRxMsg->data[1];
+        gEngrTimeoutCount    = CAN_ENGR_MODE_TIMEOUT;
+        eepBms.SerialNum[8]  = canRxMsg->data[0];
+        eepBms.SerialNum[9]  = canRxMsg->data[1];
         eepBms.SerialNum[10] = canRxMsg->data[2];
         eepBms.SerialNum[11] = canRxMsg->data[3];
         eepBms.SerialNum[12] = canRxMsg->data[4];
     }
 }
-
+/**
+ * @brief      Write data into EEPROM command handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_WriteParam2Eeprom(CAN_MSG_t *canRxMsg) {
     bool sendNack = true;
 
@@ -795,17 +891,25 @@ static void CMD_WriteParam2Eeprom(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
-
-static void CMD_ExcuteCtrlCmd(CAN_MSG_t *canRxMsg) {
+/**
+ * @brief      Executed control command handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void CMD_ExecuteCtrlCmd(CAN_MSG_t *canRxMsg) {
     unsigned short subCmd;
-    bool sendNack = true;
+    bool           sendNack = true;
 
     HIGH_BYTE(subCmd) = canRxMsg->data[0];
-    LOW_BYTE(subCmd) = canRxMsg->data[1];
+    LOW_BYTE(subCmd)  = canRxMsg->data[1];
 
     switch (subCmd) {
         case SUB_CMD_HV_CTRL:
-            gMbmsRelayCmd = (BMS_WORK_MODE_e) canRxMsg->data[2];
+            gMbmsRelayCmd = (BMS_WORK_MODE_e)canRxMsg->data[2];
             // remote_work_cmd_check();
             sendNack = false;
             break;
@@ -813,7 +917,6 @@ static void CMD_ExcuteCtrlCmd(CAN_MSG_t *canRxMsg) {
         case SUB_CMD_SYS_RESET:
             if (0x47 == canRxMsg->data[2]) {
                 gMbmsRelayCmd = BMS_RESET;
-                // Reset() ;
             }
             break;
 
@@ -837,21 +940,29 @@ static void CMD_ExcuteCtrlCmd(CAN_MSG_t *canRxMsg) {
         MBMS_Ack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Enter engineer mode handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_EnterEngrMode(CAN_MSG_t *canRxMsg) {
     unsigned short key;
-    bool sendNack = true;
+    bool           sendNack = true;
 
     gEngrMode = false;
 
     if ((0xAA == canRxMsg->data[2]) && (0x55 == canRxMsg->data[3])) {
-        LOW_BYTE(key) = canRxMsg->data[4]; // 取出驗証Key碼
+        LOW_BYTE(key)  = canRxMsg->data[4];  // 取出驗証Key碼
         HIGH_BYTE(key) = canRxMsg->data[5];
 
         if (key == MBMS_GetSecurityKey(seed)) {
-            gEngrMode = true;
-            sendNack = false;
-            seed = key; // 清除Seed記錄
+            gEngrMode         = true;
+            sendNack          = false;
+            seed              = key;  // 清除Seed記錄
             gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
 
             MBMS_Ack(canRxMsg);
@@ -862,21 +973,29 @@ static void CMD_EnterEngrMode(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
-
-static void CMD_ExtensionTime(CAN_MSG_t *canRxMsg) {
+/**
+ * @brief      Extend engineer mode time handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+static void CMD_ExtendTime(CAN_MSG_t *canRxMsg) {
     unsigned short key;
-    bool sendNack = true;
+    bool           sendNack = true;
 
     gEngrMode = false;
 
     if ((0xAA == canRxMsg->data[2]) && (0x55 == canRxMsg->data[3])) {
-        LOW_BYTE(key) = canRxMsg->data[4]; // 取出驗証Key碼
+        LOW_BYTE(key)  = canRxMsg->data[4];  // 取出驗証Key碼
         HIGH_BYTE(key) = canRxMsg->data[5];
 
         if (key == MBMS_GetSecurityKey(seed)) {
-            gEngrMode = true;
-            sendNack = false;
-            seed = key; // 清除Seed記錄
+            gEngrMode         = true;
+            sendNack          = false;
+            seed              = key;  // 清除Seed記錄
             gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
 
             MBMS_Ack(canRxMsg);
@@ -887,43 +1006,83 @@ static void CMD_ExtensionTime(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set current sensor parameter handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetCurrParam(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
-        MBMS_SetGroupParam(CurrParamGroup, sizeof (CurrParamGroup) / sizeof (CurrParamGroup[0]), canRxMsg);
+        MBMS_SetGroupParam(CurrParamGroup, sizeof(CurrParamGroup) / sizeof(CurrParamGroup[0]), canRxMsg);
     } else {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set voltage parameter handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetVoltParam(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
-        MBMS_SetGroupParam(VoltParamGroup, sizeof (VoltParamGroup) / sizeof (VoltParamGroup[0]), canRxMsg);
+        MBMS_SetGroupParam(VoltParamGroup, sizeof(VoltParamGroup) / sizeof(VoltParamGroup[0]), canRxMsg);
     } else {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set temperature parameter handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetTempParam(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
-        MBMS_SetGroupParam(TempParamGroup, sizeof (TempParamGroup) / sizeof (TempParamGroup[0]), canRxMsg);
+        MBMS_SetGroupParam(TempParamGroup, sizeof(TempParamGroup) / sizeof(TempParamGroup[0]), canRxMsg);
     } else {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set others parameter handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetOtherParam(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
-        MBMS_SetGroupParam(OtherParamGroup, sizeof (OtherParamGroup) / sizeof (OtherParamGroup[0]), canRxMsg);
+        MBMS_SetGroupParam(OtherParamGroup, sizeof(OtherParamGroup) / sizeof(OtherParamGroup[0]), canRxMsg);
     } else {
         MBMS_Nack(canRxMsg);
     }
 }
-
+/**
+ * @brief      Set current sensor calibration parameter handler
+ *
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetCurrCalibParam(CAN_MSG_t *canRxMsg) {
     unsigned short cmd;
 
@@ -931,18 +1090,18 @@ static void CMD_SetCurrCalibParam(CAN_MSG_t *canRxMsg) {
         gEngrTimeoutCount = CAN_ENGR_MODE_TIMEOUT;
 
         HIGH_BYTE(cmd) = canRxMsg->data[0];
-        LOW_BYTE(cmd) = canRxMsg->data[1];
+        LOW_BYTE(cmd)  = canRxMsg->data[1];
 
         switch (cmd) {
             case 0x3000:
-                LOW_BYTE(eepSpe.AdcZeroOffset) = canRxMsg->data[2];
+                LOW_BYTE(eepSpe.AdcZeroOffset)  = canRxMsg->data[2];
                 HIGH_BYTE(eepSpe.AdcZeroOffset) = canRxMsg->data[3];
 
                 CURRSNSR_ParamSet(eepSpe.AdcZeroOffset, eepSpe.AdcGainOffset);
                 break;
 
             case 0x3010:
-                LOW_BYTE(eepSpe.AdcGainOffset) = canRxMsg->data[2];
+                LOW_BYTE(eepSpe.AdcGainOffset)  = canRxMsg->data[2];
                 HIGH_BYTE(eepSpe.AdcGainOffset) = canRxMsg->data[3];
 
                 CURRSNSR_ParamSet(eepSpe.AdcZeroOffset, eepSpe.AdcGainOffset);
@@ -954,36 +1113,56 @@ static void CMD_SetCurrCalibParam(CAN_MSG_t *canRxMsg) {
         }
     }
 }
-
+/**
+ * @brief      Remote control relay handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_RemoteCtrlRealy(CAN_MSG_t *canRxMsg) {
     if ((canRxMsg->data[4] == 0x12) && (canRxMsg->data[5] == 0x34)) {
-        gMbmsRelayCmd = (BMS_WORK_MODE_e) canRxMsg->data[2];
+        gMbmsRelayCmd = (BMS_WORK_MODE_e)canRxMsg->data[2];
     }
-
     gMbmsTimeoutCount = MBMS_COMM_TIMEOUT;
 }
-
+/**
+ * @brief      Set battery cell balance parameter handler
+ * 
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_SetBalanceParam(CAN_MSG_t *canRxMsg) {
-    bmsData.Balance.Mode = (BALANCE_MODE_e) canRxMsg->data[0];
-    bmsData.Balance.VoltDiff = canRxMsg->data[1];
-    LOW_BYTE(bmsData.Balance.Volt) = canRxMsg->data[2];
+    bmsData.Balance.Mode            = (BALANCE_MODE_e)canRxMsg->data[0];
+    bmsData.Balance.VoltDiff        = canRxMsg->data[1];
+    LOW_BYTE(bmsData.Balance.Volt)  = canRxMsg->data[2];
     HIGH_BYTE(bmsData.Balance.Volt) = canRxMsg->data[3];
 }
-
+/**
+ * @brief      Enter Bootloader handler
+ *
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void CMD_EnterBootloader(CAN_MSG_t *canRxMsg) {
     if (gEngrMode == true) {
         gEngrMode = false;
 
         if ((canRxMsg->data[0] == 0x0A) && (canRxMsg->data[1] == 0x55)) {
-            if (HV_StatusGet() == HV_OFF) {
-                /* 填入0xAA，進入bootload程式段 */
-                /*
-                write_int_eep(EEP_BOOTLOAD, 0xAA) ;
-                Reset() ;
-                 */
-                // set_bootload_2_eeprom();
-                gMbmsRelayCmd = BMS_RESET;
-            }
+            // TODO: Add bootloader trigger pattern
+            // ramStart[0] = BTL_TRIGGER_PATTERN;
+            // ramStart[1] = BTL_TRIGGER_PATTERN;
+            // ramStart[2] = BTL_TRIGGER_PATTERN;
+            // ramStart[3] = BTL_TRIGGER_PATTERN;
+            gMbmsRelayCmd = BMS_RESET;
         }
     }
     canRxMsg->data[0] = 0x01;
@@ -991,7 +1170,15 @@ static void CMD_EnterBootloader(CAN_MSG_t *canRxMsg) {
     canRxMsg->data[2] = 0x00;
     MBMS_Nack(canRxMsg);
 }
-
+/**
+ * @brief      Get MBMS PF commands and respond with corresponding data
+ *
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void MBMS_DataGet(CAN_MSG_t *canRxMsg) {
     MBMS.pfCommand = canRxMsg->data[1];
     switch (MBMS.pfCommand) {
@@ -1048,7 +1235,15 @@ static void MBMS_DataGet(CAN_MSG_t *canRxMsg) {
             break;
     }
 }
-
+/**
+ * @brief      Check CANbus queue message tasks and execute MBMS commands
+ *
+ * @param      canRxMsg pointer of CAN bus message
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg) {
     if ((canRxMsg->dlc == J1939_DATA_LENGTH) && (canRxMsg->J1939.sourceAddress != J1939_GLOBAL_ADDRESS)) {
         MBMS.commad = canRxMsg->J1939.pduFormat;
@@ -1073,13 +1268,13 @@ void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg) {
             CMD_WriteParam2Eeprom(canRxMsg);
             break;
         case CMD_EX_CTRL_CMD:
-            CMD_ExcuteCtrlCmd(canRxMsg);
+            CMD_ExecuteCtrlCmd(canRxMsg);
             break;
         case CMD_ENTER_ENGR_MODE:
             CMD_EnterEngrMode(canRxMsg);
             break;
         case CMD_EXT_TIME:
-            CMD_ExtensionTime(canRxMsg);
+            CMD_ExtendTime(canRxMsg);
             break;
         case CMD_SET_CURR_PARAM:
             CMD_SetCurrParam(canRxMsg);
@@ -1110,21 +1305,43 @@ void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg) {
             break;
     }
 }
-
+/**
+ * @brief      Get MBMS mode command
+ *
+ * @return     BMS_WORK_MODE_e
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 BMS_WORK_MODE_e MBMS_RelayCommandGet(void) {
     BMS_WORK_MODE_e ret = BMS_OFF;
-    if (gMbmsRelayCmd <= BMS_DISCHG_PRE_ON) {
-        ret = gMbmsRelayCmd;
-    }
+    ret                 = gMbmsRelayCmd;
     return ret;
 }
-
+/**
+ * @brief      Get engineer mode status
+ *
+ * @return     true   in engineer mode
+ * @return     false  not in engineer mode
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 bool MBMS_EngrModeStatusGet(void) {
     bool ret = false;
-    ret = gEngrMode;
+    ret      = gEngrMode;
     return ret;
 }
-
+/**
+ * @brief      MBMS 1ms polling tasks
+ *
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-19
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void MBMS_1ms_tasks(void) {
     if (gMbmsTimeoutCount) {
         gMbmsTimeoutCount--;
@@ -1134,6 +1351,8 @@ void MBMS_1ms_tasks(void) {
     }
     if (gEngrTimeoutCount) {
         gEngrTimeoutCount--;
+    } else {
+        gEngrMode = false;
     }
     seedRandom++;
 }

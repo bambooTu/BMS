@@ -1,8 +1,37 @@
-#include "indicator.h"
+/**
+ * @file       indicator.c
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
+ */
 
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
+
+/* USER CODE END GD */
+
+/* Includes ------------------------------------------------------------------*/
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "indicator.h"
 #include "definitions.h"
 #include "dtc.h"
+/* USER CODE END Includes */
 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 #define INDICATOR_ON         GLED_Set()
 #define INDICATOR_OFF        GLED_Clear()
 #define INDICATOR_STAT       GLED_Get()
@@ -12,13 +41,43 @@
 #define LONG_DELAY_INTVL_MS  2500
 #define SHORT_INTVL_MS       250
 #define SHORT_DELAY_INTVL_MS 1500
+/* USER CODE END PD */
 
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+bool GlobalVariables = false;
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
 static DTC_FAULT_t   FaultIndicator      = {.l = 0};
 static DTC_FAULT_t   FaultIndicatorMask  = {.l = 0};
 static DTC_EVENT_e   FaultIndicatorIndex = 0;
 static INTERVAL_e    IntervalStep        = INVTERVAL_RESET;
 static unsigned char fCompleteARound     = true;
+/* USER CODE END PV */
 
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
+
+/* USER CODE END FP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/**
+ * @brief      
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void IND_WithoutFault(void) {
     static uint16_t IntervalCount = 0;
     if (IntervalCount >= NO_FAULT_INTVL_MS) {
@@ -27,7 +86,18 @@ static void IND_WithoutFault(void) {
     }
     IntervalCount += 1;
 }
-
+/**
+ * @brief      
+ * 
+ * @param      longCount 
+ * @param      shortCount 
+ * @param      IntervalStep 
+ * @param      fCompleteARound 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
                           unsigned char* fCompleteARound) {
     static unsigned char  ShortIntervalCount = 0;
@@ -86,7 +156,14 @@ static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INT
     }
     IntervalCount += 1;
 }
-
+/**
+ * @brief      
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void IND_Initialize(void) {
     INDICATOR_OFF;
     FaultIndicatorMask.l              = 0x1FFFFFFFF;
@@ -94,7 +171,14 @@ void IND_Initialize(void) {
     FaultIndicatorMask.b.EMERGENCY    = 0;
     FaultIndicatorMask.b.CURR_DIR_ERR = 0;
 }
-
+/**
+ * @brief      
+ * 
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-24
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
 void IND_1ms_Tasks(void) {
     FaultIndicator.l          = DTC_FaultMapGet();
     FaultIndicator.l          = FaultIndicator.l & FaultIndicatorMask.l;
@@ -122,6 +206,7 @@ void IND_1ms_Tasks(void) {
         IND_WithoutFault();
     }
 }
+/* USER CODE END 0 */
 
 /*******************************************************************************
  End of File

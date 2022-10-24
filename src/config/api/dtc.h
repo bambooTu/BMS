@@ -1,47 +1,41 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       dtc.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
-
 #ifndef _DTC_H /* Guard against multiple inclusion */
 #define _DTC_H
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
+extern "C" {
+
+#endif
+// DOM-IGNORE-END
+
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 #include <stdbool.h>  // Defines true
 #include <stddef.h>   // Defines NULL
 #include <stdlib.h>   // Defines EXIT_FAILURE
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* USER CODE END GD */
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Constants                                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Includes ------------------------------------------------------------------*/
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 typedef union {
     struct {
         unsigned OCCP              : 1; /**Charge Over Current Protection*/
@@ -149,30 +143,53 @@ typedef struct {
     int*           source;
     FAULT_PARAM_t* ptrObject;
 } DTC_FAULT_CHECK_TABLE_t;
+/* USER CODE END PTD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
 void               DTC_Initialize(void);
 void               DTC_1ms_Tasks(void);
 unsigned long long DTC_FaultMapGet(void);
 bool               DTC_FaultEventGet(DTC_EVENT_e event);
+void               DTC_FaultMaskSet(DTC_EVENT_e event);
+void               DTC_FaultMaskClear(DTC_EVENT_e event);
 void               DTC_FaultOccurSet(DTC_EVENT_e event);
 void               DTC_FaultOccurClear(DTC_EVENT_e event);
 unsigned short     DTC_ErrorCodeGet(DTC_EVENT_e DTC);
 ERROR_LEVEL_e      DTC_ErrorLevelGet(DTC_EVENT_e DTC);
 ERROR_LEVEL_e      DTC_WorstLevelGet(void);
+/* USER CODE END FP */
 
-extern volatile const DTC_MESSAGE_TABLE_t DTC_BMS_Message_Table[DTC_EVENT_MAX_NUM];
-/* Provide C++ Compatibility */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _DTC_H  */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+#endif /* _DTC_H */
+/*******************************************************************************
  End of File
  */

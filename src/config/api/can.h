@@ -99,9 +99,7 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-
 /* USER CODE BEGIN PTD */
-
 typedef enum {
     CL_DEVICE_SLAVE = 0x05,  // Controlled devices such as BMS Host, BMS, MBMS,
     // parallel controller, Slave device etc.
