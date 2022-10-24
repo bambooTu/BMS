@@ -1,69 +1,79 @@
-/* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/**
+ * @file       current_sensor.h
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @brief      
+ * @version    0.1
+ * @date       2022-10-24
+ * 
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ * 
+ * Abbreviation: 
+ * None
  */
-/* ************************************************************************** */
-
 #ifndef _CURRENT_SENSOR_H /* Guard against multiple inclusion */
 #define _CURRENT_SENSOR_H
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-#include "can.h"
-/* This section lists the other files that are included in this file.
- */
-
-/* TODO:  Include other files here if needed. */
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
 extern "C" {
+
 #endif
+// DOM-IGNORE-END
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Constants                                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+/* Global define -------------------------------------------------------------*/
+/* USER CODE BEGIN GD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
+/* USER CODE END GD */
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Interface Functions
-// *****************************************************************************
-// *****************************************************************************
+/* Includes ------------------------------------------------------------------*/
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "can.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Global variables -----------------------------------------------------------*/
+/* USER CODE BEGIN GV */
+
+/* USER CODE END GV */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Function prototypes -------------------------------------------------------*/
+/* USER CODE BEGIN FP */
 void CURRSNSR_ParamSet(short gainOffset, short zeroOffset);
-void CURRSNSR_CheckQueueTasks(CAN_MSG_t canRxMsg);
 void CURRSNSR_Intialize(void);
 void CURRSNSR_10ms_Tasks(void);
+/* USER CODE END FP */
 
-/* Provide C++ Compatibility */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _EXAMPLE_FILE_NAME_H */
-
-/* *****************************************************************************
+// DOM-IGNORE-END
+#endif /* _CURRENT_SENSOR_H */
+/*******************************************************************************
  End of File
  */
