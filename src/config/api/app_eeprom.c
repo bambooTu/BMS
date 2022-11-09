@@ -30,7 +30,7 @@ typedef enum {
     EEPROM_READING,
     EEPROM_WRITING,
     EEPROM_MAX
-} EEPROM_OPERATION_STATUS_e; /*Operation Status*/
+} EEPROM_OPERATION_STATUS_e; // Operation Status
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -82,7 +82,7 @@ struct {
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void APP_EepromWordWrite(unsigned int* ptrData, unsigned int dataSize, unsigned int startAddr) {
+static void APP_EEPROM_WordWrite(unsigned int* ptrData, unsigned int dataSize, unsigned int startAddr) {
     for (unsigned int i = 0; i < dataSize; i++) {
         EEPROM_WordWrite(startAddr, *(ptrData + i));
         while (EEPROM_IsBusy() == true)
@@ -102,7 +102,7 @@ static void APP_EepromWordWrite(unsigned int* ptrData, unsigned int dataSize, un
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void APP_EepromWordRead(unsigned int* ptrData, unsigned int dataSize, unsigned int startAddr) {
+static void APP_EEPROM_WordRead(unsigned int* ptrData, unsigned int dataSize, unsigned int startAddr) {
     for (unsigned int i = 0; i < dataSize; i++) {
         EEPROM_WordRead(startAddr, ptrData + i);
         while (EEPROM_IsBusy() == true)
@@ -122,7 +122,7 @@ static void APP_EepromWordRead(unsigned int* ptrData, unsigned int dataSize, uns
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static unsigned char APP_EepromChecksumCalculate(unsigned char* ptrData, unsigned short dataSize) {
+static unsigned char APP_EEPROM_ChecksumCalculate(unsigned char* ptrData, unsigned short dataSize) {
     unsigned char checkSum = 0;
 
     for (unsigned short i = 0; i < dataSize; i++) {
@@ -141,7 +141,7 @@ static unsigned char APP_EepromChecksumCalculate(unsigned char* ptrData, unsigne
  * @date       2022-08-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromPageErase(unsigned int startAddr, unsigned int dataSize) {
+void APP_EEPROM_PageErase(unsigned int startAddr, unsigned int dataSize) {
     for (unsigned int i = 0; i < dataSize; i++) {
         EEPROM_PageErase(startAddr);
         while (EEPROM_IsBusy() == true)
@@ -151,53 +151,59 @@ void APP_EepromPageErase(unsigned int startAddr, unsigned int dataSize) {
 }
 /**
  * @brief      Read data from EEPROM when APP start
- *
- * @return     unsigned char
+ * 
+ * @return     true  successful
+ * @return     false checksum error
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @date       2022-08-19
+ * @date       2022-10-26
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-unsigned char APP_EepromInitialize(void) {
+bool APP_EEPROM_Initialize(void) {
     bool          ret      = false;
     unsigned char checkSum = 0;
-    /* Read all EEPROM data*/
-    APP_EepromWordRead((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
+    // Read all EEPROM data
+    APP_EEPROM_WordRead((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
                        EEPROM_SPE_START_ADDR);
-    APP_EepromWordRead((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
+    APP_EEPROM_WordRead((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
                        EEPROM_EMG_START_ADDR);
-    APP_EepromWordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
+    APP_EEPROM_WordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
                        EEPROM_BMS_START_ADDR);
 
-    /*If Chip is new, write default data into EEPROM*/
+    // If Chip is new, write default data into EEPROM
     if (0xFF == eepSpe.BmsAddr) {
         eepEmg          = eepEmgDef;
         eepSpe          = eepSpeDef;
         eepBms          = eepBmsDef;
-        checkSum        = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
+        checkSum        = APP_EEPROM_ChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum = checkSum;
-        // NVM_PageEraseTasks();
-        APP_EepromWordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
+        
+        APP_EEPROM_WordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to word
                             EEPROM_SPE_START_ADDR);
-        APP_EepromWordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
+        APP_EEPROM_WordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to word
                             EEPROM_EMG_START_ADDR);
-        APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
+        APP_EEPROM_WordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to word
                             EEPROM_BMS_START_ADDR);
-    } /* If key & SVN value is different from default value , write data into EERPOM */
+        ret = true;
+    } 
+    // If key & SVN value is different from default value , write data into EERPOM 
     else if ((EEP_KEY_ID != eepBms.EepromKey) || (SVN_NUMBER != eepBms.EepromSVN)) {
         eepBms          = eepBmsDef;
-        checkSum        = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
+        checkSum        = APP_EEPROM_ChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum = checkSum;
-        APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4, EEPROM_BMS_START_ADDR);
-    } /* If checkSum value is different from EEPROM ,Set DTC  */
+        APP_EEPROM_WordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4, EEPROM_BMS_START_ADDR);
+        ret = true;
+    } 
+    // If checkSum value is different from EEPROM ,Set DTC
     else {
-        APP_EepromWordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
+        APP_EEPROM_WordRead((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
                            EEPROM_BMS_START_ADDR);
-        checkSum = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
+        checkSum = APP_EEPROM_ChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
+        ret = true;
         if (checkSum != eepBms.CheckSum) {
             DTC_FaultOccurSet(DTC_EEPROM_CHECKSUM);
-        }
-        ret = true;
+            ret = false;
+        }  
     }
     return ret;
 }
@@ -210,8 +216,8 @@ unsigned char APP_EepromInitialize(void) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromBmsWrite(void) {
-    eepWriteCmd.Bms = true;
+void APP_EEPROM_BmsWrite(void) {
+    eepWriteCmd.Bms = true;   
 }
 /**
  * @brief      Write emergency data to EEPROM
@@ -221,7 +227,7 @@ void APP_EepromBmsWrite(void) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromEmergencyWrite(void) {
+void APP_EEPROM_EmergencyWrite(void) {
     eepEmg.ChgCap    = bmsData.ChgCap;
     eepEmg.CycleLife = bmsData.CycleLife;
     eepEmg.DisChgCap = bmsData.DischgCap;
@@ -235,7 +241,7 @@ void APP_EepromEmergencyWrite(void) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromSpecialWrite(void) {
+void APP_EEPROM_SpecialWrite(void) {
     eepWriteCmd.Spe = true;
 }
 /**
@@ -246,24 +252,24 @@ void APP_EepromSpecialWrite(void) {
  * @date       2022-09-01
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void APP_EepromTasks(void) {
+void APP_EEPROM_Tasks(void) {
     if (eepWriteCmd.Emg == true) {
         eepOpStatus     = EEPROM_WRITING;
         eepWriteCmd.Emg = false;
-        APP_EepromWordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to Word
+        APP_EEPROM_WordWrite((unsigned int*)&eepEmg, EEPROM_EMG_SIZE / 4,  // Byte to Word
                             EEPROM_EMG_START_ADDR);
     } else if (eepWriteCmd.Spe == true) {
         eepOpStatus     = EEPROM_WRITING;
         eepWriteCmd.Spe = false;
-        APP_EepromWordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to Word
+        APP_EEPROM_WordWrite((unsigned int*)&eepSpe, EEPROM_SPE_SIZE / 4,  // Byte to Word
                             EEPROM_SPE_START_ADDR);
     } else if (eepWriteCmd.Bms == true) {
         unsigned char checkSum = 0;
         eepOpStatus            = EEPROM_WRITING;
         eepWriteCmd.Bms        = false;
-        checkSum               = APP_EepromChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
+        checkSum               = APP_EEPROM_ChecksumCalculate((unsigned char*)&eepBms, EEPROM_BMS_SIZE - 1);
         eepBms.CheckSum        = checkSum;
-        APP_EepromWordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
+        APP_EEPROM_WordWrite((unsigned int*)&eepBms, EEPROM_BMS_SIZE / 4,  // Byte to Word
                             EEPROM_BMS_START_ADDR);
     } else {
         eepOpStatus = EEPROM_READY;

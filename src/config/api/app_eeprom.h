@@ -59,11 +59,11 @@ extern "C" {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-unsigned char APP_EepromInitialize(void);
-void          APP_EepromBmsWrite(void);
-void          APP_EepromEmergencyWrite(void);
-void          APP_EepromSpecialWrite(void);
-void          APP_EepromTasks(void);
+unsigned char APP_EEPROM_Initialize(void);
+void          APP_EEPROM_BmsWrite(void);
+void          APP_EEPROM_EmergencyWrite(void);
+void          APP_EEPROM_SpecialWrite(void);
+void          APP_EEPROM_Tasks(void);
 /* USER CODE END FP */
 
 /* Private user code ---------------------------------------------------------*/
