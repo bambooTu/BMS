@@ -179,10 +179,10 @@ static void BMS_Emergency(void) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void BMS_CommandDetect(void) {
-    // TODO: Engineer mode
-
-    if (MBMS_EngrModeStatusGet() == true) {
-        switch (MBMS_RelayCommandGet()) {
+    if ((MBMS_EngrModeStatusGet() == true)  // When entering engineer mode
+        && (DIN_StateGet(DIN_4) == false)   // ,EMS does not press
+        && (fEmrgProcess == false)) {       // and BMS_Emergency() is not executed
+        switch (MBMS_RelayCommandGet()) {   // MBMS can enforce PDU status
             case BMS_CHG_ON:
                 BMS_ModeCommand(BMS_CHG_ON);
                 break;
@@ -338,6 +338,8 @@ void BMS_Crtl_1ms_Tasks(void) {
             HV_ModeCommand(MODE_PRECHG);
             break;
         default:
+            bmsData.SysStatus = SYS_TURN_OFF;
+            HV_ModeCommand(MODE_OFF);
             break;
     }
 }
