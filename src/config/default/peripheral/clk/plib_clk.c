@@ -54,9 +54,8 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "plib_clk.h"
-
 #include "device.h"
+#include "plib_clk.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -83,12 +82,14 @@
     function of the 'configuration bits' to configure the system oscillators.
 */
 
-void CLK_Initialize(void) {
+void CLK_Initialize( void )
+{
     /* unlock system for clock configuration */
     SYSKEY = 0x00000000;
     SYSKEY = 0xAA996655;
     SYSKEY = 0x556699AA;
 
+ 
     /* Set up Reference Clock 1 */
     /* REFO1CON register */
     /* ROSEL =  SYSCLK */
@@ -103,19 +104,19 @@ void CLK_Initialize(void) {
     /* Enable oscillator (ON bit) and Enable Output (OE bit) */
     REFO1CONSET = 0x00001000 | 0x00008000;
 
+  
+
     /* Peripheral Module Disable Configuration */
 
-    //CFGCONbits.PMDLOCK = 0;
 
     PMD1 = 0x171;
     PMD2 = 0x17001f;
     PMD3 = 0xffffffff;
-    PMD4 = 0xfff01f7;
+    PMD4 = 0xffe01f7;
     PMD5 = 0x30e3f2f;
     PMD6 = 0xf0d0000;
     PMD7 = 0x0;
 
-    // CFGCONbits.PMDLOCK = 1;
 
     /* Lock system since done with clock configuration */
     SYSKEY = 0x33333333;

@@ -49,7 +49,7 @@
  *     Constants
  *----------------------------------------------------------------------------*/
 #define CLASSB_SRAM_FINAL_WORD_ADDRESS (0xa003fffcU)
-#define CLASSB_SRAM_BUFF_START_ADDRESS (0xA0000600U)
+#define CLASSB_SRAM_BUFF_START_ADDRESS (0xA0000200U)
 #define CLASSB_SRAM_TEMP_STACK_ADDRESS (0xA0000400U)
 #define CLASSB_SRAM_ALL_32BITS_HIGH    (0xFFFFFFFFU)
 

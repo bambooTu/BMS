@@ -14,6 +14,8 @@
         "dtc.h": "c",
         "indicator.h": "c",
         "hv_setup.h": "c",
-        "debounce.h": "c"
+        "debounce.h": "c",
+        "csnv500.h": "c",
+        "sys_parameter_api.h": "c"
     }
 }

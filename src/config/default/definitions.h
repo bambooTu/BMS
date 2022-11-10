@@ -63,6 +63,7 @@
 #include "peripheral/coretimer/plib_coretimer.h"
 #include "peripheral/tmr/plib_tmr4.h"
 #include "peripheral/eeprom/plib_eeprom.h"
+#include "peripheral/mcpwm/plib_mcpwm.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

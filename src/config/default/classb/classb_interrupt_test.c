@@ -85,9 +85,9 @@ Notes  : None.
 void __attribute__((interrupt(IPL1SRS))) _CLASSB_TMR2_Handler(void) {
     IFS0CLR = _IFS0_T2IF_MASK;
     (*interrupt_count)++;
-#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
-    __builtin_software_breakpoint();
-#endif
+//#if (defined(__DEBUG) || defined(__DEBUG)) && defined(__XC32)
+//    __builtin_software_breakpoint();
+//#endif
 }
 
 /*============================================================================

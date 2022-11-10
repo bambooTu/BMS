@@ -59,7 +59,7 @@ extern "C" {
  *     Constants
  *----------------------------------------------------------------------------*/
 #define CLASSB_SRAM_TEST_BUFFER_SIZE (512U)         // Do not modify
-#define CLASSB_SRAM_APP_AREA_START   (0xA0000800U)  // Do not modify
+#define CLASSB_SRAM_APP_AREA_START   (0xA0000400U)  // Do not modify
 
 /*----------------------------------------------------------------------------
  *     Data types
