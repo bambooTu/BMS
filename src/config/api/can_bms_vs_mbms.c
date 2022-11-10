@@ -21,6 +21,7 @@
 /* USER CODE BEGIN Includes */
 #include "can_bms_vs_mbms.h"
 
+#include "app_eeprom.h"
 #include "bms_ctrl.h"
 #include "can_bms_vs_bmu.h"
 #include "commonly_used.h"
@@ -286,6 +287,7 @@ static void MBMS_GetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tabl
 static void MBMS_SetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tableMax, CAN_MSG_t *canRxMsg) {
     unsigned char  i      = 0;
     unsigned short subCmd = 0;
+    unsigned char  Var8   = 0;
     unsigned short Var16  = 0;
     unsigned int   Var32  = 0;
 
@@ -295,21 +297,22 @@ static void MBMS_SetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tabl
         if (subCmd == (ptrTable + i)->subCmd) {
             switch ((ptrTable + i)->length) {
                 case 1:
-                    canRxMsg->data[2] = *((unsigned char *)((ptrTable + i)->ptrVariable));
+                    Var8                                              = canRxMsg->data[2];
+                    *((unsigned char *)((ptrTable + i)->ptrVariable)) = Var8;
                     break;
 
                 case 2:
-                    Var16             = *((unsigned short *)((ptrTable + i)->ptrVariable));
-                    canRxMsg->data[2] = (unsigned char)(Var16 & 0xFF);
-                    canRxMsg->data[3] = (unsigned char)((Var16 & 0xFF00) >> 8);
+                    LOW_BYTE(Var16)                                    = canRxMsg->data[2];
+                    HIGH_BYTE(Var16)                                   = canRxMsg->data[3];
+                    *((unsigned short *)((ptrTable + i)->ptrVariable)) = Var16;
                     break;
 
                 case 4:
-                    Var32             = *((unsigned int *)((ptrTable + i)->ptrVariable));
-                    canRxMsg->data[2] = (unsigned char)(Var32 & 0xFF); /* LSB */
-                    canRxMsg->data[3] = (unsigned char)((Var32 & 0xFF00) >> 8);
-                    canRxMsg->data[4] = (unsigned char)((Var32 & 0xFF0000) >> 16);
-                    canRxMsg->data[5] = (unsigned char)((Var32 & 0xFF000000) >> 24); /* MSB */
+                    Var32 = ((unsigned int)canRxMsg->data[2]);
+                    Var32 |= ((unsigned int)canRxMsg->data[3]) << 8;
+                    Var32 |= ((unsigned int)canRxMsg->data[4]) << 16;
+                    Var32 |= ((unsigned int)canRxMsg->data[5]) << 24;
+                    *((unsigned int *)((ptrTable + i)->ptrVariable)) = Var32;
                     break;
 
                 default:
@@ -322,7 +325,9 @@ static void MBMS_SetGroupParam(const PARAM_POINT_t *ptrTable, unsigned char tabl
     }
 
     if (i >= tableMax) {
-        canRxMsg->J1939.pduFormat = 0xE8; /* NACK */
+        MBMS_Nack(canRxMsg);
+    } else {
+        MBMS_Ack(canRxMsg);
     }
 }
 
@@ -496,9 +501,10 @@ static void PF_GetOtherGrpParam(CAN_MSG_t *canRxMsg) {
         CAN_PushTxQueue(CAN_1, &canTxMsg);
     }
 }
+
 /**
  * @brief      Get current sensor calibration parameter data handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -532,9 +538,10 @@ static void PF_GetCurrCalibParam(CAN_MSG_t *canRxMsg) {
     canTxMsg.data[5] = *(((unsigned char *)(&bmsData.BusCurrent)) + 3);
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
+
 /**
  * @brief      Get system data handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -603,9 +610,10 @@ static void PF_GetSystemParam(CAN_MSG_t *canRxMsg) {
     DTC_FaultOccurClear(DTC_MBMS_COMM);
     gMbmsTimeoutCount = MBMS_COMM_TIMEOUT;
 }
+
 /**
  * @brief      Get battery cell date handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -664,9 +672,10 @@ static void PF_GetCellData(CAN_MSG_t *canRxMsg) {
     canTxMsg.data[7] = 0xAA;
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
+
 /**
  * @brief      Get battery cell balance date handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -690,9 +699,10 @@ static void PF_GetBalanceData(CAN_MSG_t *canRxMsg) {
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
+
 /**
  * @brief      Get coulomb gauge data handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -710,16 +720,17 @@ static void PF_GetCoulombGaugeData(CAN_MSG_t *canRxMsg) {
     canTxMsg.data[1] = bmsData.SOC;
     canTxMsg.data[2] = LOW_BYTE(eepEmg.CycleLife);
     canTxMsg.data[3] = HIGH_BYTE(eepEmg.CycleLife);
-    canTxMsg.data[4] = (unsigned char)(bmsData.RemCap);
-    canTxMsg.data[5] = (unsigned char)(bmsData.RemCap >> 8);
-    canTxMsg.data[6] = (unsigned char)(bmsData.RemCap >> 16);
-    canTxMsg.data[7] = (unsigned char)(bmsData.RemCap >> 24);
+    canTxMsg.data[4] = (unsigned char)((unsigned int)bmsData.RemCap);
+    canTxMsg.data[5] = (unsigned char)((unsigned int)bmsData.RemCap >> 8);
+    canTxMsg.data[6] = (unsigned char)((unsigned int)bmsData.RemCap >> 16);
+    canTxMsg.data[7] = (unsigned char)((unsigned int)bmsData.RemCap >> 24);
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
+
 /**
  * @brief      Get DTC log data handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -740,28 +751,56 @@ static void PF_GetLogData(CAN_MSG_t *canRxMsg) {
 
     CAN_PushTxQueue(CAN_1, &canTxMsg);
 }
+
 /**
  * @brief      Get DTC flag handler
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void PF_GetDtcFlag(CAN_MSG_t *canRxMsg) {
-    CAN_MSG_t canTxMsg;
+    CAN_MSG_t          canTxMsg;
+    unsigned long long dtcBitMap;
+    unsigned char      sectionNum = 1;
+    unsigned char      startByte  = 2;
+
+    dtcBitMap = DTC_LatchMapGet();
     MBMS_XferMsgInit(&canTxMsg);
 
     canTxMsg.J1939.pduSpecific = canRxMsg->J1939.sourceAddress;
-    canTxMsg.J1939.pduFormat   = PF_GET_BALANCE_DATA; /*	*/
-    // TODO:
-    CAN_PushTxQueue(CAN_1, &canTxMsg);
+    canTxMsg.J1939.pduFormat   = PF_GET_DTC_FLAG; /*	*/
+
+    canTxMsg.data[0] = DTC_EVENT_MAX_NUM;
+    canTxMsg.data[1] = sectionNum;
+
+    for (unsigned char i = 0; i < ((DTC_EVENT_MAX_NUM / 8) + 1); i++) {
+        canTxMsg.data[startByte++] = (dtcBitMap >> (8 * i)) & 0xFF;
+        /* Clear fault code reocrds */
+        DTC_LatchMapByteClear(i);
+
+        if (startByte > (J1939_DATA_LENGTH - 1)) {
+            CAN_PushTxQueue(CAN_1, &canTxMsg);
+
+            /* Next section  */
+            for (startByte = 0; startByte < J1939_DATA_LENGTH; startByte++) {
+                canTxMsg.data[startByte] = 0xAA;
+            }
+            startByte = 2;
+            sectionNum++;
+            canTxMsg.data[0] = DTC_EVENT_MAX_NUM;
+            canTxMsg.data[1] = sectionNum;
+        }
+    }
+    CAN_PushTxQueue(CAN_1, &canTxMsg);  // Last section
 }
+
 /**
- * @brief      Set communication address handler 
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ * @brief      Set communication address handler
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
@@ -789,7 +828,7 @@ static void CMD_SetCommAddr(CAN_MSG_t *canRxMsg) {
             // TODO:SetAddressFilter(eepSpe.BmsAddr, false);
 
             /* 寫入EEPROM */
-            // TODO:set_fixed_para_2_eeprom();
+            APP_EEPROM_SpecialWrite();
 
             MBMS_Ack(canRxMsg); /* 用新的通訊位址再回應一次 */
         }
@@ -802,10 +841,11 @@ static void CMD_SetCommAddr(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
- * @brief      Set manufactured date handler 
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ * @brief      Set manufactured date handler
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
@@ -821,10 +861,11 @@ static void CMD_SetMfgDate(CAN_MSG_t *canRxMsg) {
         HIGH_BYTE(eepBms.FactoryYear) = canRxMsg->data[3];
     }
 }
+
 /**
  * @brief      Set first group of serial nember handler
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
@@ -843,10 +884,11 @@ static void CMD_SetSN1(CAN_MSG_t *canRxMsg) {
         eepBms.SerialNum[7] = canRxMsg->data[7];
     }
 }
+
 /**
- * @brief      Set second group of serial nember handler 
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ * @brief      Set second group of serial nember handler
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
@@ -862,10 +904,11 @@ static void CMD_SetSN2(CAN_MSG_t *canRxMsg) {
         eepBms.SerialNum[12] = canRxMsg->data[4];
     }
 }
+
 /**
  * @brief      Write data into EEPROM command handler
- * 
- * @param      canRxMsg pointer of CAN bus message 
+ *
+ * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-19
@@ -879,9 +922,9 @@ static void CMD_WriteParam2Eeprom(CAN_MSG_t *canRxMsg) {
         if ((canRxMsg->data[0] == 0x55) && (canRxMsg->data[1] == 0xA5)) {
             sendNack = false;
 
-            // TODO: set_fixed_para_2_eeprom();
-            // TODO: set_parameter_2_eeprom();
-            // TODO: set_emergency_2_eeprom();
+            // TODO: APP_EEPROM_BmsWrite();
+            // TODO: APP_EEPROM_EmergencyWrite();
+            // TODO: APP_EEPROM_SpecialWrite();
 
             MBMS_Ack(canRxMsg);
         }
@@ -891,9 +934,10 @@ static void CMD_WriteParam2Eeprom(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Executed control command handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -925,7 +969,7 @@ static void CMD_ExecuteCtrlCmd(CAN_MSG_t *canRxMsg) {
                 for (unsigned i = 0; i < DTC_LOG_LENGTH; i++) {
                     eepEmg.ErrorCode[i] = 0x0000;
                 }
-                // TODO:set_emergency_2_eeprom();
+                APP_EEPROM_EmergencyWrite();
                 sendNack = false;
             }
             break;
@@ -940,9 +984,10 @@ static void CMD_ExecuteCtrlCmd(CAN_MSG_t *canRxMsg) {
         MBMS_Ack(canRxMsg);
     }
 }
+
 /**
  * @brief      Enter engineer mode handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -973,9 +1018,10 @@ static void CMD_EnterEngrMode(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Extend engineer mode time handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1006,9 +1052,10 @@ static void CMD_ExtendTime(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Set current sensor parameter handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1023,9 +1070,10 @@ static void CMD_SetCurrParam(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Set voltage parameter handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1040,9 +1088,10 @@ static void CMD_SetVoltParam(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Set temperature parameter handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1057,9 +1106,10 @@ static void CMD_SetTempParam(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Set others parameter handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1074,6 +1124,7 @@ static void CMD_SetOtherParam(CAN_MSG_t *canRxMsg) {
         MBMS_Nack(canRxMsg);
     }
 }
+
 /**
  * @brief      Set current sensor calibration parameter handler
  *
@@ -1113,9 +1164,10 @@ static void CMD_SetCurrCalibParam(CAN_MSG_t *canRxMsg) {
         }
     }
 }
+
 /**
  * @brief      Remote control relay handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1128,9 +1180,10 @@ static void CMD_RemoteCtrlRealy(CAN_MSG_t *canRxMsg) {
     }
     gMbmsTimeoutCount = MBMS_COMM_TIMEOUT;
 }
+
 /**
  * @brief      Set battery cell balance parameter handler
- * 
+ *
  * @param      canRxMsg pointer of CAN bus message
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -1143,6 +1196,7 @@ static void CMD_SetBalanceParam(CAN_MSG_t *canRxMsg) {
     LOW_BYTE(bmsData.Balance.Volt)  = canRxMsg->data[2];
     HIGH_BYTE(bmsData.Balance.Volt) = canRxMsg->data[3];
 }
+
 /**
  * @brief      Enter Bootloader handler
  *
@@ -1170,6 +1224,7 @@ static void CMD_EnterBootloader(CAN_MSG_t *canRxMsg) {
     canRxMsg->data[2] = 0x00;
     MBMS_Nack(canRxMsg);
 }
+
 /**
  * @brief      Get MBMS PF commands and respond with corresponding data
  *
@@ -1235,6 +1290,7 @@ static void MBMS_DataGet(CAN_MSG_t *canRxMsg) {
             break;
     }
 }
+
 /**
  * @brief      Check CANbus queue message tasks and execute MBMS commands
  *
@@ -1305,6 +1361,7 @@ void MBMS_CheckQueueTasks(CAN_MSG_t *canRxMsg) {
             break;
     }
 }
+
 /**
  * @brief      Get MBMS mode command
  *
@@ -1319,6 +1376,7 @@ BMS_WORK_MODE_e MBMS_RelayCommandGet(void) {
     ret                 = gMbmsRelayCmd;
     return ret;
 }
+
 /**
  * @brief      Get engineer mode status
  *
@@ -1334,6 +1392,7 @@ bool MBMS_EngrModeStatusGet(void) {
     ret      = gEngrMode;
     return ret;
 }
+
 /**
  * @brief      MBMS 1ms polling tasks
  *
