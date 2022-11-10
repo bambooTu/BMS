@@ -229,7 +229,7 @@ int main(void) {
                 CURRSNSR_Intialize();
                 CG_Initialize(&bmsData);
                 DIN_ParameterInitialize();
-
+                DTC_Initialize();
                 // Delay to APP_STATE_SERVICE_TASKS
                 if (!appData.bootTimeCount) {
                     appData.state = APP_STATE_SERVICE_TASKS;
