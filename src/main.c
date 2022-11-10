@@ -262,6 +262,12 @@ int main(void) {
                     tmrData._20ms.flag = false;
                     CG_20ms_Tasks(&bmsData);  // Coulomb gauge data process
                 }
+
+                if (tmrData._100ms.flag) {
+                    tmrData._100ms.flag = false;
+                    MAIN_CLASSB_RuntimeChecks();  // Runtime classb check
+                }
+
                 if (tmrData._500ms.flag) {
                     tmrData._500ms.flag = false;
                     runtimeClassBChecks();
@@ -283,24 +289,61 @@ int main(void) {
 
     return (EXIT_FAILURE);
 }
+/**
+ * @brief
+ *
+ * @return     true
+ * @return     false
+ * @version    0.1
+ * @author     Tu (Bamboo.Tu@amitatech.com)
+ * @date       2022-10-28
+ * @copyright  Copyright (c) 2022 Amita Technologies Inc.
+ */
+bool MAIN_CLASSB_RuntimeChecks(void) {
+    bool                 ret_val                = false;
+    static unsigned char runtimeTestState       = CLASSB_TEST_CPU;
+    uint16_t             clock_test_tmr1_cycles = 0;
+    CLASSB_TEST_STATUS   classb_rst_status      = CLASSB_TEST_NOT_EXECUTED;
 
-bool runtimeClassBChecks(void) {
-    bool               ret_val            = false;
-    CLASSB_TEST_STATUS classb_rst1_status = CLASSB_TEST_NOT_EXECUTED;
-    CLASSB_TEST_STATUS classb_rst2_status = CLASSB_TEST_NOT_EXECUTED;
-    
-    __builtin_disable_interrupts();
-    classb_rst1_status = CLASSB_CPU_RegistersTest(true);
-    __builtin_enable_interrupts();
-    classb_rst2_status =
-       CLASSB_FlashCRCTest(FLASH_START_ADDR, CLASSB_FLASH_TEST_BUFFER_SIZE,crc_val[0], true);
+    switch (runtimeTestState) {
+        case CLASSB_TEST_CPU:
+            __builtin_disable_interrupts();
+            classb_rst_status = CLASSB_CPU_RegistersTest(true);
+            __builtin_enable_interrupts();
 
-    if ((classb_rst1_status == CLASSB_TEST_PASSED) && (classb_rst2_status == CLASSB_TEST_PASSED)) {
-        ret_val = true;
+            runtimeTestState = CLASSB_TEST_FLASH;
+            break;
+        case CLASSB_TEST_FLASH:
+            classb_rst_status = CLASSB_FlashCRCTest(FLASH_START_ADDR, CLASSB_FLASH_RUNTIME_TEST_SIZE, crc_val[0], true);
+
+            runtimeTestState = CLASSB_TEST_RAM;
+            break;
+        case CLASSB_TEST_RAM:
+            __builtin_disable_interrupts();
+            classb_rst_status = CLASSB_SRAM_MarchTestInit((uint32_t *)CLASSB_SRAM_APP_AREA_START,
+                                                          CLASSB_SRAM_RUNTIME_TEST_SIZE, CLASSB_SRAM_MARCH_C, true);
+            __builtin_enable_interrupts();
+
+            runtimeTestState = CLASSB_TEST_CLOCK;
+            break;
+        case CLASSB_TEST_CLOCK:
+            clock_test_tmr1_cycles = ((5 * CLASSB_CLOCK_TEST_RATIO_NS_MS) / CLASSB_CLOCK_TEST_TMR1_RATIO_NS);
+            classb_rst_status      = CLASSB_ClockTest(CLASSB_CLOCK_DEFAULT_CLOCK_FREQ, CLASSB_CLOCK_ERROR_PERCENT,
+                                                      clock_test_tmr1_cycles, true);
+
+            runtimeTestState = CLASSB_TEST_CPU;
+            break;
+        default:
+            runtimeTestState = CLASSB_TEST_CPU;
+            break;
     }
 
+    if (classb_rst_status == CLASSB_TEST_PASSED) {
+        ret_val = true;
+    }
     return ret_val;
 }
+/* USER CODE END 0 */
 /*******************************************************************************
  End of File
  */
