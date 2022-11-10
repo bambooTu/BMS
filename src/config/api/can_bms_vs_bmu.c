@@ -563,12 +563,23 @@ void BMU_Initialize(void) {
 
 void BMU_CheckQueueTasks(CAN_MSG_t canRxMsg) {
     BMU_ResponseCheck(BMU_ID, canRxMsg);
+    if (canRxMsg.id == 0x15000001) {
+        testBusVolt = canRxMsg.data[0] + (canRxMsg.data[1] << 8) + (canRxMsg.data[2] << 16) + (canRxMsg.data[3] << 24);
+        testBusCurrent =
+            canRxMsg.data[4] + (canRxMsg.data[5] << 8) + (canRxMsg.data[6] << 16) + (canRxMsg.data[7] << 24);
+    } else if (canRxMsg.id == 0x15000002) {
+        testMaxTcell = canRxMsg.data[0] + (canRxMsg.data[1] << 8) + (canRxMsg.data[2] << 16) + (canRxMsg.data[3] << 24);
+        testMinTcell = canRxMsg.data[4] + (canRxMsg.data[5] << 8) + (canRxMsg.data[6] << 16) + (canRxMsg.data[7] << 24);
+    } else if (canRxMsg.id == 0x15000003) {
+        testMaxVcell = canRxMsg.data[0] + (canRxMsg.data[1] << 8) + (canRxMsg.data[2] << 16) + (canRxMsg.data[3] << 24);
+        testMinVcell = canRxMsg.data[4] + (canRxMsg.data[5] << 8) + (canRxMsg.data[6] << 16) + (canRxMsg.data[7] << 24);
+    }
 }
 
 /*TODO: 1ms TimeCount Handle*/
 void BMU_1ms_Tasks(void) {
     BMU_CtrlSM();
-    // TODO:BMU_DataInterchange();
+    BMU_DataInterchange();
     if (BMU_responseTimeoutCount) {
         BMU_responseTimeoutCount--;
     }
