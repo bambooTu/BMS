@@ -1,13 +1,13 @@
 /**
  * @file       commonly_used.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-24
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _COMMONLY_USED_H /* Guard against multiple inclusion */
@@ -50,6 +50,15 @@ extern "C" {
             }                       \
         } while (0);                \
         __ret;                      \
+    })
+
+#define SWAP(A, B)     \
+    ({                 \
+        do {           \
+            A = A - B; \
+            B = A + B; \
+            A = B - A; \
+        } while (0);   \
     })
 /* USER CODE END GD */
 
