@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "coulomb_gauge.h"
+
 #include "commonly_used.h"
 #include "sys_parameter.h"
 /* USER CODE END Includes */
@@ -77,9 +78,8 @@ volatile const double OCV_Table[SOH2SFULLCAP_TABLE_SIZE] = {0,
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-static bool          fDischgCapFull  = false;
+static bool          fDischgCapFull = false;
 static unsigned char cgTaskState    = 0;
-static unsigned char selfDischgCurr = 0;
 /* USER CODE END PV */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -89,6 +89,7 @@ static unsigned char selfDischgCurr = 0;
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 /**
  * @brief      Calculate state of health
  *
@@ -103,6 +104,7 @@ static void Calculate_SOH(BMS_DATA_t *self) {
     Decay                = self->CycleLife + self->DecayCoefficient;
     self->SOH            = (unsigned char)Lookup_Table(Decay, Decay2SOH_BP, Decay2SOH_Table, DECAY2SOH_TABLE_SIZE);
 }
+
 /**
  * @brief      Calculate state of charge
  *
@@ -118,6 +120,7 @@ static void Calculate_SOC(BMS_DATA_t *self) {
         self->SOC = 100;
     }
 }
+
 /**
  * @brief      Calculate battery remaining capacity
  *
@@ -140,6 +143,7 @@ static void Calculate_BattRemCap(BMS_DATA_t *self) {
         self->DischgCap = 0;
     }
 }
+
 /**
  * @brief      Calculate cycleLife
  *
@@ -161,6 +165,7 @@ static void Calculate_CycleLife(BMS_DATA_t *self) {
     } else {
     }
 }
+
 /**
  * @brief      Coulomb counter
  *
@@ -172,12 +177,12 @@ static void Calculate_CycleLife(BMS_DATA_t *self) {
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
 static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
-    period_ms = 1000 / period_ms;
-
+    period_ms                      = 3600 * 1000 / period_ms;
+    static float selfDischgCurrent = 0;
     if (self->BusCurrent > 0) {  // Charging
-        self->ChgCap = self->ChgCap + (self->BusCurrent / period_ms / 3600.0f);
+        self->ChgCap += (self->BusCurrent / (float)period_ms);
     } else if (self->BusCurrent < 0) {  // Discharging
-        self->DischgCap = self->DischgCap + ((-1) * self->BusCurrent / period_ms / 3600.0f);
+        self->DischgCap += ((-1) * self->BusCurrent / (float)period_ms);
     }
     selfDischgCurrent += (SELF_DISCHG_CURRENT / (float)period_ms);
     self->DischgCap += (SELF_DISCHG_CURRENT / (float)period_ms);
@@ -194,6 +199,7 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
 //         self->DecayCoefficient += 2;
 //     }
 // }
+
 /**
  * @brief      OCV point calibrate charge/discharge capacity
  *
@@ -205,15 +211,15 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
  */
 static void Calibration_OcvPoint(BMS_DATA_t *self) {
     if (self->BusCurrent > 0) {  // Charging
-        if ((self->MinVcell > 3420UL) && (self->SOC < 80)) {
-            self->ChgCap += (CELL_DESIGN_CAP * (0.0001f));
-        } else if ((self->MinVcell > 3454UL) && (self->SOC < 90)) {
+        if ((self->MinVcell > 3948UL) && (self->SOC < 85)) {
             self->ChgCap += (CELL_DESIGN_CAP * (0.0002f));
+        } else if ((self->MinVcell > 4086UL) && (self->SOC < 95)) {
+            self->ChgCap += (CELL_DESIGN_CAP * (0.0005f));
         } else {
         }
     } else if (self->BusCurrent < 0) {  // Discharging
-        if ((self->MinVcell < 3055UL) && (self->SOC > 5)) {
-            self->DischgCap += (CELL_DESIGN_CAP * 0.0004f);
+        if ((self->MinVcell < 3468UL) && (self->SOC > 5)) {
+            self->DischgCap += (CELL_DESIGN_CAP * 0.0005f);
         }
     }
 
@@ -224,11 +230,12 @@ static void Calibration_OcvPoint(BMS_DATA_t *self) {
             self->ChgCap    = self->RemCap;
             self->DischgCap = 0;
         } else if (self->BusCurrent > 0) {
-            self->ChgCap += (CELL_DESIGN_CAP * 0.0005f);
+            self->ChgCap += (CELL_DESIGN_CAP * 0.001f);
         } else {
         }
     }
 }
+
 /**
  * @brief      SOH calibrate full capacity
  *
@@ -241,6 +248,7 @@ static void Calibration_OcvPoint(BMS_DATA_t *self) {
 static void Calibration_SOH2FullCap(BMS_DATA_t *self) {
     self->FullCap = Lookup_Table(self->SOH, SOH2FullCap_BP, SOH2FullCap_Table, SOH2SFULLCAP_TABLE_SIZE);
 }
+
 /**
  * @brief      Update remaining capacity
  *
@@ -257,6 +265,7 @@ void CoulombGauge_UpdateRemCap(BMS_DATA_t *self, unsigned int newRemCap) {
     self->ChgCap    = self->RemCap;
     self->DischgCap = 0;
 }
+
 /**
  * @brief      Coulomb gauge parameter initialize
  *
@@ -273,6 +282,7 @@ static void CG_ParameterInitialize(BMS_DATA_t *self) {
     self->FullCap          = eepBms.FullCap;
     self->DecayCoefficient = eepBms.DecayCoefficient;
 }
+
 /**
  * @brief      Coulomb gauge initialize
  *
@@ -288,6 +298,7 @@ void CG_Initialize(BMS_DATA_t *self) {
     Calculate_BattRemCap(self);
     Calculate_SOC(self);
 }
+
 /**
  * @brief      Coulomb gauge polling tasks
  *
