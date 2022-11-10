@@ -42,10 +42,10 @@ typedef enum {
 } HV_OPERATION_MODE_e;
 
 typedef enum {
-    HV_OFF = 0, /**Relay Open*/
-    HV_PRECHG,  /**Relay Pre-Close*/
-    HV_ON,      /**Relay Close*/
-    HV_FAULT,
+    HV_OFF = 0, // Relay Open
+    HV_PRECHG,  // Relay Pre-Close
+    HV_ON,      // Relay Close
+    HV_FAULT,   
 } HV_STATUS_e;
 
 /* USER CODE END PTD */

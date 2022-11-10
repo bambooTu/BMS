@@ -8,7 +8,7 @@
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  * 
  * Abbreviation: 
- * None
+ * IND      Indicator
  */
 
 /* Global define -------------------------------------------------------------*/
@@ -50,7 +50,7 @@
 
 /* Global variables -----------------------------------------------------------*/
 /* USER CODE BEGIN GV */
-bool GlobalVariables = false;
+
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
@@ -71,14 +71,14 @@ static unsigned char fCompleteARound     = true;
 /* USER CODE BEGIN 0 */
 
 /**
- * @brief      
+ * @brief      The indicator light flashes when there is no fault
  * 
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-24
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void IND_WithoutFault(void) {
+static void IND_FlashWithoutFault(void) {
     static uint16_t IntervalCount = 0;
     if (IntervalCount >= NO_FAULT_INTVL_MS) {
         INDICATOR_TOGGLE;
@@ -87,18 +87,18 @@ static void IND_WithoutFault(void) {
     IntervalCount += 1;
 }
 /**
- * @brief      
+ * @brief      The indicator light flashes in the fault state
  * 
- * @param      longCount 
- * @param      shortCount 
- * @param      IntervalStep 
- * @param      fCompleteARound 
+ * @param      longCount Indicator long flashing times
+ * @param      shortCount Indicator short flashing times
+ * @param      IntervalStep State of Indicator
+ * @param      fCompleteARound 1 cycle status
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
  * @date       2022-10-24
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
+static void IND_FlashWithFault(unsigned char longCount, unsigned char shortCount, INTERVAL_e* IntervalStep,
                           unsigned char* fCompleteARound) {
     static unsigned char  ShortIntervalCount = 0;
     static unsigned char  LongIntervalCount  = 0;
@@ -157,7 +157,7 @@ static void IND_WithFault(unsigned char longCount, unsigned char shortCount, INT
     IntervalCount += 1;
 }
 /**
- * @brief      
+ * @brief      Indicator parameter initialize
  * 
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -172,7 +172,7 @@ void IND_Initialize(void) {
     FaultIndicatorMask.b.CURR_DIR_ERR = 0;
 }
 /**
- * @brief      
+ * @brief      Indicator 1ms polling tasks
  * 
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -197,13 +197,13 @@ void IND_1ms_Tasks(void) {
                 FaultIndicatorIndex = 0;
             }
         } else {
-            IND_WithFault(DTC_BMS_Message_Table[FaultIndicatorIndex - 1].longCount,
+            IND_FlashWithFault(DTC_BMS_Message_Table[FaultIndicatorIndex - 1].longCount,
                           DTC_BMS_Message_Table[FaultIndicatorIndex - 1].shortCount, &IntervalStep, &fCompleteARound);
         }
     } else {
         fCompleteARound     = true;
         FaultIndicatorIndex = 0;
-        IND_WithoutFault();
+        IND_FlashWithoutFault();
     }
 }
 /* USER CODE END 0 */

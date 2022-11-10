@@ -1,13 +1,13 @@
 /**
  * @file       mcp3421.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-24
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _MCP3421_H
@@ -22,7 +22,7 @@ extern "C" {
 
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */
-#define MCP3421_DEVICE_CDOE 0xD
+#define MCP3421_DEVICE_CDOE 0xD 
 #define I2C_TX_BUFFER_SIZE  8
 #define I2C_RX_BUFFER_SIZE  8
 /* USER CODE END GD */
@@ -31,11 +31,16 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "definitions.h" 
+#include "definitions.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef enum {
+    WRITE,
+    READ
+} I2C_R_W_e;
+
 typedef union {
     struct {
         unsigned r_w         : 1;
@@ -56,11 +61,7 @@ typedef union {
     unsigned char byte;
 } MCP3421_CONFIG_t;
 
-typedef enum {
-    WRITE,
-    READ
-} IIC_R_W_e;
-
+// PGA Gain
 typedef enum {
     GAIN1,
     GAIN2,
@@ -68,6 +69,7 @@ typedef enum {
     GAIN8
 } MCP3421_GAIN_e;
 
+// RESOLUTION SETTINGS VS. LSB
 typedef enum {
     RATE12BIT,
     RATE14BIT,
@@ -75,6 +77,7 @@ typedef enum {
     RATE18BIT,
 } MCP3421_RATE_e;
 
+// Conversion Mode
 typedef enum {
     ONE_SHOT_MODE,
     CONTINUOUS_MODE,
@@ -96,15 +99,13 @@ typedef enum {
 } APP_TRANSFER_STATUS_e;
 
 typedef struct {
-    /* The application's current state */
-    APP_STATES_e taskState;
-    APP_STATES_e pastState;
-    I2C_ERROR    errorState;
-    /* TODO: Define any additional data used by the application. */
-    unsigned char txBuffer[I2C_TX_BUFFER_SIZE];
-    unsigned char rxBuffer[I2C_RX_BUFFER_SIZE];
-    unsigned char errorCount;
-    unsigned char timeoutCount;
+    APP_STATES_e  taskState;                     // The application's current state
+    APP_STATES_e  pastState;                     // The application's past state
+    I2C_ERROR     errorState;                    // I2c error state
+    unsigned char txBuffer[I2C_TX_BUFFER_SIZE];  // I2c tx buffer
+    unsigned char rxBuffer[I2C_RX_BUFFER_SIZE];  // I2c rx buffer
+    unsigned char errorCount;                    // I2c tx error count
+    unsigned char timeoutCount;                  // I2c timeout count
 } APP_I2C_DATA_t;
 /* USER CODE END PTD */
 

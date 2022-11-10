@@ -27,8 +27,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /* USER CODE END PD */
-#define I2C_ERROR_TIMES   100
-#define I2C_TIMEOUT_TIMES 100
+#define I2C_ERROR_TIMES   100  // I2C transfer error times
+#define I2C_TIMEOUT_TIMES 100  // I2C receive timeout times
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
@@ -46,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 static volatile APP_TRANSFER_STATUS_e I2C1_XferStatus = APP_TRANSFER_STATUS_IN_PROGRESS;
-APP_I2C_DATA_t                        I2C1_data       = {};  // TODO : Static
+static APP_I2C_DATA_t                 I2C1_data       = {};
 static MCP3421_ADDR_t                 mcp3421_addr    = {};
 static MCP3421_CONFIG_t               mcp3421_config  = {};
 /* USER CODE END PV */
@@ -164,33 +164,31 @@ unsigned short MCP3421_AdcValueGet(void) {
 
         case APP_STATE_CHECK_SENSOR_READY:
             I2C1_data.pastState = APP_STATE_CHECK_SENSOR_READY;
-            if (I2C1_XferStatus == APP_TRANSFER_STATUS_SUCCESS) {
-                /* Sensor is ready. */
+            if (I2C1_XferStatus == APP_TRANSFER_STATUS_SUCCESS) {  // Sensor is ready.
                 I2C1_data.errorCount = 0;
                 I2C1_data.taskState  = APP_STATE_READ_ADC_VALUE;
-            } else if (I2C1_XferStatus == APP_TRANSFER_STATUS_ERROR) {
-                /* Sensor is not ready. */
+            } else if (I2C1_XferStatus == APP_TRANSFER_STATUS_ERROR) {  // Sensor is not ready.
                 I2C1_data.taskState = APP_STATE_XFER_ERROR;
             }
             break;
 
         case APP_STATE_READ_ADC_VALUE:
             I2C1_data.pastState = APP_STATE_READ_ADC_VALUE;
-            if (I2C1_XferStatus == APP_TRANSFER_STATUS_SUCCESS) {
+            if (I2C1_XferStatus == APP_TRANSFER_STATUS_SUCCESS) { 
                 I2C1_data.errorCount = 0;
                 adc_value            = (I2C1_data.rxBuffer[0] << 8) + I2C1_data.rxBuffer[1];
             } else if (I2C1_XferStatus == APP_TRANSFER_STATUS_ERROR) {
                 I2C1_data.taskState = APP_STATE_XFER_ERROR;
             }
             I2C1_XferStatus = APP_TRANSFER_STATUS_IN_PROGRESS;
-            if (MCP3421_ReadAdcCmd(mcp3421_addr.byte >> 1) == false) {
+            if (MCP3421_ReadAdcCmd(mcp3421_addr.byte >> 1) == false) {  
                 I2C1_data.taskState = APP_STATE_XFER_ERROR;
             }
             break;
 
         case APP_STATE_XFER_ERROR:
             if (I2C1_data.errorCount++ >= I2C_ERROR_TIMES) {
-                I2C1_data.errorCount = SATURATION(I2C1_data.errorCount, I2C_ERROR_TIMES, 0);  // Saturation the value
+                I2C1_data.errorCount = SATURATION(I2C1_data.errorCount, I2C_ERROR_TIMES, 0);
                 I2C1_data.taskState  = APP_STATE_IDLE;
             } else {
                 if (I2C1_data.pastState <= APP_STATE_CHECK_SENSOR_READY) {

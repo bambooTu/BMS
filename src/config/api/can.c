@@ -533,7 +533,7 @@ uint32_t CAN_GetRxQueueCount(CAN_MODULE_e Instance) {
 }
 
 /**
- * @brief      transfer queue data
+ * @brief      Transfer queue data
  * 
  * @param      Instance CAN Module number
  * @return     true 

@@ -36,9 +36,9 @@
 #define CURR_SNSR_TYPE          1             // 0:MCP3421 1:CSNV500
 #define CURR_SNSR_TIMEOUT_TIMES 10            // unit:10ms
 #define IP_VALUE_OFFSET         0x80000000UL  // ref. CSNV500 datasheet
-#define ADC_COEFFICIENT         19966L
-#define MOVING_AVG_TIMES        12L
-#define ZERO_THRESHOLD          0L
+#define ADC_COEFFICIENT         19966L        // ref. MCP3421 datasheet
+#define MOVING_AVG_TIMES        12L            
+#define ZERO_THRESHOLD          0L            // Crrent dead zone (mA) 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

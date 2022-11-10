@@ -8,8 +8,8 @@
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  *
  * Abbreviation:
- * HV  High-voltage
- * PDU power distribution unit
+ * HV       High-voltage
+ * PDU      power distribution unit
  *
  */
 
@@ -64,7 +64,6 @@ typedef struct {
 #define TURN_ON_POS_DELAY_MS      (500)
 #define TURN_OFF_POS_DELAY_MS     (500)
 #define TURN_OFF_NEG_DELAY_MS     (500)
-/*TODO:*/
 #define BACK_END_VOLT             (100)
 #define PRECHG_PERCENTAGE_SETTING (90)
 #define RELAY_NEG_OPEN            RELAY_NEG_Clear();     // TODO : Setting GPIO
@@ -73,8 +72,7 @@ typedef struct {
 #define RELAY_POS_CLOSE           RELAY_POS_Set();       // TODO : Setting GPIO
 #define RELAY_PRECHG_OPEN         RELAY_PRECHG_Clear();  // TODO : Setting GPIO
 #define RELAY_PRECHG_CLOSE        RELAY_PRECHG_Set();    // TODO : Setting GPIO
-#define PRECHG_CURRENT_OFFSET     200000                 // unit mA
-/*TODO:*/
+#define PRECHG_CURRENT_OFFSET     10000                  // unit mA
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -102,7 +100,7 @@ HV_DATA_t HV = {
 /* USER CODE BEGIN 0 */
 
 /**
- * @brief      High-voltage PDU trun on sequence
+ * @brief      High-voltage PDU turn on sequence
  *
  * @version    0.1
  * @author     Tu (Bamboo.Tu@amitatech.com)
@@ -167,8 +165,7 @@ static void HV_SeqTurnOn(void) {
                     HV.delayTimeCount = 0;
                     HV.opMode         = HV_PRECHG_START;
                 }
-            }
-            else{
+            } else {
                 RELAY_PRECHG_OPEN;
             }
             YLED_Set();  // TODO:Delete

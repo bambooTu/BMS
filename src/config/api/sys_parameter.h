@@ -35,22 +35,26 @@ extern "C" {
 /* section 2 */
 #define EEPROM_EMG_START_ADDR (EEPROM_START_ADDR + 0x800)
 #define EEPROM_EMG_END_ADDR   (EEPROM_START_ADDR + 0x8FF)
+
 /****** EEPROM Address 0x900 ~ 0xFFF Storage Special Parameter ******/
 /* section 3 */
 #define EEPROM_SPE_START_ADDR (EEPROM_START_ADDR + 0x900)
 #define EEPROM_SPE_END        (EEPROM_START_ADDR + 0xFFF)
 
 /*** EEPROM Initial Parameter ***/
-#define EEP_KEY_ID       0x55 /* BMS:0x55, BMU:0x65 */
+#define EEP_KEY_ID       0x55  // BMS:0x55, BMU:0x65
 #define SVN_NUMBER       202
-#define BMS_COMM_ADDR    0x00 /* Communication Address */
-#define HARDWARE_VER_0   1    /* Hardware Versiom */
+#define BMS_COMM_ADDR    0x00  // Communication Address
+/* Hardware Versiom */
+#define HARDWARE_VER_0   1
 #define HARDWARE_VER_1   0
 #define HARDWARE_VER_2   0
-#define FIRMWARE_VER_0   0 /* Firmware Version */
+/* Firmware Version */
+#define FIRMWARE_VER_0   0
 #define FIRMWARE_VER_1   0
-#define FIRMWARE_VER_2   0 /* LF-01 V000 */
-#define COMM_VER_MAJOR_0 0 /* Protocol Version  */
+#define FIRMWARE_VER_2   0  // LF-01 V000
+/* Protocol Version */
+#define COMM_VER_MAJOR_0 0
 #define COMM_VER_MAJOR_1 1
 #define COMM_VER_SUB_0   0
 #define COMM_VER_SUB_1   0
@@ -58,8 +62,8 @@ extern "C" {
 
 #define DTC_LOG_LENGTH 4
 
-#define CELL_DESIGN_CAP      78000UL /*unit:Ah*/
-#define CELL_DESIGN_MAX_VOLT 4100UL
+#define CELL_DESIGN_CAP      91000.0f  // unit:mAh
+#define CELL_DESIGN_MAX_VOLT 4177UL    // unit:mV
 /* USER CODE END GD */
 
 /* Includes ------------------------------------------------------------------*/
@@ -105,10 +109,10 @@ typedef struct {
     FAULT_PARAM_t BusOVW;   // Bus OverVoltage Warning
     FAULT_PARAM_t BusUVP;   // Bus UnderVoltage Protection
     FAULT_PARAM_t BusUVW;   // Bus UnderVoltage Warning
-    FAULT_PARAM_t CellUBP;  // Cell Unbalance VoltageWarning
-    FAULT_PARAM_t CellUBW;  // Cell Unbalance VoltageWarning
-    FAULT_PARAM_t CellOVP;  // Cell OverVoltage Warning
-    FAULT_PARAM_t CellUVP;  // Cell OverVoltage Warning
+    FAULT_PARAM_t CellUBP;  // Cell Unbalance Voltage Warning
+    FAULT_PARAM_t CellUBW;  // Cell Unbalance Voltage Warning
+    FAULT_PARAM_t CellOVP;  // Cell OverVoltage Protection
+    FAULT_PARAM_t CellUVP;  // Cell OverVoltage Protection
 
     /**OverCurrent**/
     FAULT_PARAM_t ODCP;  // Over Discharge Current Protection*
@@ -116,10 +120,10 @@ typedef struct {
     FAULT_PARAM_t OCCP;  // Over Charge Current Protection
     FAULT_PARAM_t OCCW;  // Over Charge Current Warning
 
-    unsigned short LockTimeOCP; /*unit:100mS*/
+    unsigned short LockTimeOCP;  // unit:100mS
 
     /*SOH Decay Coefficient*/
-    float          FullCap; /* unit: Ah */
+    float          FullCap;  // unit: mAh
     unsigned short DecayCoefficient;
 
     /***BMSFactoryDate***/
@@ -140,8 +144,8 @@ typedef struct {
 } EEPROM_BMS_t;
 
 typedef struct {
-    float          ChgCap;                     // unit:Ah  Fixed Eeprom Locations
-    float          DisChgCap;                  // unit:Ah Fixed Eeprom Locations
+    float          ChgCap;                     // unit:mAh Fixed Eeprom Locations
+    float          DisChgCap;                  // unit:mAh Fixed Eeprom Locations
     unsigned short CycleLife;                  // Fixed Eeprom Locations
     unsigned short ErrorCode[DTC_LOG_LENGTH];  // Diagnostic Trouble Code
 } EEPROM_EMERGENCY_t;
@@ -181,11 +185,11 @@ typedef struct {
 
     unsigned char  SOC;        // unit: %
     unsigned char  SOH;        // unit: %,According to the Cycle Life Calculation
-    unsigned int   RemCap;     // unit: mAh
-    unsigned int   ChgCap;     // unit: mAh
-    unsigned int   DischgCap;  // unit: mAh
-    unsigned int   FullCap;    // unit: mAh
-    unsigned int   DesingCap;  // unit: mAh
+    float          RemCap;     // unit: mAh
+    float          ChgCap;     // unit: mAh
+    float          DischgCap;  // unit: mAh
+    float          FullCap;    // unit: mAh
+    float          DesingCap;  // unit: mAh
     unsigned short CycleLife;  // Fixed Eeprom Locations
     unsigned short DecayCoefficient;
     /* Protection Flag */

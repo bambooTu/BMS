@@ -1,14 +1,17 @@
 /**
- * @file       Untitled-1
+ * @file       coulomb_gauge.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
- * @date       2022-10-24
- * 
+ * @date       2022-11-09
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
- * None
+ *
+ * Abbreviation:
+ * SOC          State Of Charge
+ * SOH          State Of Health
+ * FCC          Fully Charge Capacity
+ * OCV          Open Circuit Voltage
  */
 /* Global define -------------------------------------------------------------*/
 /* USER CODE BEGIN GD */

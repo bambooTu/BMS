@@ -1,13 +1,13 @@
 /**
  * @file       debounce.c
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-24
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 /* Global define -------------------------------------------------------------*/
@@ -20,7 +20,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "debounce.h"
-#include "definitions.h" 
+
+#include "definitions.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,8 +99,7 @@ static bool DIN_PinGet(DIN_MAPPING_e dinNum) {
             ret = !SW3_Get();
             break;
         case DIN_MAPPING_MAX:
-            ret = false;
-            break;
+            // jump to default
         default:
             ret = false;
             break;
@@ -138,7 +138,8 @@ static void DIN_Debounce(DIN_TASK_TABLE_t* ptrObj) {
  * @date       2022-09-13
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
  */
-void DIN_ParameterInitialize(void) {
+void DIN_Initialize(void) {
+    // Set the falling and rising edge debounce time 
     for (DIN_MAPPING_e i = DIN_1; i < DIN_MAPPING_MAX; i++) {
         gDinParamTable[i].debounceTime[RISING]  = 4;
         gDinParamTable[i].debounceTime[FALLING] = 4;

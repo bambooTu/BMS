@@ -35,30 +35,30 @@ extern "C" {
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 typedef enum {
-    SYS_INIT = 0,
-    SYS_TURN_OFF, /*Relay Open*/
-    SYS_TURN_ON,  /*Relay Close @ 0 Ampere*/
-    SYS_CHARGING,
-    SYS_DISCHARGING,
-    SYS_FAULT,      /*System Fault?Waiting For Reset*/
-    SYS_GOTO_RESET, /*Reset Mode*/
-    SYS_EMERGENCY,  /*Emergency Relay Off*/
-    SYS_PRE_ON,     /*PreChg Relay Close*/
+    SYS_INIT = 0,     // system initialization
+    SYS_TURN_OFF,     // Relay open
+    SYS_TURN_ON,      // Relay close @ 0 Ampere
+    SYS_CHARGING,     // System is charging
+    SYS_DISCHARGING,  // System is discharging
+    SYS_FAULT,        // System fault cccur and waiting for reset
+    SYS_GOTO_RESET,   // Reset mode
+    SYS_EMERGENCY,    // Emergency relay off
+    SYS_PRE_ON,       // PreChg relay close
     SYS_BMS_MAX
-} SYS_STATUS_e; /*BMS System Status*/
+} SYS_STATUS_e;  // BMS System Status
 
 typedef enum {
     /* Remote Control */
-    BMS_OFF = 0,       /* Power Off */
-    BMS_CHG_ON,        /* Remote Control Power On @ Charge Mode */
-    BMS_DISCHG_ON,     /* Remote Control Power On @ Discharge Mode */
-    BMS_CHG_PRE_ON,    /* Remote Control Pre-Power On @ Charge Mode @ Branch Parrellel */
-    BMS_DISCHG_PRE_ON, /* Remote Control Pre-Power On @ Discharge Mode @ Branch Parrellel */
+    BMS_OFF = 0,        // Power off
+    BMS_CHG_ON,         // Remote control power on @ Charge mode
+    BMS_DISCHG_ON,      // Remote control power on @ Discharge mode
+    BMS_CHG_PRE_ON,     // Remote control pre-Power on @ Charge mode @ Branch parrellel
+    BMS_DISCHG_PRE_ON,  // Remote control pre-Power on @ Discharge mode @ Branch parrellel
     /* Internal Control */
-    BMS_HAND_ON,     /* Manual Control */
-    BMS_RESET,       /* BMS software reset */
-    BMS_OCCUR_FAULT, /* BMS occur fault */
-    BMS_OCCUR_EMRG,  /* EMS is pressed occur */
+    BMS_HAND_ON,      // Manual control
+    BMS_RESET,        // BMS software reset
+    BMS_OCCUR_FAULT,  // BMS occur fault
+    BMS_OCCUR_EMRG,   // EMS is pressed occur
     BMS_CONTROL_MAX
 } BMS_WORK_MODE_e;
 

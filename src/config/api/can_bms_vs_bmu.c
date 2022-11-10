@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "can_bms_vs_bmu.h"
 
+#include "commonly_used.h"
 #include "sys_parameter.h"
 /* USER CODE END Includes */
 
@@ -110,6 +111,13 @@ unsigned int         gBmuFaultLed1msDEC       = 0;
 unsigned int         BMU_responseTimeoutCount = 0;
 unsigned char        BMU_rxMessageFlag        = 0;
 unsigned char        BMS_SourceAddrBackup     = 0;
+
+unsigned int testBusVolt    = 0;
+unsigned int testBusCurrent = 0;
+unsigned int testMaxTcell   = 0;
+unsigned int testMinTcell   = 0;
+unsigned int testMaxVcell   = 0;
+unsigned int testMinVcell   = 0;
 /* USER CODE END GV */
 
 /* Private variables ---------------------------------------------------------*/
@@ -265,7 +273,7 @@ static inline void BRANCH_XtrmVoltSearch(void) {
     unsigned char Bit;
     unsigned int  BmuVoltSum = 0;
 
-    /* Search  Max. Min. voltage value in Branch*/
+    /* Search  Max. Min. voltage value in Branch */
 
     BR.MaxVcell      = BR.BmuMaxVcell[0];
     BR.MaxVcellBmuID = 0;
@@ -298,8 +306,7 @@ static inline void BRANCH_XtrmVoltSearch(void) {
             //     }
             // }
 
-            /*** Calculate Total Voltage ***/
-            BmuVoltSum += BR.BmuVoltage[i];
+            BmuVoltSum += BR.BmuVoltage[i];  // Calculate Total Voltage
         }
     }
     BR.Voltage = BmuVoltSum;
@@ -377,7 +384,7 @@ static void BMU_CommStatusCheck(void) {
     }
     if (0 == Err) {
         ErrCnt = 0;
-        // TODO:clr_fault_event(DTC_BMU_COMM);
+        // TODO: clr_fault_event(DTC_BMU_COMM);
     } else {
         if (ErrCnt++ > 2) {
             // TODO: set_fault_occur(DTC_BMU_COMM);
@@ -443,6 +450,43 @@ static inline void BMU_DataInterchange(void) {
     bmsData.MinTcellBmuID = BR.MinTcellBmuID;
     bmsData.MinVcell      = BR.MinVcell;
     bmsData.MinVcellBmuID = BR.MinVcellBmuID;
+    bmsData.DeltaVolt     = bmsData.MaxVcell - bmsData.MinVcell;
+    bmsData.DeltaTemp     = bmsData.MaxTcell - bmsData.MinTcell;
+
+    bmsData.BusVolt_mV = testBusVolt;
+    bmsData.BusCurrent = testBusCurrent;
+    bmsData.MaxTcell   = testMaxTcell;
+    bmsData.MinTcell   = testMinTcell;
+    bmsData.MaxVcell   = testMaxVcell;
+    bmsData.MinVcell   = testMinVcell;
+
+    if (bmsData.MinTcell > bmsData.MaxTcell) {
+        SWAP(bmsData.MinTcell, bmsData.MaxTcell);
+    }
+    if (bmsData.MinVcell > bmsData.MaxVcell) {
+        SWAP(bmsData.MinVcell, bmsData.MaxVcell);
+    }
+    static unsigned char cnt = 0;
+    CAN_MSG_t            canTxMsg;
+    if (++cnt > 9) {
+        cnt = 0;
+
+        canTxMsg.id      = 0x15000000;
+        canTxMsg.dlc     = 8;
+        canTxMsg.data[0] = DTC_FaultEventGet(DTC_BUS_OVP) + (DTC_FaultEventGet(DTC_BUS_UVP) << 1) +
+                           (DTC_FaultEventGet(DTC_OCCP) << 2) + (DTC_FaultEventGet(DTC_ODCP) << 3) +
+                           (DTC_FaultEventGet(DTC_OTP) << 4) + (DTC_FaultEventGet(DTC_UTP) << 5) +
+                           (DTC_FaultEventGet(DTC_VCELL_OVP) << 6) + (DTC_FaultEventGet(DTC_VCELL_UVP) << 7);
+
+        canTxMsg.data[1] = 0;
+        canTxMsg.data[2] = bmsData.SysStatus;
+        canTxMsg.data[3] = 0;
+        canTxMsg.data[4] = 0;
+        canTxMsg.data[5] = 0;
+        canTxMsg.data[6] = 0;
+        canTxMsg.data[7] = 0;
+        CAN_PushTxQueue(CAN_4, &canTxMsg);
+    }
 }
 
 static void BMU_CtrlSM(void) {
@@ -472,7 +516,6 @@ static void BMU_CtrlSM(void) {
                     BMU_ID++;
                     BMU_taskState = BMS_BMU_REQ_CMD;
                 } else if (BMU_responseTimeoutCount == 0) {
-                    
                     if (++BMU_retryCount > 2) {
                         BMU_ResponseTimeout(BMU_ID);
                         BMU_retryCount = 0;
