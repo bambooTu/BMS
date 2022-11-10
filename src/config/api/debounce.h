@@ -63,7 +63,7 @@ typedef struct {
 
 /* Function prototypes -------------------------------------------------------*/
 /* USER CODE BEGIN FP */
-void DIN_ParameterInitialize(void);
+void DIN_Initialize(void);
 void DIN_5ms_Tasks(void);
 bool DIN_StateGet(DIN_MAPPING_e dinNum);
 /* USER CODE END FP */
