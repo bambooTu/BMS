@@ -1,13 +1,13 @@
 /**
  * @file       coulomb_gauge.h
  * @author     Tu (Bamboo.Tu@amitatech.com)
- * @brief      
+ * @brief
  * @version    0.1
  * @date       2022-10-24
- * 
+ *
  * @copyright  Copyright (c) 2022 Amita Technologies Inc.
- * 
- * Abbreviation: 
+ *
+ * Abbreviation:
  * None
  */
 #ifndef _COULOMB_GAUGE_H /* Guard against multiple inclusion */
@@ -42,6 +42,7 @@ extern "C" {
 #define DECAY2SOH_TABLE_SIZE    9
 #define SOH2SFULLCAP_TABLE_SIZE 11
 #define OCV_TABLE_SIZE          11
+#define SELF_DISCHG_CURRENT     (10.0f)  // unit:mA
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

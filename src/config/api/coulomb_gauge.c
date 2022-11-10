@@ -179,11 +179,8 @@ static void CG_CoulombCounter(BMS_DATA_t *self, unsigned int period_ms) {
     } else if (self->BusCurrent < 0) {  // Discharging
         self->DischgCap = self->DischgCap + ((-1) * self->BusCurrent / period_ms / 3600.0f);
     }
-
-    if (++selfDischgCurr > (3600 / 10 * period_ms)) {  // Self-Discharge
-        selfDischgCurr = 0;
-        self->DischgCap++;
-    }
+    selfDischgCurrent += (SELF_DISCHG_CURRENT / (float)period_ms);
+    self->DischgCap += (SELF_DISCHG_CURRENT / (float)period_ms);
 }
 // static void OCV_CorrectDecayCoefficient(BMS_DATA_t *self) {
 //     unsigned int OcvCap, DiffCap = 0;
