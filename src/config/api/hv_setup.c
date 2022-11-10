@@ -313,11 +313,17 @@ void HV_Initialize(void) {
  */
 void HV_1ms_Tasks(void) {
     bmsData.HvStatus = HV_StatusGet();
-    if ((HV.opMode == MODE_ON) || (HV.opMode == MODE_PRECHG)) {
-        HV_SeqTurnOn();
-    } else {
-        HV_SeqTurnOff();
-    }
+    switch (HV.opMode) {
+        default:
+        case MODE_EMRG:
+        case MODE_OFF:
+            HV_SeqTurnOff();
+            break;
+        case MODE_ON:
+        case MODE_PRECHG:
+            HV_SeqTurnOn();
+            break;
+        }
 }
 /* USER CODE END 0 */
 
